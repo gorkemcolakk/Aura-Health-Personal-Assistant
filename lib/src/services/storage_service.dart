@@ -50,7 +50,8 @@ class StorageService {
   Future<String?> loadApiKey() async {
     final prefs = await SharedPreferences.getInstance();
     final stored = prefs.getString('aura.api_key');
-    return stored ?? deepseekApiKey;
+    if (stored != null && stored.trim().isNotEmpty) return stored;
+    return deepseekApiKey;
   }
 
   Future<void> saveApiKey(String key) async {
