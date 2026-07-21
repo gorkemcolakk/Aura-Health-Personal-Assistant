@@ -11,6 +11,7 @@ class HealthFacility {
   final double lng;
   final double? rating;
   final bool openNow;
+  final double? distanceKm;
 
   const HealthFacility({
     required this.name,
@@ -20,6 +21,7 @@ class HealthFacility {
     required this.lng,
     this.rating,
     this.openNow = false,
+    this.distanceKm,
   });
 }
 
@@ -67,7 +69,7 @@ class PlacesService {
   Future<List<HealthFacility>> findNearbyHealthFacilities({
     required double lat,
     required double lng,
-    int maxDistanceKm = 5,
+    int maxDistanceKm = 3,
   }) async {
     final allResults = <HealthFacility>[];
 
@@ -110,6 +112,7 @@ class PlacesService {
               type: entry.key,
               lat: rLat,
               lng: rLng,
+              distanceKm: dist,
             ));
           }
         }

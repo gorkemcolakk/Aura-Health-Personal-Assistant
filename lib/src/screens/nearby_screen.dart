@@ -427,6 +427,15 @@ class _NearbyScreenState extends State<NearbyScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 8),
+                                  if (facility.distanceKm != null)
+                                    Text(
+                                      '${facility.distanceKm!.toStringAsFixed(1)} km',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: colors.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  const SizedBox(width: 4),
                                   const Icon(Icons.map, size: 20),
                                 ],
                               ),
