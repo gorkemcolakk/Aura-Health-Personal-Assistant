@@ -148,5 +148,4 @@ class PlacesService {
   }
 
   double _degToRad(double deg) => deg * pi / 180;
-  }
 }
