@@ -52,14 +52,31 @@ class _NearbyScreenState extends State<NearbyScreen> {
       );
 
       final location = LatLng(position.latitude, position.longitude);
-      setState(() => _currentLocation = location);
 
+      // Emülatör Mountain View sahte konumunu yakala, İstanbul'a düş
+      if (_isEmulatorLocation(location)) {
+        setState(() => _currentLocation = _defaultLocation);
+        _mapController.move(_defaultLocation, 12);
+        await _searchNearby(_defaultLocation);
+        return;
+      }
+
+      setState(() => _currentLocation = location);
       _mapController.move(location, 14);
       await _searchNearby(location);
     } catch (e) {
       setState(() => _loading = false);
       await _searchNearby(_defaultLocation);
     }
+  }
+
+  bool _isEmulatorLocation(LatLng loc) {
+    // Google HQ civarı (Mountain View / Palo Alto emülatör varsayılanı)
+    const emulatorLat = 37.42;
+    const emulatorLng = -122.08;
+    const tolerance = 0.5;
+    return (loc.latitude - emulatorLat).abs() < tolerance &&
+           (loc.longitude - emulatorLng).abs() < tolerance;
   }
 
   Future<bool> _handlePermission() async {
@@ -239,7 +256,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
             child: Row(
               children: [
                 Icon(Icons.local_hospital, color: colors.primary, size: 28),
@@ -258,6 +275,22 @@ class _NearbyScreenState extends State<NearbyScreen> {
               ],
             ),
           ),
+          // Konum bilgisi
+          if (_currentLocation != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: Row(
+                children: [
+                  Icon(Icons.location_on, size: 14, color: colors.primary),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${_currentLocation!.latitude.toStringAsFixed(4)}, ${_currentLocation!.longitude.toStringAsFixed(4)}'
+                    '${_currentLocation == _defaultLocation ? " (İstanbul)" : ""}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
           Expanded(
             flex: 3,
             child: ClipRRect(
