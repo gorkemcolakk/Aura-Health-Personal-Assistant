@@ -135,12 +135,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
         _loading = false;
       });
 
-      if (facilities.isNotEmpty) {
-        final bounds = _computeBounds(location, facilities);
-        _mapController.fitCamera(
-          CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(40)),
-        );
-      }
+      // Arama noktasına odaklan, tüm sonuçlara zoom out yapma
+      _mapController.move(location, 14);
     } catch (e) {
       setState(() {
         _loading = false;

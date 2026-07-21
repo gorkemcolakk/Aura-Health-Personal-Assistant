@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:http/http.dart' as http;
 
@@ -66,9 +67,12 @@ class PlacesService {
   Future<List<HealthFacility>> findNearbyHealthFacilities({
     required double lat,
     required double lng,
-    int radius = 10000,
+    int maxDistanceKm = 5,
   }) async {
     final allResults = <HealthFacility>[];
+
+    // 5km için yaklaşık 0.05 derece
+    final delta = maxDistanceKm / 111.0;
 
     for (final entry in _queries.entries) {
       try {
@@ -76,9 +80,9 @@ class PlacesService {
           '$_nominatimUrl/search'
           '?q=${Uri.encodeComponent(entry.value)}'
           '&format=json'
-          '&limit=15'
+          '&limit=20'
           '&bounded=1'
-          '&viewbox=${lng - 0.15},${lat - 0.15},${lng + 0.15},${lat + 0.15}',
+          '&viewbox=${lng - delta},${lat - delta},${lng + delta},${lat + delta}',
         );
 
         final response = await http.get(
@@ -93,30 +97,56 @@ class PlacesService {
           final results = jsonDecode(response.body) as List<dynamic>;
 
           for (final r in results) {
+            final rLat = double.tryParse(r['lat']?.toString() ?? '0') ?? 0;
+            final rLng = double.tryParse(r['lon']?.toString() ?? '0') ?? 0;
+
+            // Kesin mesafe filtresi (Haversine)
+            final dist = _haversineKm(lat, lng, rLat, rLng);
+            if (dist > maxDistanceKm) continue;
+
             allResults.add(HealthFacility(
               name: r['display_name']?.toString().split(',').first.trim() ?? 'Bilinmiyor',
               address: r['display_name']?.toString() ?? '',
               type: entry.key,
-              lat: double.tryParse(r['lat']?.toString() ?? '0') ?? 0,
-              lng: double.tryParse(r['lon']?.toString() ?? '0') ?? 0,
+              lat: rLat,
+              lng: rLng,
             ));
           }
         }
-      } catch (_) {
-        // Bir tipte hata olsa da diğerlerini dene
-      }
+      } catch (_) {}
 
-      // Nominatim rate limit: saniyede 1 istek
       await Future.delayed(const Duration(seconds: 1));
     }
 
-    // Duplicate'ları temizle
+    // Duplicate temizle ve mesafeye göre sırala
     final seen = <String>{};
-    return allResults.where((f) {
+    final filtered = allResults.where((f) {
       final key = '${f.name}_${f.lat}_${f.lng}';
       if (seen.contains(key)) return false;
       seen.add(key);
       return true;
     }).toList();
+
+    filtered.sort((a, b) {
+      final dA = _haversineKm(lat, lng, a.lat, a.lng);
+      final dB = _haversineKm(lat, lng, b.lat, b.lng);
+      return dA.compareTo(dB);
+    });
+
+    return filtered;
+  }
+
+  double _haversineKm(double lat1, double lon1, double lat2, double lon2) {
+    const r = 6371;
+    final dLat = _degToRad(lat2 - lat1);
+    final dLon = _degToRad(lon2 - lon1);
+    final a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(_degToRad(lat1)) * cos(_degToRad(lat2)) *
+            sin(dLon / 2) * sin(dLon / 2);
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    return r * c;
+  }
+
+  double _degToRad(double deg) => deg * pi / 180;
   }
 }
