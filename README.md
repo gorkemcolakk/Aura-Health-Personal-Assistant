@@ -153,7 +153,7 @@ Proxy `http://127.0.0.1:8787` adresinde çalışır.
 |---|---|
 | 📍 | İstanbul, Türkiye |
 | 📧 | [grkeemcolak@icloud.com](mailto:grkeemcolak@icloud.com) |
-| 🔗 | [linkedin.com/in/eren-görkem-çolak](https://linkedin.com/in/eren-görkem-çolak) |
+| 🔗 | [linkedin.com/in/eren-gorkem-colak](https://linkedin.com/in/eren-gorkem-colak) |
 
 ---
 
