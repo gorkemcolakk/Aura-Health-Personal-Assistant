@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../config/secrets.dart';
 import '../models/health_profile.dart';
 import '../models/medication.dart';
 
@@ -48,7 +49,8 @@ class StorageService {
 
   Future<String?> loadApiKey() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('aura.api_key');
+    final stored = prefs.getString('aura.api_key');
+    return stored ?? geminiApiKey;
   }
 
   Future<void> saveApiKey(String key) async {
