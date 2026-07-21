@@ -17,6 +17,7 @@ class NearbyScreen extends StatefulWidget {
 class _NearbyScreenState extends State<NearbyScreen> {
   final _placesService = PlacesService();
   final _mapController = MapController();
+  final _searchController = TextEditingController();
 
   LatLng? _currentLocation;
   List<HealthFacility> _facilities = [];
@@ -36,6 +37,12 @@ class _NearbyScreenState extends State<NearbyScreen> {
   void initState() {
     super.initState();
     _initLocation();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _initLocation() async {
@@ -77,6 +84,30 @@ class _NearbyScreenState extends State<NearbyScreen> {
     const tolerance = 0.5;
     return (loc.latitude - emulatorLat).abs() < tolerance &&
            (loc.longitude - emulatorLng).abs() < tolerance;
+  }
+
+  Future<void> _searchAddress(String query) async {
+    if (query.trim().isEmpty) return;
+
+    setState(() => _loading = true);
+
+    final coords = await _placesService.geocode(query.trim());
+    if (coords == null) {
+      setState(() {
+        _loading = false;
+        _error = '"$query" bulunamadı';
+      });
+      return;
+    }
+
+    final location = LatLng(coords.$1, coords.$2);
+    setState(() {
+      _currentLocation = location;
+      _error = null;
+    });
+
+    _mapController.move(location, 14);
+    await _searchNearby(location);
   }
 
   Future<bool> _handlePermission() async {
@@ -291,6 +322,27 @@ class _NearbyScreenState extends State<NearbyScreen> {
                 ],
               ),
             ),
+          // Adres arama
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Adres veya semt ara (örn: Kadıköy)',
+                prefixIcon: const Icon(Icons.search, size: 20),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.send, size: 18),
+                  onPressed: () => _searchAddress(_searchController.text),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                filled: true,
+                fillColor: colors.surfaceContainerHighest.withValues(alpha: 0.4),
+              ),
+              style: Theme.of(context).textTheme.bodySmall,
+              onSubmitted: _searchAddress,
+            ),
+          ),
           Expanded(
             flex: 3,
             child: ClipRRect(

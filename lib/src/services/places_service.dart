@@ -33,6 +33,36 @@ class PlacesService {
     'Sağlık Ocağı': 'health centre',
   };
 
+  /// Adresi koordinata çevir
+  Future<(double, double)?> geocode(String address) async {
+    try {
+      final url = Uri.parse(
+        '$_nominatimUrl/search'
+        '?q=${Uri.encodeComponent(address)}'
+        '&format=json'
+        '&limit=1',
+      );
+
+      final response = await http.get(
+        url,
+        headers: {
+          'User-Agent': 'AuraHealthApp/1.0',
+          'Accept-Language': 'tr',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final results = jsonDecode(response.body) as List<dynamic>;
+        if (results.isNotEmpty) {
+          final lat = double.tryParse(results[0]['lat']?.toString() ?? '');
+          final lng = double.tryParse(results[0]['lon']?.toString() ?? '');
+          if (lat != null && lng != null) return (lat, lng);
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
   Future<List<HealthFacility>> findNearbyHealthFacilities({
     required double lat,
     required double lng,
