@@ -11,7 +11,8 @@ class AiCoachService {
     required String question,
     String? apiKey,
   }) async {
-    if (apiKey == null || apiKey.trim().isEmpty) {
+    final key = (apiKey ?? '').trim();
+    if (key.isEmpty) {
       return _offlineAnswer(profile, question);
     }
 
@@ -24,10 +25,9 @@ class AiCoachService {
           : "";
       final medList = medications.map((m) => "- ${m.name} (${m.dosage})").join('\n');
 
-      // First try gemini-2.5-flash, if not found, we will catch and try gemini-pro
       final model = GenerativeModel(
         model: 'gemini-1.5-flash',
-        apiKey: apiKey.trim(),
+        apiKey: key,
         systemInstruction: Content.system('''
 Sen uzman bir sağlık koçu ve doktor, diyetisyen, spor eğitmeni "Aura Health AI"sın.
 Hastanın profili:
@@ -48,37 +48,19 @@ Kısa, samimi, empatik ve motive edici cevaplar ver. Tıbbi tavsiye verme, sadec
 '''),
       );
 
-      final content = [Content.text(question)];
-      
-      try {
-        final response = await model.generateContent(content);
-        return response.text?.trim() ?? 'Aura şu an cevap veremiyor.';
-      } catch (e) {
-        if (e.toString().contains('not found')) {
-          // Fallback to gemini-pro if gemini-1.5-flash is not available for this API key
-          final fallbackModel = GenerativeModel(
-            model: 'gemini-pro',
-            apiKey: apiKey.trim(),
-          );
-          final fallbackResponse = await fallbackModel.generateContent([
-            Content.text(
-                'Aşağıdaki bilgilere göre sağlık koçluğu yap. Kısa ve empatik cevap ver.\nProfil: ${profile.name}, VKİ: ${HealthCalculator.bmi(profile).toStringAsFixed(1)}, Su: ${profile.waterConsumedMl}ml\nSoru: $question')
-          ]);
-          return fallbackResponse.text?.trim() ?? 'Aura şu an cevap veremiyor.';
-        }
-        rethrow;
-      }
+      final response = await model.generateContent([Content.text(question)]);
+      return response.text?.trim() ?? 'Aura şu an cevap veremiyor.';
     } catch (e) {
       final errorStr = e.toString().toLowerCase();
       String friendlyMessage = 'Bir hata oluştu.';
       if (errorStr.contains('quota') || errorStr.contains('rate') || errorStr.contains('429')) {
         friendlyMessage = 'Çok fazla soru sordun, API limitine takıldın. Lütfen yaklaşık 1 dakika bekleyip tekrar dene.';
-      } else if (errorStr.contains('key') || errorStr.contains('invalid')) {
-        friendlyMessage = 'API anahtarın geçersiz veya süresi dolmuş.';
-      } else if (errorStr.contains('socket') || errorStr.contains('host lookup') || errorStr.contains('network') || errorStr.contains('clientexception')) {
+      } else if (errorStr.contains('key') || errorStr.contains('invalid') || errorStr.contains('403') || errorStr.contains('401')) {
+        friendlyMessage = 'API anahtarın geçersiz veya yetkisiz. Hata: ${e.toString().substring(0, e.toString().length.clamp(0, 200))}';
+      } else if (errorStr.contains('socket') || errorStr.contains('host') || errorStr.contains('network')) {
         friendlyMessage = 'İnternet bağlantını kontrol et.';
       } else {
-        friendlyMessage = 'Yapay zeka servisine bağlanılamadı.';
+        friendlyMessage = 'Yapay zeka servisine bağlanılamadı. Hata: ${e.toString().substring(0, e.toString().length.clamp(0, 200))}';
       }
       return '$friendlyMessage\n\n${_offlineAnswer(profile, question)}';
     }
