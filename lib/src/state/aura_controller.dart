@@ -85,6 +85,8 @@ class AuraController extends ChangeNotifier {
         } catch (_) {}
       }
       await loadChatSessions();
+      // Login'de her zaman yeni sohbetle başla
+      _activeSessionId = null;
       notifyListeners();
       return true;
     }
@@ -300,31 +302,9 @@ class AuraController extends ChangeNotifier {
     isThinking = false;
     notifyListeners();
 
-    // Auto-save: kayıtlı sohbet varsa otomatik güncelle
-    if (_activeSessionId != null && currentUserTc != null) {
-      await _autoSaveSession();
-    }
-  }
-
-  Future<void> _autoSaveSession() async {
-    if (currentUserTc == null || _activeSessionId == null) return;
-    final existing = chatSessions.where((s) => s.id == _activeSessionId).firstOrNull;
-    final title = existing?.title ?? _chatTitleFromMessages();
-    final session = ChatSession(
-      id: _activeSessionId!,
-      title: title,
-      messages: List.from(messages),
-      createdAt: existing?.createdAt ?? DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-    await db.saveChatSession(currentUserTc!, session);
-    // Sessizce listeyi güncelle (UI tetiklemeden)
-    final idx = chatSessions.indexWhere((s) => s.id == _activeSessionId);
-    if (idx >= 0) {
-      chatSessions = [...chatSessions]..[idx] = session;
-      chatSessions.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-    } else {
-      chatSessions = [session, ...chatSessions];
+    // Auto-save: kayıtlı sohbet varsa sessizce güncelle
+    if (_activeSessionId != null) {
+      await _silentSave();
     }
   }
   Future<void> clearMessages() async {
@@ -361,13 +341,38 @@ class AuraController extends ChangeNotifier {
   }
 
   Future<void> switchToSession(ChatSession session) async {
-    // Önce mevcut sohbeti kaydet
-    if (_activeSessionId != null && messages.length > 1) {
-      await saveCurrentChat();
+    // Önce mevcut sohbeti kaydet (eğer aktif session varsa)
+    if (_activeSessionId != null && _activeSessionId != session.id && messages.length > 1) {
+      await _silentSave(forceSessionId: _activeSessionId);
     }
     _activeSessionId = session.id;
     messages = List.from(session.messages);
     notifyListeners();
+  }
+
+  Future<void> _silentSave({String? forceSessionId}) async {
+    if (currentUserTc == null) return;
+    final sid = forceSessionId ?? _activeSessionId;
+    if (sid == null || messages.length <= 1) return;
+
+    final existing = chatSessions.where((s) => s.id == sid).firstOrNull;
+    final title = existing?.title ?? _chatTitleFromMessages();
+    final session = ChatSession(
+      id: sid,
+      title: title,
+      messages: List.from(messages),
+      createdAt: existing?.createdAt ?? DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+    await db.saveChatSession(currentUserTc!, session);
+    
+    final idx = chatSessions.indexWhere((s) => s.id == sid);
+    if (idx >= 0) {
+      chatSessions[idx] = session;
+    } else {
+      chatSessions = [session, ...chatSessions];
+    }
+    chatSessions.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
   }
 
   Future<void> renameSession(ChatSession session, String newTitle) async {
