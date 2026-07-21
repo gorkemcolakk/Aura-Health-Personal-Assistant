@@ -1,10 +1,15 @@
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 
 import '../models/health_profile.dart';
 import '../models/medication.dart';
 import 'health_calculator.dart';
 
 class AiCoachService {
+  static const _endpoint = 'https://api.deepseek.com/v1/chat/completions';
+  static const _model = 'deepseek-chat';
+
   Future<String> ask({
     required HealthProfile profile,
     required List<Medication> medications,
@@ -17,18 +22,65 @@ class AiCoachService {
     }
 
     try {
-      final waterTarget = HealthCalculator.dailyWaterTargetMl(profile);
-      final sleepLogs = profile.sleepLogs;
-      final lastSleep = sleepLogs.isNotEmpty ? sleepLogs.last : null;
-      final sleepText = lastSleep != null
-          ? "\n- Son Uykusu: ${lastSleep.hours} saat (${lastSleep.feeling})"
-          : "";
-      final medList = medications.map((m) => "- ${m.name} (${m.dosage})").join('\n');
+      final systemPrompt = _buildPrompt(profile, medications);
 
-      final model = GenerativeModel(
-        model: 'gemini-1.5-flash',
-        apiKey: key,
-        systemInstruction: Content.system('''
+      final body = jsonEncode({
+        'model': _model,
+        'messages': [
+          {'role': 'system', 'content': systemPrompt},
+          {'role': 'user', 'content': question},
+        ],
+        'temperature': 0.7,
+        'max_tokens': 1024,
+      });
+
+      final response = await http.post(
+        Uri.parse(_endpoint),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $key',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final text = data['choices']?[0]?['message']?['content'];
+        return text?.toString().trim() ?? 'Aura şu an cevap veremiyor.';
+      }
+
+      final errorBody = jsonDecode(response.body);
+      final errorMsg = errorBody['error']?['message'] ?? 'Bilinmeyen hata';
+
+      if (response.statusCode == 401) {
+        return 'DeepSeek API anahtarı geçersiz.\n\n${_offlineAnswer(profile, question)}';
+      }
+      if (response.statusCode == 402) {
+        return 'DeepSeek hesabında yeterli bakiye yok.\n\n${_offlineAnswer(profile, question)}';
+      }
+      if (response.statusCode == 429) {
+        return 'Çok fazla istek gönderildi, lütfen biraz bekle.\n\n${_offlineAnswer(profile, question)}';
+      }
+      return 'API hatası (${response.statusCode}): $errorMsg\n\n${_offlineAnswer(profile, question)}';
+    } catch (e) {
+      final s = e.toString().toLowerCase();
+      if (s.contains('socket') || s.contains('host') || s.contains('network')) {
+        return 'İnternet bağlantını kontrol et.\n\n${_offlineAnswer(profile, question)}';
+      }
+      return 'AI servisine bağlanılamadı.\n\n${_offlineAnswer(profile, question)}';
+    }
+  }
+
+  String _buildPrompt(HealthProfile profile, List<Medication> medications) {
+    final waterTarget = HealthCalculator.dailyWaterTargetMl(profile);
+    final sleepLogs = profile.sleepLogs;
+    final lastSleep = sleepLogs.isNotEmpty ? sleepLogs.last : null;
+    final sleepText = lastSleep != null
+        ? "\n- Son Uykusu: ${lastSleep.hours} saat (${lastSleep.feeling})"
+        : "";
+    final medList = medications.map((m) => "- ${m.name} (${m.dosage})").join('\n');
+
+    return '''
 Sen uzman bir sağlık koçu ve doktor, diyetisyen, spor eğitmeni "Aura Health AI"sın.
 Hastanın profili:
 - İsim: ${profile.name}
@@ -45,25 +97,7 @@ Hastanın profili:
 $medList
 
 Kısa, samimi, empatik ve motive edici cevaplar ver. Tıbbi tavsiye verme, sadece sağlıklı yaşam koçluğu yap.
-'''),
-      );
-
-      final response = await model.generateContent([Content.text(question)]);
-      return response.text?.trim() ?? 'Aura şu an cevap veremiyor.';
-    } catch (e) {
-      final errorStr = e.toString().toLowerCase();
-      String friendlyMessage = 'Bir hata oluştu.';
-      if (errorStr.contains('quota') || errorStr.contains('rate') || errorStr.contains('429')) {
-        friendlyMessage = 'Çok fazla soru sordun, API limitine takıldın. Lütfen yaklaşık 1 dakika bekleyip tekrar dene.';
-      } else if (errorStr.contains('key') || errorStr.contains('invalid') || errorStr.contains('403') || errorStr.contains('401')) {
-        friendlyMessage = 'API anahtarın geçersiz veya yetkisiz. Hata: ${e.toString().substring(0, e.toString().length.clamp(0, 200))}';
-      } else if (errorStr.contains('socket') || errorStr.contains('host') || errorStr.contains('network')) {
-        friendlyMessage = 'İnternet bağlantını kontrol et.';
-      } else {
-        friendlyMessage = 'Yapay zeka servisine bağlanılamadı. Hata: ${e.toString().substring(0, e.toString().length.clamp(0, 200))}';
-      }
-      return '$friendlyMessage\n\n${_offlineAnswer(profile, question)}';
-    }
+''';
   }
 
   String _offlineAnswer(HealthProfile profile, String question) {
