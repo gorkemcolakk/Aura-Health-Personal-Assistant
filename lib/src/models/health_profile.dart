@@ -27,6 +27,10 @@ class HealthProfile {
     required this.waterConsumedMl,
     required this.waterLogs,
     required this.sleepLogs,
+    this.bloodType = '',
+    this.allergies = '',
+    this.emergencyContact = '',
+    this.emergencyPhone = '',
   });
 
   factory HealthProfile.initial({String name = ''}) {
@@ -68,6 +72,10 @@ class HealthProfile {
           : (json['sleepLogs'] as List<dynamic>)
               .map((item) => SleepLog.fromJson(item as Map<String, dynamic>))
               .toList(),
+      bloodType: json['bloodType'] as String? ?? '',
+      allergies: json['allergies'] as String? ?? '',
+      emergencyContact: json['emergencyContact'] as String? ?? '',
+      emergencyPhone: json['emergencyPhone'] as String? ?? '',
     );
   }
 
@@ -81,6 +89,10 @@ class HealthProfile {
   final int waterConsumedMl;
   final List<WaterLog> waterLogs;
   final List<SleepLog> sleepLogs;
+  final String bloodType;
+  final String allergies;
+  final String emergencyContact;
+  final String emergencyPhone;
 
   String get initials {
     final parts = name.trim().split(RegExp(r'\s+'));
@@ -101,6 +113,10 @@ class HealthProfile {
     int? waterConsumedMl,
     List<WaterLog>? waterLogs,
     List<SleepLog>? sleepLogs,
+    String? bloodType,
+    String? allergies,
+    String? emergencyContact,
+    String? emergencyPhone,
   }) {
     return HealthProfile(
       name: name ?? this.name,
@@ -113,6 +129,10 @@ class HealthProfile {
       waterConsumedMl: waterConsumedMl ?? this.waterConsumedMl,
       waterLogs: waterLogs ?? this.waterLogs,
       sleepLogs: sleepLogs ?? this.sleepLogs,
+      bloodType: bloodType ?? this.bloodType,
+      allergies: allergies ?? this.allergies,
+      emergencyContact: emergencyContact ?? this.emergencyContact,
+      emergencyPhone: emergencyPhone ?? this.emergencyPhone,
     );
   }
 
@@ -128,6 +148,10 @@ class HealthProfile {
       'waterConsumedMl': waterConsumedMl,
       'waterLogs': waterLogs.map((item) => item.toJson()).toList(),
       'sleepLogs': sleepLogs.map((item) => item.toJson()).toList(),
+      'bloodType': bloodType,
+      'allergies': allergies,
+      'emergencyContact': emergencyContact,
+      'emergencyPhone': emergencyPhone,
     });
   }
 }

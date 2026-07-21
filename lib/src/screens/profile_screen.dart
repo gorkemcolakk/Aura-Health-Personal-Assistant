@@ -18,6 +18,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _weight = TextEditingController();
   final _goal = TextEditingController();
   final _conditions = TextEditingController();
+  final _bloodType = TextEditingController();
+  final _allergies = TextEditingController();
+  final _emergencyContact = TextEditingController();
+  final _emergencyPhone = TextEditingController();
   bool _didFill = false;
   ActivityLevel _activity = ActivityLevel.balanced;
 
@@ -34,6 +38,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _weight.text = profile.weightKg.toStringAsFixed(1);
     _goal.text = profile.healthGoal;
     _conditions.text = profile.conditions;
+    _bloodType.text = profile.bloodType;
+    _allergies.text = profile.allergies;
+    _emergencyContact.text = profile.emergencyContact;
+    _emergencyPhone.text = profile.emergencyPhone;
     _activity = profile.activity;
     _didFill = true;
   }
@@ -46,6 +54,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _weight.dispose();
     _goal.dispose();
     _conditions.dispose();
+    _bloodType.dispose();
+    _allergies.dispose();
+    _emergencyContact.dispose();
+    _emergencyPhone.dispose();
     super.dispose();
   }
 
@@ -159,6 +171,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                // --- Acil Durum Bilgileri ---
+                const Divider(),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.emergency, color: Colors.red, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Acil Durum Bilgileri',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.red),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _bloodType,
+                  decoration: const InputDecoration(
+                    labelText: 'Kan Grubu (örn: A Rh+)',
+                    prefixIcon: Icon(Icons.bloodtype),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _allergies,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    labelText: 'Alerjiler (örn: Penisilin, Fıstık)',
+                    prefixIcon: Icon(Icons.warning_amber),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _emergencyContact,
+                  decoration: const InputDecoration(
+                    labelText: 'Acil Durumda Aranacak Kişi',
+                    prefixIcon: Icon(Icons.person_add),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _emergencyPhone,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    labelText: 'Acil Durum Telefonu',
+                    prefixIcon: Icon(Icons.phone),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 FilledButton.icon(
                   onPressed: () async {
                     await controller.saveProfile(
@@ -180,6 +240,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         activity: _activity,
                         healthGoal: _goal.text.trim(),
                         conditions: _conditions.text.trim(),
+                        bloodType: _bloodType.text.trim(),
+                        allergies: _allergies.text.trim(),
+                        emergencyContact: _emergencyContact.text.trim(),
+                        emergencyPhone: _emergencyPhone.text.trim(),
                       ),
                     );
                     if (context.mounted) {

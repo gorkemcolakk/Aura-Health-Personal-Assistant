@@ -6,6 +6,7 @@ import '../services/health_calculator.dart';
 import '../state/aura_controller.dart';
 import '../state/aura_scope.dart';
 import '../widgets/aura_card.dart';
+import '../widgets/emergency_card.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -300,6 +301,7 @@ class _Header extends StatelessWidget {
             ],
           ),
         ),
+        const _EmergencyButton(),
       ],
     );
   }
@@ -1152,6 +1154,43 @@ class _FeelingButton extends StatelessWidget {
             const SizedBox(height: 4),
             Text(label, style: const TextStyle(fontSize: 12)),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmergencyButton extends StatelessWidget {
+  const _EmergencyButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final profile = AuraScope.of(context).profile;
+    final hasData = profile.bloodType.isNotEmpty || profile.allergies.isNotEmpty;
+
+    return Tooltip(
+      message: hasData ? 'Acil Durum Kartı' : 'Acil durum bilgisi girilmemiş',
+      child: Material(
+        color: hasData ? const Color(0xFFD32F2F) : Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => EmergencyCard(profile: profile)),
+            );
+          },
+          child: Container(
+            width: 46,
+            height: 46,
+            alignment: Alignment.center,
+            child: Icon(
+              Icons.emergency,
+              color: hasData ? Colors.white : Colors.grey,
+              size: 24,
+            ),
+          ),
         ),
       ),
     );
