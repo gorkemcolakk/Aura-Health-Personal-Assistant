@@ -5,6 +5,7 @@ import 'package:sqflite/sqflite.dart';
 
 import '../models/health_profile.dart';
 import '../models/chat_session.dart';
+import '../models/medication.dart';
 
 class DatabaseService {
   static Database? _db;
