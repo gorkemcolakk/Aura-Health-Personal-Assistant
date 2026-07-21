@@ -6,6 +6,7 @@ import 'screens/ai_coach_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/medication_screen.dart';
+import 'screens/nearby_screen.dart';
 import 'screens/profile_screen.dart';
 import 'state/aura_scope.dart';
 import 'state/aura_controller.dart';
@@ -54,6 +55,7 @@ class _AuraShellState extends State<AuraShell> {
     ProfileScreen(),
     MedicationScreen(),
     AiCoachScreen(),
+    NearbyScreen(),
   ];
 
   @override
@@ -129,6 +131,13 @@ class _AuraShellState extends State<AuraShell> {
                       selectedIcon: Icons.auto_awesome,
                       selected: _selectedIndex == 3,
                       onTap: () => _select(3),
+                    ),
+                    _DockItem(
+                      label: 'Yakınlar',
+                      icon: Icons.local_hospital_outlined,
+                      selectedIcon: Icons.local_hospital,
+                      selected: _selectedIndex == 4,
+                      onTap: () => _select(4),
                     ),
                   ],
                 ),
