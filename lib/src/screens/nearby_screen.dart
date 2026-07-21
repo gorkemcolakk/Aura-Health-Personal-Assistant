@@ -478,6 +478,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                       );
                     },
                   ),
+            ),
           ),
         ],
       ),
