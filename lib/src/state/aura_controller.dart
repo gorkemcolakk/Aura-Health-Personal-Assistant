@@ -299,6 +299,33 @@ class AuraController extends ChangeNotifier {
     ];
     isThinking = false;
     notifyListeners();
+
+    // Auto-save: kayıtlı sohbet varsa otomatik güncelle
+    if (_activeSessionId != null && currentUserTc != null) {
+      await _autoSaveSession();
+    }
+  }
+
+  Future<void> _autoSaveSession() async {
+    if (currentUserTc == null || _activeSessionId == null) return;
+    final existing = chatSessions.where((s) => s.id == _activeSessionId).firstOrNull;
+    final title = existing?.title ?? _chatTitleFromMessages();
+    final session = ChatSession(
+      id: _activeSessionId!,
+      title: title,
+      messages: List.from(messages),
+      createdAt: existing?.createdAt ?? DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+    await db.saveChatSession(currentUserTc!, session);
+    // Sessizce listeyi güncelle (UI tetiklemeden)
+    final idx = chatSessions.indexWhere((s) => s.id == _activeSessionId);
+    if (idx >= 0) {
+      chatSessions = [...chatSessions]..[idx] = session;
+      chatSessions.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    } else {
+      chatSessions = [session, ...chatSessions];
+    }
   }
   Future<void> clearMessages() async {
     if (messages.length > 1) {
