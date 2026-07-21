@@ -148,7 +148,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Gemini API Anahtarı Gerekli'),
+          title: const Text('DeepSeek API Anahtarı Gerekli'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
