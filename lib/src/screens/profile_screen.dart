@@ -258,23 +258,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
-          AuraCard(
-            color: const Color(0xFFEAF6F4),
-            child: Row(
-              children: [
-                const Icon(Icons.privacy_tip_outlined),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'API anahtarı cihazda tutulur. Yayına çıkmadan önce güvenli anahtar kasasına taşınmalı.',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           OutlinedButton.icon(
             onPressed: () {
               controller.logout();
