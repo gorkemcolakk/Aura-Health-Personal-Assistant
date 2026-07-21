@@ -17,14 +17,11 @@ class AiCoachService {
     String? apiKey,
   }) async {
     final key = (apiKey ?? '').trim();
-    print('🔑 DeepSeek API Key length: ${key.length}, starts with: ${key.isNotEmpty ? key.substring(0, 5) : "EMPTY"}');
     if (key.isEmpty) {
-      print('❌ API key empty, returning offline answer');
       return _offlineAnswer(profile, question);
     }
 
     try {
-      print('🚀 Calling DeepSeek API...');
       final systemPrompt = _buildPrompt(profile, medications);
 
       final body = jsonEncode({
@@ -49,13 +46,11 @@ class AiCoachService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final text = data['choices']?[0]?['message']?['content'];
-        print('✅ DeepSeek response: ${text?.toString().substring(0, text.toString().length.clamp(0, 100))}');
         return text?.toString().trim() ?? 'Aura şu an cevap veremiyor.';
       }
 
       final errorBody = jsonDecode(response.body);
       final errorMsg = errorBody['error']?['message'] ?? 'Bilinmeyen hata';
-      print('❌ DeepSeek HTTP ${response.statusCode}: $errorMsg');
 
       if (response.statusCode == 401) {
         return 'DeepSeek API anahtarı geçersiz.\n\n${_offlineAnswer(profile, question)}';
@@ -68,7 +63,6 @@ class AiCoachService {
       }
       return 'API hatası (${response.statusCode}): $errorMsg\n\n${_offlineAnswer(profile, question)}';
     } catch (e) {
-      print('❌ DeepSeek exception: $e');
       final s = e.toString().toLowerCase();
       if (s.contains('socket') || s.contains('host') || s.contains('network')) {
         return 'İnternet bağlantını kontrol et.\n\n${_offlineAnswer(profile, question)}';
