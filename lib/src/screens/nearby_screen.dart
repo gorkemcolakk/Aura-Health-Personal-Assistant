@@ -246,8 +246,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
                     Navigator.pop(ctx);
                     _openDirections(facility);
                   },
-                  icon: const Icon(Icons.directions),
-                  label: const Text('Yol Tarifi Al'),
+                  icon: const Icon(Icons.map),
+                  label: const Text('Haritada Göster'),
                 ),
               ),
             ],
@@ -258,7 +258,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
   }
 
   void _openDirections(HealthFacility facility) async {
-    final url = 'https://www.google.com/maps/dir/?api=1&destination=${facility.lat},${facility.lng}';
+    // Sadece konumu göster, rota çizme (emülatör uyumlu)
+    final url = 'https://www.google.com/maps/search/?api=1&query=${facility.lat},${facility.lng}';
     try {
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     } catch (_) {}
@@ -430,7 +431,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  const Icon(Icons.directions, size: 20),
+                                  const Icon(Icons.map, size: 20),
                                 ],
                               ),
                             ),
