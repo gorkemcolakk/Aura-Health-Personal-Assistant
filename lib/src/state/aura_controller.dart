@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/chat_message.dart';
+import '../models/chat_session.dart';
 import '../models/health_profile.dart';
 import '../models/medication.dart';
 import '../models/sleep_log.dart';
@@ -47,6 +48,12 @@ class AuraController extends ChangeNotifier {
   ];
   bool isThinking = false;
 
+  // Sohbet oturumları
+  List<ChatSession> chatSessions = [];
+  String? _activeSessionId;
+
+  String? get activeSessionId => _activeSessionId;
+
   Future<void> load() async {
     apiKey = await storage.loadApiKey();
     themeMode = await storage.loadThemeMode();
@@ -77,6 +84,7 @@ class AuraController extends ChangeNotifier {
           await notifications.scheduleMedication(med);
         } catch (_) {}
       }
+      await loadChatSessions();
       notifyListeners();
       return true;
     }
@@ -297,6 +305,85 @@ class AuraController extends ChangeNotifier {
       messages = [messages.first];
       notifyListeners();
     }
+  }
+
+  // --- Chat Sessions ---
+  Future<void> loadChatSessions() async {
+    if (currentUserTc == null) return;
+    chatSessions = await db.loadChatSessions(currentUserTc!);
+    notifyListeners();
+  }
+
+  Future<void> saveCurrentChat({String? title}) async {
+    if (currentUserTc == null || messages.length <= 1) return;
+
+    final sessionId = _activeSessionId ?? DateTime.now().millisecondsSinceEpoch.toString();
+    final sessionTitle = title ?? _chatTitleFromMessages();
+
+    final session = ChatSession(
+      id: sessionId,
+      title: sessionTitle,
+      messages: List.from(messages),
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    await db.saveChatSession(currentUserTc!, session);
+    _activeSessionId = sessionId;
+    await loadChatSessions();
+  }
+
+  Future<void> switchToSession(ChatSession session) async {
+    // Önce mevcut sohbeti kaydet
+    if (_activeSessionId != null && messages.length > 1) {
+      await saveCurrentChat();
+    }
+    _activeSessionId = session.id;
+    messages = List.from(session.messages);
+    notifyListeners();
+  }
+
+  Future<void> renameSession(ChatSession session, String newTitle) async {
+    if (currentUserTc == null) return;
+    final updated = ChatSession(
+      id: session.id,
+      title: newTitle,
+      messages: session.messages,
+      createdAt: session.createdAt,
+      updatedAt: DateTime.now(),
+    );
+    await db.saveChatSession(currentUserTc!, updated);
+    await loadChatSessions();
+  }
+
+  Future<void> deleteSession(ChatSession session) async {
+    if (currentUserTc == null) return;
+    await db.deleteChatSession(currentUserTc!, session.id);
+    if (_activeSessionId == session.id) {
+      _activeSessionId = null;
+    }
+    await loadChatSessions();
+  }
+
+  void newChat() {
+    _activeSessionId = null;
+    messages = [
+      ChatMessage(
+        role: ChatRole.assistant,
+        text: 'Merhaba, ben Aura AI. Profilini, su hedefini ve ilaç düzenini dikkate alarak yardımcı olabilirim.',
+        createdAt: DateTime.now(),
+      ),
+    ];
+    notifyListeners();
+  }
+
+  String _chatTitleFromMessages() {
+    for (final m in messages) {
+      if (m.role == ChatRole.user && m.text.isNotEmpty) {
+        return m.text.length > 40 ? '${m.text.substring(0, 40)}...' : m.text;
+      }
+    }
+    return 'Yeni Sohbet';
   }
 
   Future<void> toggleMedicationTaken(Medication medication, bool taken) async {

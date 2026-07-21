@@ -4,7 +4,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../models/health_profile.dart';
-import '../models/medication.dart';
+import '../models/chat_session.dart';
 
 class DatabaseService {
   static Database? _db;
@@ -21,7 +21,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE users (
@@ -43,6 +43,24 @@ class DatabaseService {
             data TEXT NOT NULL
           )
         ''');
+        await db.execute('''
+          CREATE TABLE chat_sessions (
+            id TEXT PRIMARY KEY,
+            tc TEXT NOT NULL,
+            data TEXT NOT NULL
+          )
+        ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS chat_sessions (
+              id TEXT PRIMARY KEY,
+              tc TEXT NOT NULL,
+              data TEXT NOT NULL
+            )
+          ''');
+        }
       },
     );
   }
@@ -137,5 +155,36 @@ class DatabaseService {
       });
     }
     await batch.commit(noResult: true);
+  }
+
+  // --- Chat Sessions ---
+  Future<List<ChatSession>> loadChatSessions(String tc) async {
+    final db = await database;
+    final results = await db.query('chat_sessions', where: 'tc = ?', whereArgs: [tc], orderBy: 'data');
+    if (results.isEmpty) return [];
+    
+    return results.map((row) {
+      final source = row['data'] as String;
+      return ChatSession.fromJson(source);
+    }).toList()
+      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+  }
+
+  Future<void> saveChatSession(String tc, ChatSession session) async {
+    final db = await database;
+    await db.insert(
+      'chat_sessions',
+      {
+        'id': session.id,
+        'tc': tc,
+        'data': session.toJson(),
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> deleteChatSession(String tc, String sessionId) async {
+    final db = await database;
+    await db.delete('chat_sessions', where: 'tc = ? AND id = ?', whereArgs: [tc, sessionId]);
   }
 }
