@@ -47,10 +47,8 @@ class StorageService {
     await prefs.setString(_medicationsKey, Medication.encodeList(medications));
   }
 
-  Future<String?> loadApiKey() async {
-    final prefs = await SharedPreferences.getInstance();
-    final stored = prefs.getString('aura.api_key');
-    if (stored != null && stored.trim().isNotEmpty) return stored;
+  Future<String> loadApiKey() async {
+    // Always use the key from secrets.dart (gitignored)
     return deepseekApiKey;
   }
 
