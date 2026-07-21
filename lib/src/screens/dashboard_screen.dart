@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../models/health_profile.dart';
 import '../models/water_log.dart';
 import '../services/health_calculator.dart';
 import '../state/aura_controller.dart';
@@ -50,6 +51,8 @@ class DashboardScreen extends StatelessWidget {
                   waterProgress: waterProgress,
                   consumed: profile.waterConsumedMl,
                 ),
+                const SizedBox(height: 16),
+                _EmergencyRow(profile: profile),
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -301,7 +304,6 @@ class _Header extends StatelessWidget {
             ],
           ),
         ),
-        const _EmergencyButton(),
       ],
     );
   }
@@ -1160,37 +1162,49 @@ class _FeelingButton extends StatelessWidget {
   }
 }
 
-class _EmergencyButton extends StatelessWidget {
-  const _EmergencyButton();
+class _EmergencyRow extends StatelessWidget {
+  const _EmergencyRow({required this.profile});
+
+  final HealthProfile profile;
 
   @override
   Widget build(BuildContext context) {
-    final profile = AuraScope.of(context).profile;
     final hasData = profile.bloodType.isNotEmpty || profile.allergies.isNotEmpty;
 
-    return Tooltip(
-      message: hasData ? 'Acil Durum Kartı' : 'Acil durum bilgisi girilmemiş',
-      child: Material(
-        color: hasData ? const Color(0xFFD32F2F) : Colors.grey.shade300,
+    return AuraCard(
+      padding: const EdgeInsets.all(14),
+      child: InkWell(
         borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => EmergencyCard(profile: profile)),
-            );
-          },
-          child: Container(
-            width: 46,
-            height: 46,
-            alignment: Alignment.center,
-            child: Icon(
-              Icons.emergency,
-              color: hasData ? Colors.white : Colors.grey,
-              size: 24,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => EmergencyCard(profile: profile)),
+          );
+        },
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: hasData ? const Color(0xFFD32F2F) : Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.emergency,
+                color: hasData ? Colors.white : Colors.grey,
+                size: 20,
+              ),
             ),
-          ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                hasData ? 'Acil Durum Kartı' : 'Acil durum bilgisi ekle',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+            ),
+            Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.primary),
+          ],
         ),
       ),
     );
