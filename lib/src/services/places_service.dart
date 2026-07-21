@@ -2,8 +2,6 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import '../config/secrets.dart';
-
 class HealthFacility {
   final String name;
   final String address;
@@ -25,70 +23,64 @@ class HealthFacility {
 }
 
 class PlacesService {
-  static const _baseUrl = 'https://maps.googleapis.com/maps/api/place';
+  static const _nominatimUrl = 'https://nominatim.openstreetmap.org';
 
-  static const _healthTypes = [
-    'hospital',
-    'pharmacy',
-    'doctor',
-    'health',
-  ];
+  // Her tip için ayrı arama (Nominatim free-text search)
+  static const _queries = {
+    'Hastane': 'hospital',
+    'Eczane': 'pharmacy',
+    'Klinik': 'clinic',
+    'Sağlık Ocağı': 'health centre',
+  };
 
   Future<List<HealthFacility>> findNearbyHealthFacilities({
     required double lat,
     required double lng,
-    int radius = 5000,
+    int radius = 10000,
   }) async {
     final allResults = <HealthFacility>[];
 
-    for (final type in _healthTypes) {
+    for (final entry in _queries.entries) {
       try {
         final url = Uri.parse(
-          '$_baseUrl/nearbysearch/json'
-          '?location=$lat,$lng'
-          '&radius=$radius'
-          '&type=$type'
-          '&key=$googleMapsApiKey',
+          '$_nominatimUrl/search'
+          '?q=${Uri.encodeComponent(entry.value)}'
+          '&format=json'
+          '&limit=15'
+          '&bounded=1'
+          '&viewbox=${lng - 0.15},${lat - 0.15},${lng + 0.15},${lat + 0.15}',
         );
 
-        final response = await http.get(url);
+        final response = await http.get(
+          url,
+          headers: {
+            'User-Agent': 'AuraHealthApp/1.0',
+            'Accept-Language': 'tr',
+          },
+        );
 
         if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final results = data['results'] as List<dynamic>?;
+          final results = jsonDecode(response.body) as List<dynamic>;
 
-          if (results != null) {
-            for (final r in results) {
-              final types = List<String>.from(r['types'] ?? []);
-              String facilityType;
-              if (types.contains('hospital')) {
-                facilityType = 'Hastane';
-              } else if (types.contains('pharmacy')) {
-                facilityType = 'Eczane';
-              } else if (types.contains('doctor')) {
-                facilityType = 'Klinik';
-              } else {
-                facilityType = 'Sağlık';
-              }
-
-              allResults.add(HealthFacility(
-                name: r['name']?.toString() ?? 'Bilinmiyor',
-                address: r['vicinity']?.toString() ?? '',
-                type: facilityType,
-                lat: (r['geometry']?['location']?['lat'] as num?)?.toDouble() ?? 0,
-                lng: (r['geometry']?['location']?['lng'] as num?)?.toDouble() ?? 0,
-                rating: (r['rating'] as num?)?.toDouble(),
-                openNow: r['opening_hours']?['open_now'] == true,
-              ));
-            }
+          for (final r in results) {
+            allResults.add(HealthFacility(
+              name: r['display_name']?.toString().split(',').first.trim() ?? 'Bilinmiyor',
+              address: r['display_name']?.toString() ?? '',
+              type: entry.key,
+              lat: double.tryParse(r['lat']?.toString() ?? '0') ?? 0,
+              lng: double.tryParse(r['lon']?.toString() ?? '0') ?? 0,
+            ));
           }
         }
       } catch (_) {
         // Bir tipte hata olsa da diğerlerini dene
       }
+
+      // Nominatim rate limit: saniyede 1 istek
+      await Future.delayed(const Duration(seconds: 1));
     }
 
-    // Duplicate'ları temizle (aynı yere birden fazla tipte denk gelmiş olabilir)
+    // Duplicate'ları temizle
     final seen = <String>{};
     return allResults.where((f) {
       final key = '${f.name}_${f.lat}_${f.lng}';

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../config/secrets.dart';
 import '../services/places_service.dart';
 import '../widgets/aura_card.dart';
 
@@ -15,75 +15,55 @@ class NearbyScreen extends StatefulWidget {
 }
 
 class _NearbyScreenState extends State<NearbyScreen> {
-  GoogleMapController? _mapController;
   final _placesService = PlacesService();
+  final _mapController = MapController();
 
   LatLng? _currentLocation;
   List<HealthFacility> _facilities = [];
   bool _loading = true;
   String? _error;
 
-  // İstanbul varsayılan konum
   static const _defaultLocation = LatLng(41.0082, 28.9784);
 
-  final Map<String, BitmapDescriptor> _markerIcons = {};
+  static const _typeColors = {
+    'Hastane': Colors.red,
+    'Eczane': Colors.green,
+    'Klinik': Colors.blue,
+    'Sağlık Ocağı': Colors.orange,
+  };
 
   @override
   void initState() {
     super.initState();
-    _loadMarkers();
     _initLocation();
-  }
-
-  Future<void> _loadMarkers() async {
-    _markerIcons['Hastane'] = BitmapDescriptor.defaultMarkerWithHue(
-      BitmapDescriptor.hueRed,
-    );
-    _markerIcons['Eczane'] = BitmapDescriptor.defaultMarkerWithHue(
-      BitmapDescriptor.hueGreen,
-    );
-    _markerIcons['Klinik'] = BitmapDescriptor.defaultMarkerWithHue(
-      BitmapDescriptor.hueBlue,
-    );
-    _markerIcons['Sağlık'] = BitmapDescriptor.defaultMarkerWithHue(
-      BitmapDescriptor.hueOrange,
-    );
   }
 
   Future<void> _initLocation() async {
     try {
       final hasPermission = await _handlePermission();
-      if (!hasPermission) {
-        setState(() {
-          _loading = false;
-          _error = 'Konum izni gerekli';
-        });
+      if (!hasPermission || !await Geolocator.isLocationServiceEnabled()) {
+        setState(() => _loading = false);
         await _searchNearby(_defaultLocation);
         return;
       }
 
       final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       );
 
       final location = LatLng(position.latitude, position.longitude);
       setState(() => _currentLocation = location);
 
-      _mapController?.animateCamera(CameraUpdate.newLatLngZoom(location, 14));
+      _mapController.move(location, 14);
       await _searchNearby(location);
     } catch (e) {
-      setState(() {
-        _loading = false;
-        _error = 'Konum alınamadı: $e';
-      });
+      setState(() => _loading = false);
       await _searchNearby(_defaultLocation);
     }
   }
 
   Future<bool> _handlePermission() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) return false;
 
     LocationPermission permission = await Geolocator.checkPermission();
@@ -100,7 +80,6 @@ class _NearbyScreenState extends State<NearbyScreen> {
       final facilities = await _placesService.findNearbyHealthFacilities(
         lat: location.latitude,
         lng: location.longitude,
-        radius: 10000,
       );
 
       setState(() {
@@ -108,9 +87,11 @@ class _NearbyScreenState extends State<NearbyScreen> {
         _loading = false;
       });
 
-      if (_mapController != null && facilities.isNotEmpty) {
+      if (facilities.isNotEmpty) {
         final bounds = _computeBounds(location, facilities);
-        _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 60));
+        _mapController.fitCamera(
+          CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(40)),
+        );
       }
     } catch (e) {
       setState(() {
@@ -133,35 +114,53 @@ class _NearbyScreenState extends State<NearbyScreen> {
       if (f.lng > maxLng) maxLng = f.lng;
     }
 
-    return LatLngBounds(
-      southwest: LatLng(minLat, minLng),
-      northeast: LatLng(maxLat, maxLng),
-    );
+    return LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng));
   }
 
-  Set<Marker> _buildMarkers() {
-    final markers = <Marker>{};
+  List<Marker> _buildMarkers() {
+    final markers = <Marker>[];
 
     if (_currentLocation != null) {
       markers.add(
         Marker(
-          markerId: const MarkerId('current'),
-          position: _currentLocation!,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
-          infoWindow: const InfoWindow(title: 'Konumunuz'),
+          point: _currentLocation!,
+          width: 30,
+          height: 30,
+          child: const Icon(Icons.my_location, color: Colors.purple, size: 30),
         ),
       );
     }
 
     for (final f in _facilities) {
+      final color = _typeColors[f.type] ?? Colors.grey;
       markers.add(
         Marker(
-          markerId: MarkerId('${f.name}_${f.lat}_${f.lng}'),
-          position: LatLng(f.lat, f.lng),
-          icon: _markerIcons[f.type] ?? BitmapDescriptor.defaultMarker,
-          infoWindow: InfoWindow(
-            title: f.name,
-            snippet: '${f.type} ${f.rating != null ? "⭐${f.rating}" : ""}',
+          point: LatLng(f.lat, f.lng),
+          width: 60,
+          height: 80,
+          child: GestureDetector(
+            onTap: () => _showFacilityInfo(f),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                    boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 2)],
+                  ),
+                  child: Text(
+                    f.name,
+                    style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Icon(Icons.location_on, color: color, size: 28),
+              ],
+            ),
           ),
         ),
       );
@@ -170,9 +169,48 @@ class _NearbyScreenState extends State<NearbyScreen> {
     return markers;
   }
 
+  void _showFacilityInfo(HealthFacility facility) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(_typeIcon(facility.type), style: const TextStyle(fontSize: 28)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(facility.name, style: Theme.of(context).textTheme.titleMedium),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(facility.address, style: Theme.of(context).textTheme.bodySmall, maxLines: 3),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _openDirections(facility);
+                  },
+                  icon: const Icon(Icons.directions),
+                  label: const Text('Yol Tarifi Al'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _openDirections(HealthFacility facility) async {
-    final url =
-        'https://www.google.com/maps/dir/?api=1&destination=${facility.lat},${facility.lng}';
+    final url = 'https://www.google.com/maps/dir/?api=1&destination=${facility.lat},${facility.lng}';
     try {
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     } catch (_) {}
@@ -186,6 +224,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
         return '💊';
       case 'Klinik':
         return '🩺';
+      case 'Sağlık Ocağı':
+        return '🏚️';
       default:
         return '🏥';
     }
@@ -198,58 +238,53 @@ class _NearbyScreenState extends State<NearbyScreen> {
     return SafeArea(
       child: Column(
         children: [
-          // Header
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
             child: Row(
               children: [
                 Icon(Icons.local_hospital, color: colors.primary, size: 28),
                 const SizedBox(width: 10),
-                Text(
-                  'Yakın Sağlık Kuruluşları',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+                Text('Yakın Sağlık Kuruluşları', style: Theme.of(context).textTheme.titleLarge),
                 const Spacer(),
                 if (!_loading)
                   IconButton(
-                    onPressed: () => _initLocation(),
+                    onPressed: () {
+                      setState(() => _loading = true);
+                      _initLocation();
+                    },
                     icon: const Icon(Icons.refresh),
                     tooltip: 'Yenile',
                   ),
               ],
             ),
           ),
-
-          // Harita
           Expanded(
             flex: 3,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Stack(
                 children: [
-                  GoogleMap(
-                    initialCameraPosition: CameraPosition(
-                      target: _currentLocation ?? _defaultLocation,
-                      zoom: 14,
+                  FlutterMap(
+                    mapController: _mapController,
+                    options: MapOptions(
+                      initialCenter: _currentLocation ?? _defaultLocation,
+                      initialZoom: 14,
                     ),
-                    onMapCreated: (controller) {
-                      _mapController = controller;
-                    },
-                    markers: _buildMarkers(),
-                    myLocationEnabled: true,
-                    myLocationButtonEnabled: false,
-                    zoomControlsEnabled: false,
-                    mapToolbarEnabled: false,
+                    children: [
+                      TileLayer(
+                        urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'com.aurahealth.app',
+                      ),
+                      MarkerLayer(markers: _buildMarkers()),
+                    ],
                   ),
-                  if (_loading)
-                    const Center(child: CircularProgressIndicator()),
+                  if (_loading) const Center(child: CircularProgressIndicator()),
                   if (_error != null)
                     Center(
                       child: AuraCard(
                         child: Text(_error!, style: const TextStyle(color: Colors.red)),
                       ),
                     ),
-                  // Lejant
                   Positioned(
                     top: 8,
                     left: 8,
@@ -261,6 +296,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                           _legendItem(Colors.red, 'Hastane'),
                           _legendItem(Colors.green, 'Eczane'),
                           _legendItem(Colors.blue, 'Klinik'),
+                          _legendItem(Colors.orange, 'Sağlık Ocağı'),
                         ],
                       ),
                     ),
@@ -269,8 +305,6 @@ class _NearbyScreenState extends State<NearbyScreen> {
               ),
             ),
           ),
-
-          // Alt liste
           Expanded(
             flex: 2,
             child: _facilities.isEmpty && !_loading
@@ -291,7 +325,10 @@ class _NearbyScreenState extends State<NearbyScreen> {
                           padding: const EdgeInsets.all(12),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(12),
-                            onTap: () => _openDirections(facility),
+                            onTap: () {
+                              _mapController.move(LatLng(facility.lat, facility.lng), 16);
+                              _showFacilityInfo(facility);
+                            },
                             child: Padding(
                               padding: const EdgeInsets.all(4),
                               child: Row(
@@ -302,26 +339,11 @@ class _NearbyScreenState extends State<NearbyScreen> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          facility.name,
-                                          style: Theme.of(context).textTheme.titleSmall,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        Text(
-                                          facility.address,
-                                          style: Theme.of(context).textTheme.bodySmall,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                        Text(facility.name, style: Theme.of(context).textTheme.titleSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+                                        Text(facility.address, style: Theme.of(context).textTheme.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
                                       ],
                                     ),
                                   ),
-                                  if (facility.rating != null) ...[
-                                    const Icon(Icons.star, color: Colors.amber, size: 16),
-                                    const SizedBox(width: 2),
-                                    Text(facility.rating!.toStringAsFixed(1)),
-                                  ],
                                   const SizedBox(width: 8),
                                   const Icon(Icons.directions, size: 20),
                                 ],
@@ -347,10 +369,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
           Container(
             width: 12,
             height: 12,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.8),
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.8), shape: BoxShape.circle),
           ),
           const SizedBox(width: 4),
           Text(label, style: const TextStyle(fontSize: 11)),
