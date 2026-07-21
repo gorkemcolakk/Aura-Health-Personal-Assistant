@@ -27,13 +27,14 @@ class HealthFacility {
 
 class PlacesService {
   static const _nominatimUrl = 'https://nominatim.openstreetmap.org';
+  static const _overpassUrl = 'https://overpass-api.de/api/interpreter';
 
-  // Her tip için ayrı arama (Nominatim free-text search)
+  // Türkçe arama terimleri + OSM tag'leri
   static const _queries = {
     'Hastane': 'hospital',
-    'Eczane': 'pharmacy',
+    'Eczane': 'eczane',
     'Klinik': 'clinic',
-    'Sağlık Ocağı': 'health centre',
+    'Sağlık Ocağı': 'aile sağlığı merkezi',
   };
 
   /// Adresi koordinata çevir
@@ -66,11 +67,100 @@ class PlacesService {
     return null;
   }
 
+  // Overpass API OSM tag eşleştirmesi
+  static const _osmTags = {
+    'Hastane': ['"amenity"="hospital"'],
+    'Eczane': ['"amenity"="pharmacy"', '"shop"="chemist"'],
+    'Klinik': ['"amenity"="clinic"', '"amenity"="doctors"'],
+    'Sağlık Ocağı': ['"amenity"="clinic"', '"healthcare"="centre"'],
+  };
+
   Future<List<HealthFacility>> findNearbyHealthFacilities({
     required double lat,
     required double lng,
     int maxDistanceKm = 3,
   }) async {
+    // Önce Overpass API dene (daha iyi sonuç)
+    final overpassResults = await _searchOverpass(lat, lng, maxDistanceKm);
+    if (overpassResults.isNotEmpty) return overpassResults;
+
+    // Fallback: Nominatim
+    return _searchNominatim(lat, lng, maxDistanceKm);
+  }
+
+  Future<List<HealthFacility>> _searchOverpass(
+    double lat, double lng, int maxDistanceKm,
+  ) async {
+    final allResults = <HealthFacility>[];
+
+    for (final entry in _osmTags.entries) {
+      final tagQueries = entry.value.map((t) => 'node[$t](around:${maxDistanceKm * 1000},$lat,$lng);').join();
+      final query = '[out:json];($tagQueries);out body 30;';
+
+      try {
+        final response = await http.post(
+          Uri.parse(_overpassUrl),
+          body: query,
+          headers: {'Content-Type': 'text/plain'},
+        );
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          final elements = data['elements'] as List<dynamic>?;
+
+          if (elements != null) {
+            for (final el in elements) {
+              final tags = el['tags'] as Map<String, dynamic>?;
+              if (tags == null) continue;
+
+              final rLat = (el['lat'] as num?)?.toDouble() ?? 0.0;
+              final rLng = (el['lon'] as num?)?.toDouble() ?? 0.0;
+              final dist = _haversineKm(lat, lng, rLat, rLng);
+              if (dist > maxDistanceKm) continue;
+
+              final name = tags['name']?.toString() ??
+                  tags['name:tr']?.toString() ??
+                  entry.key;
+              final street = tags['addr:street']?.toString() ?? '';
+              final city = tags['addr:city']?.toString() ?? '';
+
+              allResults.add(HealthFacility(
+                name: name,
+                address: '$name, $street, $city'.trim(),
+                type: entry.key,
+                lat: rLat,
+                lng: rLng,
+                distanceKm: dist,
+              ));
+            }
+          }
+        }
+      } catch (_) {}
+
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+
+    // Duplicate temizle, mesafeye göre sırala
+    final seen = <String>{};
+    final filtered = allResults.where((f) {
+      final key = '${f.name}_${f.lat}_${f.lng}';
+      if (seen.contains(key)) return false;
+      seen.add(key);
+      return true;
+    }).toList();
+
+    filtered.sort((a, b) {
+      final dA = _haversineKm(lat, lng, a.lat, a.lng);
+      final dB = _haversineKm(lat, lng, b.lat, b.lng);
+      return dA.compareTo(dB);
+    });
+
+    return filtered;
+  }
+
+  Future<List<HealthFacility>> _searchNominatim(
+    double lat, double lng, int maxDistanceKm,
+  ) async {
     final allResults = <HealthFacility>[];
 
     // 5km için yaklaşık 0.05 derece

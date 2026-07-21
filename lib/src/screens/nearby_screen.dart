@@ -23,6 +23,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
   List<HealthFacility> _facilities = [];
   bool _loading = true;
   String? _error;
+  String? _activeFilter; // null = hepsi
 
   static const _defaultLocation = LatLng(41.0082, 28.9784);
 
@@ -163,6 +164,9 @@ class _NearbyScreenState extends State<NearbyScreen> {
 
   List<Marker> _buildMarkers() {
     final markers = <Marker>[];
+    final filtered = _activeFilter == null
+        ? _facilities
+        : _facilities.where((f) => f.type == _activeFilter).toList();
 
     if (_currentLocation != null) {
       markers.add(
@@ -175,7 +179,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
       );
     }
 
-    for (final f in _facilities) {
+    for (final f in filtered) {
       final color = _typeColors[f.type] ?? Colors.grey;
       markers.add(
         Marker(
@@ -321,7 +325,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
             ),
           // Adres arama
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -340,6 +344,22 @@ class _NearbyScreenState extends State<NearbyScreen> {
               onSubmitted: _searchAddress,
             ),
           ),
+          // Filtre çipleri
+          SizedBox(
+            height: 36,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              children: [
+                _filterChip('Tümü', null),
+                _filterChip('🏥 Hastane', 'Hastane'),
+                _filterChip('💊 Eczane', 'Eczane'),
+                _filterChip('🩺 Klinik', 'Klinik'),
+                _filterChip('🏚️ Sağlık Ocağı', 'Sağlık Ocağı'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 4),
           Expanded(
             flex: 3,
             child: ClipRRect(
@@ -396,11 +416,24 @@ class _NearbyScreenState extends State<NearbyScreen> {
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   )
-                : ListView.builder(
+                : Builder(
+                    builder: (context) {
+                      final filtered = _activeFilter == null
+                          ? _facilities
+                          : _facilities.where((f) => f.type == _activeFilter).toList();
+                      if (filtered.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'Bu kategoride sonuç bulunamadı',
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        );
+                      }
+                      return ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    itemCount: _facilities.length,
+                    itemCount: filtered.length,
                     itemBuilder: (context, index) {
-                      final facility = _facilities[index];
+                      final facility = filtered[index];
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: AuraCard(
@@ -447,6 +480,20 @@ class _NearbyScreenState extends State<NearbyScreen> {
                   ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _filterChip(String label, String? type) {
+    final selected = _activeFilter == type;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: FilterChip(
+        label: Text(label, style: const TextStyle(fontSize: 12)),
+        selected: selected,
+        onSelected: (_) => setState(() => _activeFilter = type),
+        visualDensity: VisualDensity.compact,
+        selectedColor: Theme.of(context).colorScheme.primaryContainer,
       ),
     );
   }
