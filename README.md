@@ -1,6 +1,6 @@
 # 🧘 Aura Health — Kişisel Sağlık Asistanı
 
-**Aura Health**, günlük sağlık takibini kolaylaştıran, yapay zeka destekli bir Flutter mobil uygulamasıdır. Su tüketimi, uyku, ilaç hatırlatmaları, BMI hesaplama ve Gemini AI koçluk özellikleriyle sağlığınızı tek bir yerden yönetmenizi sağlar.
+**Aura Health**, günlük sağlık takibini kolaylaştıran, yapay zeka destekli bir Flutter mobil uygulamasıdır. Su tüketimi, uyku, ilaç hatırlatmaları, BMI hesaplama ve AI koçluk özellikleriyle sağlığınızı tek bir yerden yönetmenizi sağlar.
 
 <p align="center">
   <img src="aura_mobile_final3.png" alt="Aura Health" width="260"/>
@@ -29,10 +29,9 @@
 - **Bildirim alarmı** — Tam ekran glassmorphism overlay, nefes animasyonu ile
 
 ### 🤖 AI Sağlık Koçu
-- **Google Gemini** destekli sohbet asistanı
+- Yapay zeka destekli sohbet asistanı
 - Sağlık profiline, ilaçlarına, su ve uyku verilerine özel yanıtlar
 - Hızlı soru çipleri: "Bugünkü sağlık özetim", "Su tüketimim nasıl?", "Kilo kontrolü tavsiyesi"
-- API anahtarı yoksa dialog ile isteme
 - Sohbet geçmişi silinebilir
 
 ### 👤 Kullanıcı Sistemi
@@ -57,7 +56,7 @@
 | **Yerel Depolama** | `shared_preferences` |
 | **Bildirimler** | `flutter_local_notifications` |
 | **Grafik** | `fl_chart` |
-| **AI** | Google Gemini (`google_generative_ai`) |
+| **AI** | Yapay Zeka API (DeepSeek) |
 | **Backend (opsiyonel)** | Node.js HTTP sunucu (`server.mjs`) |
 | **Şifreleme** | SHA-256 (`crypto`) |
 
@@ -86,7 +85,7 @@ lib/
     │   ├── profile_screen.dart   # Kullanıcı profili ve ayarlar
     │   └── register_screen.dart  # Kayıt ekranı
     ├── services/
-    │   ├── ai_coach_service.dart  # Gemini AI servisi
+    │   ├── ai_coach_service.dart  # Yapay zeka servisi
     │   ├── database_service.dart  # SQLite veritabanı servisi
     │   ├── health_calculator.dart # BMI, su hedefi hesaplamaları
     │   ├── notification_service.dart # İlaç alarm bildirimleri
@@ -128,18 +127,16 @@ flutter run
 
 ### Backend (Opsiyonel)
 
-AI özellikleri için Gemini API anahtarını backend proxy üzerinden kullanabilirsin:
+AI özellikleri için backend proxy kullanabilirsin:
 
 ```bash
 cd backend
 cp .env.example .env.local
-# .env.local dosyasına GEMINI_API_KEY ekle
+# .env.local dosyasına API anahtarını ekle
 node server.mjs
 ```
 
-Proxy `http://127.0.0.1:8787` adresinde çalışır. Uygulama proxy'e ulaşamazsa offline yanıtlarla devam eder.
-
-Alternatif olarak API anahtarını doğrudan uygulama üzerinden AI Koç ekranındaki dialog'dan da girebilirsin.
+Proxy `http://127.0.0.1:8787` adresinde çalışır.
 
 ---
 
@@ -147,13 +144,16 @@ Alternatif olarak API anahtarını doğrudan uygulama üzerinden AI Koç ekranı
 
 - Kullanıcı şifreleri **SHA-256** ile hash'lenerek SQLite'da saklanır
 - TC Kimlik No, kullanıcı kimliklendirme anahtarı olarak kullanılır
-- Gemini API anahtarı cihazda `shared_preferences` içinde tutulur (opsiyonel olarak backend proxy üzerinden de kullanılabilir)
 
 ---
 
-## 📄 Lisans
+## 📬 İletişim
 
-MIT — Dilediğiniz gibi kullanın, değiştirin ve paylaşın.
+| | |
+|---|---|
+| 📍 | İstanbul, Türkiye |
+| 📧 | [grkeemcolak@icloud.com](mailto:grkeemcolak@icloud.com) |
+| 🔗 | [linkedin.com/in/eren-görkem-çolak](https://linkedin.com/in/eren-görkem-çolak) |
 
 ---
 
