@@ -5,8 +5,8 @@
 <p align="center">
   <img src="images/dashboard.png" alt="Dashboard" width="180"/>
   <img src="images/ai-chat.png" alt="AI Chat" width="180"/>
+  <img src="images/medications.png" alt="Medications" width="180"/>
   <img src="images/nearby-map.png" alt="Nearby Map" width="180"/>
-  <img src="images/emergency-card.png" alt="Emergency Card" width="180"/>
   <img src="images/profile.png" alt="Profile" width="180"/>
 </p>
 
