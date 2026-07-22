@@ -691,30 +691,27 @@ class _WaterTimelineCard extends StatelessWidget {
 
   final AuraController controller;
 
-  String _dateLabel(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final logDay = DateTime(date.year, date.month, date.day);
-    final diff = today.difference(logDay).inDays;
-    if (diff == 0) return 'Bugün';
-    if (diff == 1) return 'Dün';
-    return '${logDay.day}/${logDay.month}';
-  }
-
   @override
   Widget build(BuildContext context) {
-    final logs = controller.profile.waterLogs;
+    final allLogs = controller.profile.waterLogs;
+    if (allLogs.isEmpty) return const SizedBox.shrink();
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    // Sadece bugünün kayıtları
+    final logs = allLogs
+        .where((l) =>
+            l.timestamp.year == today.year &&
+            l.timestamp.month == today.month &&
+            l.timestamp.day == today.day)
+        .toList()
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
     if (logs.isEmpty) return const SizedBox.shrink();
 
+    final todayTotal = logs.fold<int>(0, (sum, l) => sum + l.amountMl);
     final colors = Theme.of(context).colorScheme;
-    final sortedLogs = List<WaterLog>.from(logs)..sort((a, b) => b.timestamp.compareTo(a.timestamp));
-
-    // Tarihe göre grupla
-    final grouped = <String, List<WaterLog>>{};
-    for (final log in sortedLogs) {
-      final label = _dateLabel(log.timestamp);
-      grouped.putIfAbsent(label, () => []).add(log);
-    }
 
     return AuraCard(
       child: Column(
@@ -724,64 +721,34 @@ class _WaterTimelineCard extends StatelessWidget {
             children: [
               const Icon(Icons.history, size: 20),
               const SizedBox(width: 10),
-              Text('Su geçmişi', style: Theme.of(context).textTheme.titleMedium),
+              Text('Bugünkü su geçmişi', style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
-              Text('${logs.length} giriş', style: TextStyle(color: colors.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w500)),
+              Text('${(todayTotal / 1000).toStringAsFixed(1)} L', style: TextStyle(color: colors.primary, fontWeight: FontWeight.w700)),
             ],
           ),
-          const SizedBox(height: 14),
-          ...grouped.entries.map((entry) {
-            final dateLabel = entry.key;
-            final dayLogs = entry.value;
-            final dayTotal = dayLogs.fold<int>(0, (sum, l) => sum + l.amountMl);
+          const SizedBox(height: 12),
+          ...logs.map((log) {
+            final timeStr = '${log.timestamp.hour.toString().padLeft(2, '0')}:${log.timestamp.minute.toString().padLeft(2, '0')}';
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(dateLabel, style: TextStyle(fontWeight: FontWeight.w700, color: colors.primary, fontSize: 13)),
-                    const SizedBox(width: 8),
-                    Text('${(dayTotal / 1000).toStringAsFixed(1)} L', style: TextStyle(color: colors.onSurfaceVariant, fontSize: 12)),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                ...dayLogs.map((log) {
-                  final turkeyTime = log.timestamp.toUtc().add(const Duration(hours: 3));
-                  final timeStr = '${turkeyTime.hour.toString().padLeft(2, '0')}:${turkeyTime.minute.toString().padLeft(2, '0')}';
-
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 10, height: 10,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF1E88E5).withValues(alpha: .15),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: const Color(0xFF1E88E5), width: 2.5),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(timeStr, style: TextStyle(color: colors.onSurfaceVariant, fontSize: 13)),
-                        const SizedBox(width: 10),
-                        Text('${log.amountMl} ml', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                        const Spacer(),
-                        InkWell(
-                          onTap: () {
-                            controller.deleteWaterLog(log);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('${log.amountMl} ml kayıt silindi.'), behavior: SnackBarBehavior.floating, duration: const Duration(seconds: 2)),
-                            );
-                          },
-                          child: Icon(Icons.delete_outline, color: colors.error.withValues(alpha: .75), size: 16),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-                const SizedBox(height: 10),
-              ],
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(
+                children: [
+                  Container(width: 10, height: 10, decoration: BoxDecoration(color: const Color(0xFF1E88E5).withValues(alpha: .15), shape: BoxShape.circle, border: Border.all(color: const Color(0xFF1E88E5), width: 2.5))),
+                  const SizedBox(width: 12),
+                  Text(timeStr, style: TextStyle(color: colors.onSurfaceVariant, fontSize: 13)),
+                  const SizedBox(width: 10),
+                  Text('${log.amountMl} ml', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  const Spacer(),
+                  InkWell(
+                    onTap: () {
+                      controller.deleteWaterLog(log);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${log.amountMl} ml kayıt silindi.'), behavior: SnackBarBehavior.floating, duration: const Duration(seconds: 2)));
+                    },
+                    child: Icon(Icons.delete_outline, color: colors.error.withValues(alpha: .75), size: 16),
+                  ),
+                ],
+              ),
             );
           }),
         ],
