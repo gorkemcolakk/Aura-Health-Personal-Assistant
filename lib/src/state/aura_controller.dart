@@ -29,7 +29,7 @@ class AuraController extends ChangeNotifier {
   HealthProfile profile = HealthProfile.initial();
   List<Medication> medications = const [];
   String? apiKey;
-  ThemeMode themeMode = ThemeMode.system;
+  String themeKey = 'system';
 
   String? currentUserTc;
   String? currentUserName;
@@ -56,7 +56,7 @@ class AuraController extends ChangeNotifier {
 
   Future<void> load() async {
     apiKey = await storage.loadApiKey();
-    themeMode = await storage.loadThemeMode();
+    themeKey = await storage.loadThemeKey();
     // Do not load profile/medications until user logs in.
     
     _medicationTimer?.cancel();
@@ -169,10 +169,10 @@ class AuraController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setThemeMode(ThemeMode mode) async {
-    themeMode = mode;
+  Future<void> setThemeKey(String key) async {
+    themeKey = key;
     notifyListeners();
-    await storage.saveThemeMode(mode);
+    await storage.saveThemeKey(key);
   }
 
   Future<void> saveProfile(HealthProfile nextProfile) async {

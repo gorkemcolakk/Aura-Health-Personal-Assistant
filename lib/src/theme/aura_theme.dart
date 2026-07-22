@@ -122,4 +122,67 @@ class AuraTheme {
       ),
     );
   }
+
+  static ThemeData nature() {
+    const forest = Color(0xFF2D6A4F);
+    const sage = Color(0xFF52B788);
+    const teal = Color(0xFF1A8C83);
+    const cream = Color(0xFFFAF8F0);
+    const leaf = Color(0xFFD8F3DC);
+    const bark = Color(0xFF3E2723);
+
+    final scheme = ColorScheme.fromSeed(
+      seedColor: forest,
+      brightness: Brightness.light,
+      primary: forest,
+      secondary: teal,
+      surface: Colors.white,
+      onSurface: bark,
+      surfaceContainerHighest: leaf,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: cream,
+      fontFamily: 'Roboto',
+      textTheme: const TextTheme(
+        headlineLarge: TextStyle(fontWeight: FontWeight.w700, height: 1.05, letterSpacing: -0.5),
+        headlineMedium: TextStyle(fontWeight: FontWeight.w700, height: 1.1),
+        titleLarge: TextStyle(fontWeight: FontWeight.w700),
+        titleMedium: TextStyle(fontWeight: FontWeight.w600),
+        bodyLarge: TextStyle(height: 1.4),
+        bodyMedium: TextStyle(height: 1.4),
+      ),
+      cardTheme: CardThemeData(
+        color: Colors.white,
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(color: sage.withValues(alpha: .25)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(color: sage.withValues(alpha: .25)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: forest, width: 1.5),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size.fromHeight(52),
+          backgroundColor: forest,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        ),
+      ),
+    );
+  }
 }
