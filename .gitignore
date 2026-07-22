@@ -46,3 +46,12 @@ app.*.map.json
 
 # Secrets (API keys)
 lib/src/config/secrets.dart
+
+# Generated / junk
+.metadata
+*.err.log
+*.log
+aura_mobile*.png
+flutter_web*.log
+web_*.log
+backend_proxy*.log
