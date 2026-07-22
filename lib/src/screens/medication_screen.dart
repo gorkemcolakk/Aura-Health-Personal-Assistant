@@ -153,7 +153,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
                             ? Icons.notifications_active
                             : Icons.notifications_off,
                         color: medication.enabled
-                            ? const Color(0xFF1A8C83)
+                            ? Theme.of(context).colorScheme.primary
                             : Colors.grey,
                       ),
                     ),

@@ -70,10 +70,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 22, 20, 120),
         children: [
-          Text('Profil', style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: 8),
-          const Text(
-            'VKİ, su ihtiyacı ve AI önerileri bu bilgilerle hesaplanır.',
+          // Renkli header
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle),
+                  child: Center(
+                    child: Text(profile.initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18)),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Profil', style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white)),
+                      const SizedBox(height: 2),
+                      Text('VKİ, su ihtiyacı ve AI önerileri bu bilgilerle hesaplanır.', style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 18),
           AuraCard(

@@ -68,14 +68,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Icon(
                   Icons.health_and_safety,
                   size: 80,
-                  color: Color(0xFF1A8C83),
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'Aura Health',
                   style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF1A8C83),
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                 ),
                 const SizedBox(height: 8),

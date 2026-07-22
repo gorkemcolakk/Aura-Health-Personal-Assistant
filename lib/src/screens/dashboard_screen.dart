@@ -273,7 +273,7 @@ class _Header extends StatelessWidget {
           height: 56,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: const Color(0xFF1A8C83),
+            color: Theme.of(context).colorScheme.primary,
             borderRadius: BorderRadius.circular(18),
           ),
           child: Text(
@@ -427,7 +427,7 @@ class _Ring extends StatelessWidget {
             value: progress,
             strokeWidth: 13,
             backgroundColor: const Color(0xFFE7EFED),
-            color: const Color(0xFF1A8C83),
+            color: Theme.of(context).colorScheme.primary,
             strokeCap: StrokeCap.round,
           ),
           Center(
@@ -781,7 +781,7 @@ class _WeeklyWaterChart extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.bar_chart, color: Color(0xFF1A8C83)),
+              Icon(Icons.bar_chart, color: Theme.of(context).colorScheme.primary),
               const SizedBox(width: 8),
               Text(
                 'Haftalık Su Tüketimi',
@@ -830,7 +830,7 @@ class _WeeklyWaterChart extends StatelessWidget {
                           child: Text(
                             dayData.dayName,
                             style: TextStyle(
-                              color: dayData.isToday ? const Color(0xFF1A8C83) : Colors.grey.shade600,
+                              color: dayData.isToday ? Theme.of(context).colorScheme.primary : Colors.grey.shade600,
                               fontWeight: dayData.isToday ? FontWeight.bold : FontWeight.w500,
                               fontSize: 12,
                             ),
@@ -855,7 +855,7 @@ class _WeeklyWaterChart extends StatelessWidget {
                   horizontalInterval: target > 0 ? target : 2000,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
-                      color: const Color(0xFF1A8C83).withValues(alpha: 0.3),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                       strokeWidth: 2,
                       dashArray: [5, 5],
                     );
@@ -873,7 +873,7 @@ class _WeeklyWaterChart extends StatelessWidget {
                     barRods: [
                       BarChartRodData(
                         toY: day.amountMl.toDouble(),
-                        color: isReached ? const Color(0xFF1A8C83) : const Color(0xFF78C0A8),
+                        color: isReached ? Theme.of(context).colorScheme.primary : const Color(0xFF78C0A8),
                         width: 18,
                         borderRadius: BorderRadius.circular(6),
                         backDrawRodData: BackgroundBarChartRodData(
@@ -895,7 +895,7 @@ class _WeeklyWaterChart extends StatelessWidget {
               Container(
                 width: 20,
                 height: 2,
-                color: const Color(0xFF1A8C83).withValues(alpha: 0.5),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
               ),
               const SizedBox(width: 8),
               Text(
