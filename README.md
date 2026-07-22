@@ -3,7 +3,11 @@
 **Aura Health**, günlük sağlık takibini kolaylaştıran, yapay zeka destekli bir Flutter mobil uygulamasıdır. Su tüketimi, uyku, ilaç hatırlatmaları, BMI hesaplama ve AI koçluk özellikleriyle sağlığınızı tek bir yerden yönetmenizi sağlar.
 
 <p align="center">
-  <img src="aura_mobile_final3.png" alt="Aura Health" width="260"/>
+  <img src="images/dashboard.png" alt="Dashboard" width="180"/>
+  <img src="images/ai-chat.png" alt="AI Chat" width="180"/>
+  <img src="images/nearby-map.png" alt="Nearby Map" width="180"/>
+  <img src="images/emergency-card.png" alt="Emergency Card" width="180"/>
+  <img src="images/profile.png" alt="Profile" width="180"/>
 </p>
 
 ---
