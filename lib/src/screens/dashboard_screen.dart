@@ -372,7 +372,7 @@ class _HeroStatus extends StatelessWidget {
               Expanded(
                 child: _Ring(
                   progress: waterProgress,
-                  center: '${(consumed / 1000).toStringAsFixed(1)} L',
+                  center: '${(consumed / 1000).toStringAsFixed(2)} L',
                   label: 'Su',
                 ),
               ),
@@ -393,7 +393,7 @@ class _HeroStatus extends StatelessWidget {
                       borderRadius: BorderRadius.circular(99),
                     ),
                     const SizedBox(height: 8),
-                    Text('Hedef ${(waterTarget / 1000).toStringAsFixed(1)} L'),
+                    Text('Hedef ${(waterTarget / 1000).toStringAsFixed(2)} L'),
                   ],
                 ),
               ),
@@ -723,7 +723,7 @@ class _WaterTimelineCard extends StatelessWidget {
               const SizedBox(width: 10),
               Text('Bugünkü su geçmişi', style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
-              Text('${(todayTotal / 1000).toStringAsFixed(1)} L', style: TextStyle(color: colors.primary, fontWeight: FontWeight.w700)),
+              Text('${(todayTotal / 1000).toStringAsFixed(2)} L', style: TextStyle(color: colors.primary, fontWeight: FontWeight.w700)),
             ],
           ),
           const SizedBox(height: 12),
