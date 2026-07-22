@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.health_and_safety,
                   size: 80,
                   color: Theme.of(context).colorScheme.primary,
