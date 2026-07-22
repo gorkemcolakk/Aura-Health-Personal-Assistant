@@ -27,13 +27,9 @@ class AuraApp extends StatelessWidget {
           return MaterialApp(
             title: 'Aura Health',
             debugShowCheckedModeBanner: false,
-            theme: controller.themeKey == 'nature' ? AuraTheme.nature() : AuraTheme.light(),
+            theme: AuraTheme.light(),
             darkTheme: AuraTheme.dark(),
-            themeMode: controller.themeKey == 'dark'
-                ? ThemeMode.dark
-                : controller.themeKey == 'system'
-                    ? ThemeMode.system
-                    : ThemeMode.light,
+            themeMode: controller.themeMode,
             home: controller.currentUserTc == null
                 ? const LoginScreen()
                 : const AuraShell(),
@@ -228,16 +224,20 @@ class _DockItem extends StatelessWidget {
 class _ThemeToggleButton extends StatelessWidget {
   const _ThemeToggleButton();
 
-  static const _keys = ['light', 'dark', 'nature'];
-  static const _icons = [Icons.light_mode, Icons.dark_mode, Icons.eco];
-  static const _labels = ['Aydınlık', 'Karanlık', 'Doğa'];
-
   @override
   Widget build(BuildContext context) {
     final controller = AuraScope.of(context);
-    final idx = _keys.indexOf(controller.themeKey);
-    final icon = _icons[idx >= 0 ? idx : 0];
-    final label = _labels[idx >= 0 ? idx : 0];
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final mode = controller.themeMode;
+
+    IconData icon;
+    if (mode == ThemeMode.system) {
+      icon = Icons.brightness_medium;
+    } else if (mode == ThemeMode.dark) {
+      icon = Icons.dark_mode;
+    } else {
+      icon = Icons.light_mode;
+    }
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
@@ -246,10 +246,17 @@ class _ThemeToggleButton extends StatelessWidget {
       shadowColor: Colors.black26,
       child: IconButton(
         icon: Icon(icon, color: Theme.of(context).colorScheme.primary),
-        tooltip: 'Tema: $label',
+        tooltip: 'Tema Değiştir',
         onPressed: () {
-          final nextIdx = (idx + 1) % _keys.length;
-          controller.setThemeKey(_keys[nextIdx]);
+          ThemeMode nextMode;
+          if (mode == ThemeMode.system) {
+            nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
+          } else if (mode == ThemeMode.dark) {
+            nextMode = ThemeMode.light;
+          } else {
+            nextMode = ThemeMode.system;
+          }
+          controller.setThemeMode(nextMode);
         },
       ),
     );

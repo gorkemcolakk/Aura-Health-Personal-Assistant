@@ -57,13 +57,21 @@ class StorageService {
     await prefs.setString('aura.api_key', key.trim());
   }
 
-  Future<String> loadThemeKey() async {
+  Future<ThemeMode> loadThemeMode() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('aura.theme_key') ?? 'system';
+    final value = prefs.getString('aura.theme_mode');
+    switch (value) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
+    }
   }
 
-  Future<void> saveThemeKey(String key) async {
+  Future<void> saveThemeMode(ThemeMode mode) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('aura.theme_key', key);
+    await prefs.setString('aura.theme_mode', mode.name);
   }
 }
