@@ -35,12 +35,20 @@ class HealthCalculator {
         .round();
   }
 
+  static int todayWaterMl(HealthProfile profile) {
+    final today = DateTime.now();
+    return profile.waterLogs
+        .where((log) =>
+            log.timestamp.year == today.year &&
+            log.timestamp.month == today.month &&
+            log.timestamp.day == today.day)
+        .fold<int>(0, (sum, log) => sum + log.amountMl);
+  }
+
   static double waterProgress(HealthProfile profile) {
     final target = dailyWaterTargetMl(profile);
-    if (target <= 0) {
-      return 0;
-    }
-    return (profile.waterConsumedMl / target).clamp(0, 1);
+    if (target <= 0) return 0;
+    return (todayWaterMl(profile) / target).clamp(0, 1);
   }
 
   static List<DailyWater> getWeeklyWaterData(HealthProfile profile) {

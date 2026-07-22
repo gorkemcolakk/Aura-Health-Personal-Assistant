@@ -90,7 +90,7 @@ Hastanın profili:
 - Aktivite seviyesi: ${profile.activity.name}
 - Sağlık hedefi: ${profile.healthGoal}
 - Hastalıklar/Alerjiler/Durum: ${profile.conditions}
-- Bugün İçilen Su: ${profile.waterConsumedMl} / $waterTarget ml$sleepText
+- Bugün İçilen Su: ${HealthCalculator.todayWaterMl(profile)} / $waterTarget ml$sleepText
 - Vücut Kitle İndeksi (VKİ): ${HealthCalculator.bmi(profile).toStringAsFixed(1)}
 
 Şu anki ilaçları:
@@ -107,7 +107,7 @@ Kısa, samimi, empatik ve motive edici cevaplar ver. Tıbbi tavsiye verme, sadec
     return '''
 Yerel Aura yorumu:
 
-VKİ değerin yaklaşık ${bmi.toStringAsFixed(1)} ve kategori "$label". Günlük su hedefin yaklaşık ${(water / 1000).toStringAsFixed(1)} L. Bugün ${profile.waterConsumedMl} ml kaydetmişsin; küçük aralıklarla su içmek hedefe ulaşmayı kolaylaştırır.
+VKİ değerin yaklaşık ${bmi.toStringAsFixed(1)} ve kategori "$label". Günlük su hedefin yaklaşık ${(water / 1000).toStringAsFixed(1)} L. Bugün ${HealthCalculator.todayWaterMl(profile)} ml kaydetmişsin; küçük aralıklarla su içmek hedefe ulaşmayı kolaylaştırır.
 
 "$question" için güvenli önerim: belirti, ağrı, ilaç yan etkisi veya ani değişim varsa bunu kişisel tıbbi karar gibi ele alma; hekim ya da eczacıya danış. Günlük takip, uyku, su ve ilaç düzeni tarafında yardımcı olabilirim.
 ''';
