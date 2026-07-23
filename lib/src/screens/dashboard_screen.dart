@@ -997,7 +997,7 @@ class _SleepCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Hedef: ${target.toStringAsFixed(0)} saat',
+              'Hedef: ${target.toStringAsFixed(1)} saat',
               style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
             ),
           ] else ...[
@@ -1378,7 +1378,7 @@ class _WeeklySleepChart extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Hedef: ${target.toInt()} saat',
+                'Hedef: ${target.toStringAsFixed(1)} saat',
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
               ),
             ],

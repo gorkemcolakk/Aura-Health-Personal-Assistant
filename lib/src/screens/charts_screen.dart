@@ -204,7 +204,7 @@ class _SleepBars extends StatelessWidget {
               const SizedBox(width: 8),
               Text('Haftalık Uyku Düzeni', style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
-              Text('Hedef ${target.toStringAsFixed(0)} saat', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
+              Text('Hedef ${target.toStringAsFixed(1)} saat', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
             ],
           ),
           const SizedBox(height: 16),
