@@ -1,33 +1,14 @@
 import 'dart:math';
 
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import '../services/health_calculator.dart';
 import '../state/aura_scope.dart';
 import '../widgets/aura_card.dart';
 
-class ChartsScreen extends StatefulWidget {
+class ChartsScreen extends StatelessWidget {
   const ChartsScreen({super.key});
-
-  @override
-  State<ChartsScreen> createState() => _ChartsScreenState();
-}
-
-class _ChartsScreenState extends State<ChartsScreen> with TickerProviderStateMixin {
-  late final AnimationController _waveCtrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _waveCtrl = AnimationController(vsync: this, duration: const Duration(seconds: 3))
-      ..repeat();
-  }
-
-  @override
-  void dispose() {
-    _waveCtrl.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +23,7 @@ class _ChartsScreenState extends State<ChartsScreen> with TickerProviderStateMix
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
         children: [
-          _WaterWaveChart(controller: controller, animation: _waveCtrl),
+          const _WaterWaveChart(),
           const SizedBox(height: 20),
           _SleepBars(controller: controller),
         ],
@@ -53,17 +34,13 @@ class _ChartsScreenState extends State<ChartsScreen> with TickerProviderStateMix
 
 // ─── Su Dalga Grafiği ──────────────────────────────────────
 class _WaterWaveChart extends StatelessWidget {
-  const _WaterWaveChart({required this.controller, required this.animation});
-
-  final dynamic controller;
-  final Animation<double> animation;
+  const _WaterWaveChart();
 
   @override
   Widget build(BuildContext context) {
+    final controller = AuraScope.of(context);
     final weeklyData = HealthCalculator.getWeeklyWaterData(controller.profile);
     final target = HealthCalculator.dailyWaterTargetMl(controller.profile);
-    final todayMl = HealthCalculator.todayWaterMl(controller.profile);
-    final todayPct = target > 0 ? (todayMl / target).clamp(0.0, 1.0) : 0.0;
     final colors = Theme.of(context).colorScheme;
 
     return AuraCard(
@@ -84,42 +61,75 @@ class _WaterWaveChart extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // Bugün — animasyonlu dalga
-          Center(
-            child: SizedBox(
-              width: 170,
-              height: 170,
-              child: AnimatedBuilder(
-                animation: animation,
-                builder: (context, _) {
-                  return CustomPaint(
-                    painter: _WavePainter(
-                      progress: todayPct,
-                      phase: animation.value * 2 * pi,
-                      color: colors.primary,
+          // Çizgi grafik
+          SizedBox(
+            height: 180,
+            child: LineChart(
+              LineChartData(
+                gridData: FlGridData(
+                  show: true,
+                  drawHorizontalLine: true,
+                  getDrawingHorizontalLine: (value) => FlLine(
+                    color: value == target.toDouble() ? colors.primary.withValues(alpha: 0.3) : colors.surfaceContainerHighest,
+                    strokeWidth: value == target.toDouble() ? 2 : 1,
+                    dashArray: value == target.toDouble() ? [6, 4] : null,
+                  ),
+                ),
+                titlesData: FlTitlesData(
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, meta) {
+                        final days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(days[value.toInt()], style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: colors.onSurfaceVariant)),
+                        );
+                      },
                     ),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '${(todayMl / 1000).toStringAsFixed(2)} L',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              color: colors.primary,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          Text(
-                            'Bugün',
-                            style: TextStyle(color: colors.onSurfaceVariant, fontSize: 13),
-                          ),
-                        ],
+                  ),
+                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                ),
+                borderData: FlBorderData(show: false),
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: weeklyData.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value.amountMl.toDouble())).toList(),
+                    isCurved: true,
+                    curveSmoothness: 0.3,
+                    color: colors.primary,
+                    barWidth: 3,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) {
+                        final dayData = weeklyData[index];
+                        return FlDotCirclePainter(
+                          radius: dayData.isToday ? 5 : 3,
+                          color: dayData.isToday ? colors.primary : colors.primary.withValues(alpha: 0.4),
+                          strokeWidth: 2,
+                          strokeColor: Colors.white,
+                        );
+                      },
+                    ),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [colors.primary.withValues(alpha: 0.2), colors.primary.withValues(alpha: 0.02)],
                       ),
                     ),
-                  );
-                },
+                  ),
+                ],
+                minY: 0,
+                maxY: (target * 1.5).ceilToDouble(),
               ),
             ),
+          ),
+          const SizedBox(height: 8),
+          Center(
+            child: Text('Hedef ${(target / 1000).toStringAsFixed(2)} L', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
           ),
           const SizedBox(height: 20),
 
