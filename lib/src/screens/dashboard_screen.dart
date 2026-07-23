@@ -529,7 +529,7 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      padding: EdgeInsets.fromLTRB(24, 20, 24, media.viewInsets.bottom + 24),
+      padding: EdgeInsets.fromLTRB(24, 16, 24, media.viewInsets.bottom + 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -544,33 +544,25 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 decoration: const BoxDecoration(
                   color: Color(0xFFE3F2FD),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.water_drop, color: Color(0xFF1E88E5), size: 24),
+                child: const Icon(Icons.water_drop, color: Color(0xFF1E88E5), size: 20),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Text(
                 'Özel Su Ekle',
-                style: Theme.of(context).textTheme.titleLarge,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
-            ],
-          ),
-          const SizedBox(height: 28),
-          // Tarih seçici
-          Row(
-            children: [
-              const Icon(Icons.calendar_today, size: 18),
-              const SizedBox(width: 8),
-              Text('Tarih: $dateLabel', style: const TextStyle(fontWeight: FontWeight.w600)),
               const Spacer(),
-              TextButton(
+              // Tarih seçici
+              TextButton.icon(
                 onPressed: () async {
                   final picked = await showDatePicker(
                     context: context,
@@ -581,19 +573,21 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
                   );
                   if (picked != null) setState(() => _selectedDate = picked);
                 },
-                child: const Text('Değiştir'),
+                icon: const Icon(Icons.calendar_today, size: 16),
+                label: Text(dateLabel, style: const TextStyle(fontSize: 13)),
+                style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10)),
               ),
             ],
           ),
-          const Divider(height: 24),
+          const SizedBox(height: 16),
           Center(
             child: Stack(
               alignment: Alignment.center,
               children: [
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
-                  width: 140,
-                  height: 140,
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
                     color: const Color(0xFF1A8C83).withValues(alpha: .06 + (_amount / 1000) * 0.14),
                     shape: BoxShape.circle,
@@ -610,13 +604,13 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
                       '${_amount.round()}',
                       style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                             color: const Color(0xFF1A8C83),
-                            fontSize: 38,
+                            fontSize: 30,
                             fontWeight: FontWeight.w900,
                           ),
                     ),
                     Text(
                       'ml',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: colors.onSurfaceVariant,
                           ),
                     ),
@@ -625,7 +619,7 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: const Color(0xFF1A8C83),
@@ -675,8 +669,10 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.center,
             children: [150, 330, 500, 1000, 2000].map((preset) {
               final isSelected = _amount.round() == preset;
               return InkWell(
