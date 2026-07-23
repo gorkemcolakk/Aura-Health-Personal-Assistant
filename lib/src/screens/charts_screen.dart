@@ -113,7 +113,7 @@ class _WaterWaveChart extends StatelessWidget {
 
           // Çizgi grafik
           SizedBox(
-            height: 180,
+            height: 200,
             child: LineChart(
               LineChartData(
                 lineTouchData: LineTouchData(
@@ -123,22 +123,14 @@ class _WaterWaveChart extends StatelessWidget {
                       return spots.map((s) {
                         final day = weeklyData[s.spotIndex];
                         return LineTooltipItem(
-                          '${day.dayName}\n${(s.y / 1000).toStringAsFixed(2)} L',
-                          TextStyle(color: colors.primary, fontWeight: FontWeight.w700, fontSize: 12),
+                          '${day.dayName}  ${(s.y / 1000).toStringAsFixed(2)} L',
+                          const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
                         );
                       }).toList();
                     },
                   ),
                 ),
-                gridData: FlGridData(
-                  show: true,
-                  drawHorizontalLine: true,
-                  getDrawingHorizontalLine: (value) => FlLine(
-                    color: value == target.toDouble() ? colors.primary.withValues(alpha: 0.3) : colors.surfaceContainerHighest,
-                    strokeWidth: value == target.toDouble() ? 2 : 1,
-                    dashArray: value == target.toDouble() ? [6, 4] : null,
-                  ),
-                ),
+                gridData: const FlGridData(show: false),
                 titlesData: FlTitlesData(
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
@@ -146,9 +138,10 @@ class _WaterWaveChart extends StatelessWidget {
                       interval: 1,
                       getTitlesWidget: (value, meta) {
                         final days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+                        final dayData = weeklyData[value.toInt()];
                         return Padding(
                           padding: const EdgeInsets.only(top: 8),
-                          child: Text(days[value.toInt()], style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: colors.onSurfaceVariant)),
+                          child: Text(days[value.toInt()], style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: dayData.isToday ? colors.primary : colors.onSurfaceVariant)),
                         );
                       },
                     ),
@@ -162,7 +155,7 @@ class _WaterWaveChart extends StatelessWidget {
                   LineChartBarData(
                     spots: weeklyData.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value.amountMl.toDouble())).toList(),
                     isCurved: true,
-                    curveSmoothness: 0.3,
+                    curveSmoothness: 0.35,
                     color: colors.primary,
                     barWidth: 3,
                     dotData: FlDotData(
@@ -170,8 +163,8 @@ class _WaterWaveChart extends StatelessWidget {
                       getDotPainter: (spot, percent, barData, index) {
                         final dayData = weeklyData[index];
                         return FlDotCirclePainter(
-                          radius: dayData.isToday ? 5 : 4,
-                          color: dayData.isToday ? colors.primary : colors.primary.withValues(alpha: 0.4),
+                          radius: 5,
+                          color: dayData.isToday ? colors.primary : colors.primary.withValues(alpha: 0.5),
                           strokeWidth: 2,
                           strokeColor: Colors.white,
                         );
