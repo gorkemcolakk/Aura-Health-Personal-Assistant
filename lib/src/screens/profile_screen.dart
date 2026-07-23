@@ -427,16 +427,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _targetRow(BuildContext context, IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, size: 22, color: Theme.of(context).colorScheme.primary),
+        Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 12),
-        Text(label, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
+        Text(label, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface)),
         const Spacer(),
         Text(
           value,
           style: TextStyle(
             color: Theme.of(context).colorScheme.primary,
-            fontWeight: FontWeight.w700,
-            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
           ),
         ),
       ],
