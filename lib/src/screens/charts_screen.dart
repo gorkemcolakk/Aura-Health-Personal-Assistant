@@ -7,8 +7,28 @@ import '../services/health_calculator.dart';
 import '../state/aura_scope.dart';
 import '../widgets/aura_card.dart';
 
-class ChartsScreen extends StatelessWidget {
+class ChartsScreen extends StatefulWidget {
   const ChartsScreen({super.key});
+
+  @override
+  State<ChartsScreen> createState() => _ChartsScreenState();
+}
+
+class _ChartsScreenState extends State<ChartsScreen> with TickerProviderStateMixin {
+  late final AnimationController _waveCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _waveCtrl = AnimationController(vsync: this, duration: const Duration(seconds: 3))
+      ..repeat();
+  }
+
+  @override
+  void dispose() {
+    _waveCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +43,7 @@ class ChartsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
         children: [
-          const _WaterWaveChart(),
+          _WaterWaveChart(animation: _waveCtrl),
           const SizedBox(height: 20),
           _SleepBars(controller: controller),
         ],
@@ -34,13 +54,17 @@ class ChartsScreen extends StatelessWidget {
 
 // ─── Su Dalga Grafiği ──────────────────────────────────────
 class _WaterWaveChart extends StatelessWidget {
-  const _WaterWaveChart();
+  const _WaterWaveChart({required this.animation});
+
+  final Animation<double> animation;
 
   @override
   Widget build(BuildContext context) {
     final controller = AuraScope.of(context);
     final weeklyData = HealthCalculator.getWeeklyWaterData(controller.profile);
     final target = HealthCalculator.dailyWaterTargetMl(controller.profile);
+    final todayMl = HealthCalculator.todayWaterMl(controller.profile);
+    final todayPct = target > 0 ? (todayMl / target).clamp(0.0, 1.0) : 0.0;
     final colors = Theme.of(context).colorScheme;
 
     return AuraCard(
@@ -58,6 +82,32 @@ class _WaterWaveChart extends StatelessWidget {
                 style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700),
               ),
             ],
+          ),
+          const SizedBox(height: 20),
+
+          // Bugün — animasyonlu dalga
+          Center(
+            child: SizedBox(
+              width: 150,
+              height: 150,
+              child: AnimatedBuilder(
+                animation: animation,
+                builder: (context, _) {
+                  return CustomPaint(
+                    painter: _WavePainter(progress: todayPct, phase: animation.value * 2 * pi, color: colors.primary),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('${(todayMl / 1000).toStringAsFixed(2)} L', style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: colors.primary, fontWeight: FontWeight.w900)),
+                          Text('Bugün', style: TextStyle(color: colors.onSurfaceVariant, fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
           const SizedBox(height: 20),
 
@@ -130,53 +180,6 @@ class _WaterWaveChart extends StatelessWidget {
           const SizedBox(height: 8),
           Center(
             child: Text('Hedef ${(target / 1000).toStringAsFixed(2)} L', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
-          ),
-          const SizedBox(height: 20),
-
-          // Haftalık mini sütunlar
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: weeklyData.map((day) {
-              final pct = target > 0 ? (day.amountMl / target).clamp(0.0, 1.0) : 0.0;
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: Column(
-                    children: [
-                      Text(
-                        '${(day.amountMl / 1000).toStringAsFixed(1)}L',
-                        style: TextStyle(fontSize: 11, color: colors.onSurfaceVariant, fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 4),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 600),
-                        curve: Curves.easeOutCubic,
-                        height: max(70 * pct, 4),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: day.isToday
-                                ? [colors.primary, colors.primary.withValues(alpha: 0.6)]
-                                : [colors.primary.withValues(alpha: 0.35), colors.primary.withValues(alpha: 0.15)],
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        day.dayName,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: day.isToday ? FontWeight.w800 : FontWeight.w600,
-                          color: day.isToday ? colors.primary : colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
           ),
         ],
       ),
