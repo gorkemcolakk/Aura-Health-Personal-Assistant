@@ -14,6 +14,7 @@ class PdfService {
       PdfPageFormat format, HealthProfile profile, String aiSummary) async {
     final pdf = pw.Document();
 
+    // Roboto fontlarının yüklenmesi
     final font = await PdfGoogleFonts.robotoRegular();
     final fontBold = await PdfGoogleFonts.robotoBold();
 
@@ -54,22 +55,22 @@ class PdfService {
                   pw.Text('AURA HEALTH',
                       style: pw.TextStyle(
                           fontSize: 32,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.teal800)),
+                          font: fontBold,
+                          color: PdfColors.teal900)),
                   pw.Text('Doktor Raporu',
                       style: pw.TextStyle(
-                          fontSize: 22, color: PdfColors.grey700)),
+                          fontSize: 22, font: font, color: PdfColors.grey800)),
                 ],
               ),
-              pw.Divider(thickness: 2, color: PdfColors.teal200),
+              pw.Divider(thickness: 2, color: PdfColors.teal300),
               pw.SizedBox(height: 12),
 
               // ── Hasta Bilgileri ──────────────────────────────────────
               pw.Text('HASTA BİLGİLERİ',
                   style: pw.TextStyle(
                       fontSize: 18,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.teal700)),
+                      font: fontBold,
+                      color: PdfColors.teal800)),
               pw.SizedBox(height: 8),
               pw.Container(
                 padding: const pw.EdgeInsets.all(12),
@@ -86,17 +87,20 @@ class PdfService {
                         pw.Text('İsim: ${profile.name}',
                             style: pw.TextStyle(
                                 fontSize: 16,
-                                fontWeight: pw.FontWeight.bold)),
+                                font: fontBold,
+                                color: PdfColors.black)),
                         pw.SizedBox(height: 6),
                         pw.Text('Yaş: ${profile.age}',
                             style: pw.TextStyle(
                                 fontSize: 16,
-                                fontWeight: pw.FontWeight.bold)),
+                                font: fontBold,
+                                color: PdfColors.black)),
                         pw.SizedBox(height: 6),
                         pw.Text('Tarih: $formattedDate',
                             style: pw.TextStyle(
                                 fontSize: 16,
-                                fontWeight: pw.FontWeight.bold)),
+                                font: fontBold,
+                                color: PdfColors.black)),
                       ],
                     ),
                     pw.Column(
@@ -105,18 +109,21 @@ class PdfService {
                         pw.Text('Boy: ${profile.heightCm} cm',
                             style: pw.TextStyle(
                                 fontSize: 16,
-                                fontWeight: pw.FontWeight.bold)),
+                                font: fontBold,
+                                color: PdfColors.black)),
                         pw.SizedBox(height: 6),
                         pw.Text('Kilo: ${profile.weightKg} kg',
                             style: pw.TextStyle(
                                 fontSize: 16,
-                                fontWeight: pw.FontWeight.bold)),
+                                font: fontBold,
+                                color: PdfColors.black)),
                         pw.SizedBox(height: 6),
                         pw.Text(
                             'Kan Grubu: ${profile.bloodType.isEmpty ? "Belirtilmemiş" : profile.bloodType}',
                             style: pw.TextStyle(
                                 fontSize: 16,
-                                fontWeight: pw.FontWeight.bold)),
+                                font: fontBold,
+                                color: PdfColors.black)),
                       ],
                     ),
                   ],
@@ -128,16 +135,16 @@ class PdfService {
               pw.Text('SAĞLIK VERİLERİ (Son 7 Gün)',
                   style: pw.TextStyle(
                       fontSize: 18,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.teal700)),
+                      font: fontBold,
+                      color: PdfColors.teal800)),
               pw.SizedBox(height: 8),
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
                 children: [
-                  _buildMetricBox('VKİ', bmi.toStringAsFixed(1), 'kg/m2'),
-                  _buildMetricBox('Ort. Su', '${avgWater.round()}', 'ml/gün'),
+                  _buildMetricBox('VKİ', bmi.toStringAsFixed(1), 'kg/m2', font, fontBold),
+                  _buildMetricBox('Ort. Su', '${avgWater.round()}', 'ml/gün', font, fontBold),
                   _buildMetricBox(
-                      'Ort. Uyku', avgSleep.toStringAsFixed(1), 'saat/gün'),
+                      'Ort. Uyku', avgSleep.toStringAsFixed(1), 'saat/gün', font, fontBold),
                 ],
               ),
               pw.SizedBox(height: 20),
@@ -145,14 +152,14 @@ class PdfService {
               // ── Klinik Durum ─────────────────────────────────────────
               pw.Text('Klinik Durum / Alerjiler:',
                   style: pw.TextStyle(
-                      fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                      fontSize: 16, font: fontBold, color: PdfColors.black)),
               pw.SizedBox(height: 6),
               pw.Text(
                 clinicalText.isEmpty
                     ? 'Belirtilen kritik durum veya alerji yok.'
                     : clinicalText,
                 style: pw.TextStyle(
-                    fontSize: 16, fontWeight: pw.FontWeight.bold),
+                    fontSize: 16, font: fontBold, color: PdfColors.grey900),
               ),
               pw.SizedBox(height: 20),
               pw.Divider(color: PdfColors.grey400),
@@ -162,8 +169,8 @@ class PdfService {
               pw.Text('YAPAY ZEKA (AURA) DOKTOR ÖZETİ',
                   style: pw.TextStyle(
                       fontSize: 18,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.indigo700)),
+                      font: fontBold,
+                      color: PdfColors.indigo800)),
               pw.SizedBox(height: 8),
               pw.Container(
                 width: double.infinity,
@@ -172,20 +179,20 @@ class PdfService {
                   color: PdfColors.indigo50,
                   borderRadius:
                       const pw.BorderRadius.all(pw.Radius.circular(12)),
-                  border: pw.Border.all(color: PdfColors.indigo100),
+                  border: pw.Border.all(color: PdfColors.indigo200),
                 ),
                 child: pw.Text(
                   aiSummary,
                   style: pw.TextStyle(
                     fontSize: 14,
                     lineSpacing: 5,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.blueGrey900,
+                    font: font, // Metnin çamur gibi durmaması için Regular, ama kontrastı yüksek siyah yapıldı
+                    color: PdfColors.black,
                   ),
                 ),
               ),
               
-              // Push warning box to the bottom
+              // Boşluğu değerlendirip footer'ı en alta iten yapıcı
               pw.Spacer(),
 
               // Shortened Warning Footer
@@ -202,8 +209,8 @@ class PdfService {
                     textAlign: pw.TextAlign.center,
                     style: pw.TextStyle(
                         fontSize: 11,
-                        color: PdfColors.orange900,
-                        fontWeight: pw.FontWeight.bold),
+                        font: fontBold,
+                        color: PdfColors.orange900),
                   ),
                 ),
               ),
@@ -216,12 +223,12 @@ class PdfService {
     return await pdf.save();
   }
 
-  static pw.Widget _buildMetricBox(String title, String value, String unit) {
+  static pw.Widget _buildMetricBox(String title, String value, String unit, pw.Font font, pw.Font fontBold) {
     return pw.Container(
       width: 160,
       padding: const pw.EdgeInsets.symmetric(vertical: 14, horizontal: 8),
       decoration: pw.BoxDecoration(
-        border: pw.Border.all(color: PdfColors.teal300, width: 2),
+        border: pw.Border.all(color: PdfColors.teal400, width: 2),
         borderRadius: const pw.BorderRadius.all(pw.Radius.circular(16)),
         color: PdfColors.teal50,
       ),
@@ -230,20 +237,20 @@ class PdfService {
           pw.Text(title,
               style: pw.TextStyle(
                   fontSize: 16,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.teal800)),
+                  font: fontBold,
+                  color: PdfColors.teal900)),
           pw.SizedBox(height: 12),
           pw.Text(value,
               style: pw.TextStyle(
                   fontSize: 36,
-                  fontWeight: pw.FontWeight.bold,
+                  font: fontBold,
                   color: PdfColors.teal900)),
           pw.SizedBox(height: 4),
           pw.Text(unit,
               style: pw.TextStyle(
                   fontSize: 14,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.teal700)),
+                  font: fontBold,
+                  color: PdfColors.teal800)),
         ],
       ),
     );
