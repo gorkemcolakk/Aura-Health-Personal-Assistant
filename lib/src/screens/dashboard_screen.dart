@@ -578,7 +578,6 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
                     firstDate: DateTime.now().subtract(const Duration(days: 365)),
                     lastDate: DateTime.now(),
                     helpText: 'Su içme tarihini seç',
-                    useRootNavigator: false,
                   );
                   if (picked != null) setState(() => _selectedDate = picked);
                 },
@@ -658,6 +657,7 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
                 keyboardType: TextInputType.number,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 14),
+                contextMenuBuilder: (context, editableTextState) => const SizedBox.shrink(),
                 decoration: InputDecoration(
                   hintText: 'Manuel ml girişi',
                   hintStyle: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant),
