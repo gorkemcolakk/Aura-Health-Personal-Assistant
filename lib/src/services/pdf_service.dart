@@ -31,15 +31,17 @@ class PdfService {
     final avgWater = weeklyWater.map((e) => e.amountMl).reduce((a, b) => a + b) / 7;
 
     pdf.addPage(
-      pw.MultiPage(
+      pw.Page(
         pageFormat: format,
-        margin: const pw.EdgeInsets.all(32),
+        margin: const pw.EdgeInsets.all(24),
         theme: pw.ThemeData.withFont(
           base: font,
           bold: fontBold,
         ),
         build: (pw.Context context) {
-          return [
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
               // Header
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -49,13 +51,13 @@ class PdfService {
                 ],
               ),
               pw.Divider(thickness: 2, color: PdfColors.teal200),
-              pw.SizedBox(height: 20),
+              pw.SizedBox(height: 12),
               
               // Patient Info
               pw.Text('HASTA BILGILERI', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.teal700)),
-              pw.SizedBox(height: 12),
+              pw.SizedBox(height: 8),
               pw.Container(
-                padding: const pw.EdgeInsets.all(16),
+                padding: const pw.EdgeInsets.all(12),
                 decoration: const pw.BoxDecoration(
                   color: PdfColors.grey100,
                   borderRadius: pw.BorderRadius.all(pw.Radius.circular(8)),
@@ -86,11 +88,11 @@ class PdfService {
                   ],
                 ),
               ),
-              pw.SizedBox(height: 30),
+              pw.SizedBox(height: 20),
 
               // Health Metrics
               pw.Text('SAGLIK VERILERI (Son 7 Gun)', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.teal700)),
-              pw.SizedBox(height: 12),
+              pw.SizedBox(height: 8),
               
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
@@ -101,21 +103,21 @@ class PdfService {
                 ],
               ),
               
-              pw.SizedBox(height: 30),
+              pw.SizedBox(height: 20),
               
               pw.Text('Klinik Durum / Alerjiler:', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 6),
+              pw.SizedBox(height: 4),
               pw.Text(profile.conditions.isEmpty ? 'Belirtilen kritik durum yok.' : profile.conditions, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
               
-              pw.SizedBox(height: 40),
-              pw.Divider(color: PdfColors.grey400),
               pw.SizedBox(height: 20),
+              pw.Divider(color: PdfColors.grey400),
+              pw.SizedBox(height: 12),
 
               // AI Summary
               pw.Text('YAPAY ZEKA (AURA) DOKTOR OZETI', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.indigo700)),
-              pw.SizedBox(height: 12),
+              pw.SizedBox(height: 8),
               pw.Container(
-                padding: const pw.EdgeInsets.all(20),
+                padding: const pw.EdgeInsets.all(16),
                 decoration: pw.BoxDecoration(
                   color: PdfColors.indigo50,
                   borderRadius: const pw.BorderRadius.all(pw.Radius.circular(12)),
@@ -132,7 +134,7 @@ class PdfService {
                 ),
               ),
               
-              pw.SizedBox(height: 40),
+              pw.Spacer(),
               
               // Footer
               pw.Center(
@@ -142,7 +144,8 @@ class PdfService {
                   style: const pw.TextStyle(fontSize: 11, color: PdfColors.grey500),
                 ),
               ),
-            ];
+            ],
+          );
         },
       ),
     );
@@ -153,7 +156,7 @@ class PdfService {
   static pw.Widget _buildMetricBox(String title, String value, String unit) {
     return pw.Container(
       width: 160,
-      padding: const pw.EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+      padding: const pw.EdgeInsets.symmetric(vertical: 14, horizontal: 8),
       decoration: pw.BoxDecoration(
         border: pw.Border.all(color: PdfColors.teal300, width: 2),
         borderRadius: const pw.BorderRadius.all(pw.Radius.circular(16)),
