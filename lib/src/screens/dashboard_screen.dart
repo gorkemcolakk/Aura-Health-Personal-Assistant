@@ -676,13 +676,6 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
           ),
           const SizedBox(height: 12),
           Row(
-                  setState(() => _amount = parsed.toDouble());
-                }
-              },
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [150, 330, 500, 1000, 2000].map((preset) {
               final isSelected = _amount.round() == preset;
