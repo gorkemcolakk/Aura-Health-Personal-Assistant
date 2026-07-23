@@ -25,7 +25,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _allergies = TextEditingController();
   final _emergencyContact = TextEditingController();
   final _emergencyPhone = TextEditingController();
-  final _sleepTarget = TextEditingController();
   bool _didFill = false;
   ActivityLevel _activity = ActivityLevel.balanced;
 
@@ -46,7 +45,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _allergies.text = profile.allergies;
     _emergencyContact.text = profile.emergencyContact;
     _emergencyPhone.text = profile.emergencyPhone;
-    _sleepTarget.text = profile.sleepTargetHours.toString();
     _activity = profile.activity;
     _didFill = true;
   }
@@ -63,7 +61,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _allergies.dispose();
     _emergencyContact.dispose();
     _emergencyPhone.dispose();
-    _sleepTarget.dispose();
     super.dispose();
   }
 
@@ -192,14 +189,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                TextField(
-                  controller: _sleepTarget,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                    labelText: 'Günlük uyku hedefi (saat)',
-                    prefixIcon: const Icon(Icons.nights_stay),
-                    helperText: 'Önerilen: ${HealthCalculator.recommendedSleepHours(AuraScope.of(context).profile).toStringAsFixed(1)} saat',
-                    helperMaxLines: 1,
+                // Uyku hedefi — otomatik hesaplanır
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.nights_stay, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Günlük uyku hedefi',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '🎯 ${HealthCalculator.recommendedSleepHours(AuraScope.of(context).profile).toStringAsFixed(1)} saat',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        'Otomatik',
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 11),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -294,7 +319,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         allergies: _allergies.text.trim(),
                         emergencyContact: _emergencyContact.text.trim(),
                         emergencyPhone: _emergencyPhone.text.trim(),
-                        sleepTargetHours: double.tryParse(_sleepTarget.text.replaceAll(',', '.')) ?? profile.sleepTargetHours,
                       ),
                     );
                     if (context.mounted) {
