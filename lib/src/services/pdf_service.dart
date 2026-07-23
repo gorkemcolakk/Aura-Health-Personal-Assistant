@@ -36,172 +36,180 @@ class PdfService {
     ].join('\n');
 
     pdf.addPage(
-      pw.MultiPage(
+      pw.Page(
         pageFormat: format,
         margin: const pw.EdgeInsets.all(20),
         theme: pw.ThemeData.withFont(
           base: font,
           bold: fontBold,
         ),
-        // Footer appears on every page
-        footer: (pw.Context context) => pw.Container(
-          padding: const pw.EdgeInsets.all(10),
-          decoration: pw.BoxDecoration(
-            color: PdfColors.orange50,
-            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
-            border: pw.Border.all(color: PdfColors.orange200),
-          ),
-          child: pw.Center(
-            child: pw.Text(
-              'DİKKAT: Bu rapor Aura Health Yapay Zeka (AI) Asistanı tarafından hasta verileri baz alınarak otomatik oluşturulmuştur.\nHiçbir tıbbi kesinlik taşımaz ve reçete yerine geçmez. Sadece uzman hekim değerlendirmesine ön bilgi sunmak amacıyla hazırlanmıştır.',
-              textAlign: pw.TextAlign.center,
-              style: pw.TextStyle(
-                  fontSize: 11,
-                  color: PdfColors.orange900,
-                  fontWeight: pw.FontWeight.bold),
-            ),
-          ),
-        ),
-        build: (pw.Context context) => [
-          // ── Header ──────────────────────────────────────────────
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text('AURA HEALTH',
-                  style: pw.TextStyle(
-                      fontSize: 32,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.teal800)),
-              pw.Text('Doktor Raporu',
-                  style: pw.TextStyle(
-                      fontSize: 22, color: PdfColors.grey700)),
-            ],
-          ),
-          pw.Divider(thickness: 2, color: PdfColors.teal200),
-          pw.SizedBox(height: 12),
-
-          // ── Hasta Bilgileri ──────────────────────────────────────
-          pw.Text('HASTA BİLGİLERİ',
-              style: pw.TextStyle(
-                  fontSize: 18,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.teal700)),
-          pw.SizedBox(height: 8),
-          pw.Container(
-            padding: const pw.EdgeInsets.all(12),
-            decoration: const pw.BoxDecoration(
-              color: PdfColors.grey100,
-              borderRadius: pw.BorderRadius.all(pw.Radius.circular(8)),
-            ),
-            child: pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text('İsim: ${profile.name}',
-                        style: pw.TextStyle(
-                            fontSize: 16,
-                            fontWeight: pw.FontWeight.bold)),
-                    pw.SizedBox(height: 6),
-                    pw.Text('Yaş: ${profile.age}',
-                        style: pw.TextStyle(
-                            fontSize: 16,
-                            fontWeight: pw.FontWeight.bold)),
-                    pw.SizedBox(height: 6),
-                    pw.Text('Tarih: $formattedDate',
-                        style: pw.TextStyle(
-                            fontSize: 16,
-                            fontWeight: pw.FontWeight.bold)),
-                  ],
-                ),
-                pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text('Boy: ${profile.heightCm} cm',
-                        style: pw.TextStyle(
-                            fontSize: 16,
-                            fontWeight: pw.FontWeight.bold)),
-                    pw.SizedBox(height: 6),
-                    pw.Text('Kilo: ${profile.weightKg} kg',
-                        style: pw.TextStyle(
-                            fontSize: 16,
-                            fontWeight: pw.FontWeight.bold)),
-                    pw.SizedBox(height: 6),
-                    pw.Text(
-                        'Kan Grubu: ${profile.bloodType.isEmpty ? "Belirtilmemiş" : profile.bloodType}',
-                        style: pw.TextStyle(
-                            fontSize: 16,
-                            fontWeight: pw.FontWeight.bold)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          pw.SizedBox(height: 20),
-
-          // ── Sağlık Verileri ──────────────────────────────────────
-          pw.Text('SAĞLIK VERİLERİ (Son 7 Gün)',
-              style: pw.TextStyle(
-                  fontSize: 18,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.teal700)),
-          pw.SizedBox(height: 8),
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
-            children: [
-              _buildMetricBox('VKİ', bmi.toStringAsFixed(1), 'kg/m2'),
-              _buildMetricBox('Ort. Su', '${avgWater.round()}', 'ml/gün'),
-              _buildMetricBox(
-                  'Ort. Uyku', avgSleep.toStringAsFixed(1), 'saat/gün'),
-            ],
-          ),
-          pw.SizedBox(height: 20),
-
-          // ── Klinik Durum ─────────────────────────────────────────
-          pw.Text('Klinik Durum / Alerjiler:',
-              style: pw.TextStyle(
-                  fontSize: 16, fontWeight: pw.FontWeight.bold)),
-          pw.SizedBox(height: 6),
-          pw.Text(
-            clinicalText.isEmpty
-                ? 'Belirtilen kritik durum veya alerji yok.'
-                : clinicalText,
-            style: pw.TextStyle(
-                fontSize: 16, fontWeight: pw.FontWeight.bold),
-          ),
-          pw.SizedBox(height: 20),
-          pw.Divider(color: PdfColors.grey400),
-          pw.SizedBox(height: 12),
-
-          // ── Yapay Zeka Özeti ─────────────────────────────────────
-          pw.Text('YAPAY ZEKA (AURA) DOKTOR ÖZETİ',
-              style: pw.TextStyle(
-                  fontSize: 18,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.indigo700)),
-          pw.SizedBox(height: 8),
-          pw.Container(
-            width: double.infinity,
-            padding: const pw.EdgeInsets.all(16),
-            decoration: pw.BoxDecoration(
-              color: PdfColors.indigo50,
-              borderRadius:
-                  const pw.BorderRadius.all(pw.Radius.circular(12)),
-              border: pw.Border.all(color: PdfColors.indigo100),
-            ),
-            child: pw.Text(
-              aiSummary,
-              style: pw.TextStyle(
-                fontSize: 14,
-                lineSpacing: 5,
-                fontWeight: pw.FontWeight.bold,
-                color: PdfColors.blueGrey900,
+              // ── Header ──────────────────────────────────────────────
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text('AURA HEALTH',
+                      style: pw.TextStyle(
+                          fontSize: 32,
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColors.teal800)),
+                  pw.Text('Doktor Raporu',
+                      style: pw.TextStyle(
+                          fontSize: 22, color: PdfColors.grey700)),
+                ],
               ),
-            ),
-          ),
-          pw.SizedBox(height: 16),
-        ],
+              pw.Divider(thickness: 2, color: PdfColors.teal200),
+              pw.SizedBox(height: 12),
+
+              // ── Hasta Bilgileri ──────────────────────────────────────
+              pw.Text('HASTA BİLGİLERİ',
+                  style: pw.TextStyle(
+                      fontSize: 18,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.teal700)),
+              pw.SizedBox(height: 8),
+              pw.Container(
+                padding: const pw.EdgeInsets.all(12),
+                decoration: const pw.BoxDecoration(
+                  color: PdfColors.grey100,
+                  borderRadius: pw.BorderRadius.all(pw.Radius.circular(8)),
+                ),
+                child: pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text('İsim: ${profile.name}',
+                            style: pw.TextStyle(
+                                fontSize: 16,
+                                fontWeight: pw.FontWeight.bold)),
+                        pw.SizedBox(height: 6),
+                        pw.Text('Yaş: ${profile.age}',
+                            style: pw.TextStyle(
+                                fontSize: 16,
+                                fontWeight: pw.FontWeight.bold)),
+                        pw.SizedBox(height: 6),
+                        pw.Text('Tarih: $formattedDate',
+                            style: pw.TextStyle(
+                                fontSize: 16,
+                                fontWeight: pw.FontWeight.bold)),
+                      ],
+                    ),
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text('Boy: ${profile.heightCm} cm',
+                            style: pw.TextStyle(
+                                fontSize: 16,
+                                fontWeight: pw.FontWeight.bold)),
+                        pw.SizedBox(height: 6),
+                        pw.Text('Kilo: ${profile.weightKg} kg',
+                            style: pw.TextStyle(
+                                fontSize: 16,
+                                fontWeight: pw.FontWeight.bold)),
+                        pw.SizedBox(height: 6),
+                        pw.Text(
+                            'Kan Grubu: ${profile.bloodType.isEmpty ? "Belirtilmemiş" : profile.bloodType}',
+                            style: pw.TextStyle(
+                                fontSize: 16,
+                                fontWeight: pw.FontWeight.bold)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              pw.SizedBox(height: 20),
+
+              // ── Sağlık Verileri ──────────────────────────────────────
+              pw.Text('SAĞLIK VERİLERİ (Son 7 Gün)',
+                  style: pw.TextStyle(
+                      fontSize: 18,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.teal700)),
+              pw.SizedBox(height: 8),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
+                children: [
+                  _buildMetricBox('VKİ', bmi.toStringAsFixed(1), 'kg/m2'),
+                  _buildMetricBox('Ort. Su', '${avgWater.round()}', 'ml/gün'),
+                  _buildMetricBox(
+                      'Ort. Uyku', avgSleep.toStringAsFixed(1), 'saat/gün'),
+                ],
+              ),
+              pw.SizedBox(height: 20),
+
+              // ── Klinik Durum ─────────────────────────────────────────
+              pw.Text('Klinik Durum / Alerjiler:',
+                  style: pw.TextStyle(
+                      fontSize: 16, fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 6),
+              pw.Text(
+                clinicalText.isEmpty
+                    ? 'Belirtilen kritik durum veya alerji yok.'
+                    : clinicalText,
+                style: pw.TextStyle(
+                    fontSize: 16, fontWeight: pw.FontWeight.bold),
+              ),
+              pw.SizedBox(height: 20),
+              pw.Divider(color: PdfColors.grey400),
+              pw.SizedBox(height: 12),
+
+              // ── Yapay Zeka Özeti ─────────────────────────────────────
+              pw.Text('YAPAY ZEKA (AURA) DOKTOR ÖZETİ',
+                  style: pw.TextStyle(
+                      fontSize: 18,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.indigo700)),
+              pw.SizedBox(height: 8),
+              pw.Container(
+                width: double.infinity,
+                padding: const pw.EdgeInsets.all(16),
+                decoration: pw.BoxDecoration(
+                  color: PdfColors.indigo50,
+                  borderRadius:
+                      const pw.BorderRadius.all(pw.Radius.circular(12)),
+                  border: pw.Border.all(color: PdfColors.indigo100),
+                ),
+                child: pw.Text(
+                  aiSummary,
+                  style: pw.TextStyle(
+                    fontSize: 14,
+                    lineSpacing: 5,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.blueGrey900,
+                  ),
+                ),
+              ),
+              
+              // Push warning box to the bottom
+              pw.Spacer(),
+
+              // Shortened Warning Footer
+              pw.Container(
+                padding: const pw.EdgeInsets.all(8),
+                decoration: pw.BoxDecoration(
+                  color: PdfColors.orange50,
+                  borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
+                  border: pw.Border.all(color: PdfColors.orange200),
+                ),
+                child: pw.Center(
+                  child: pw.Text(
+                    'ÖNEMLİ: Bu rapor AI tarafından üretilmiştir, tıbbi kesinlik taşımaz ve hekim değerlendirmesi yerine geçemez.',
+                    textAlign: pw.TextAlign.center,
+                    style: pw.TextStyle(
+                        fontSize: 11,
+                        color: PdfColors.orange900,
+                        fontWeight: pw.FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
 
