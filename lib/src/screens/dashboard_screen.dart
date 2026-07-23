@@ -512,11 +512,17 @@ class _CustomWaterSheet extends StatefulWidget {
 
 class _CustomWaterSheetState extends State<_CustomWaterSheet> {
   double _amount = 250;
+  DateTime _selectedDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final media = MediaQuery.of(context);
+    final dateLabel = _isToday(_selectedDate)
+        ? 'Bugün'
+        : _isYesterday(_selectedDate)
+            ? 'Dün'
+            : '${_selectedDate.day}/${_selectedDate.month}';
 
     return Container(
       decoration: const BoxDecoration(
@@ -557,6 +563,29 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
             ],
           ),
           const SizedBox(height: 28),
+          // Tarih seçici
+          Row(
+            children: [
+              const Icon(Icons.calendar_today, size: 18),
+              const SizedBox(width: 8),
+              Text('Tarih: $dateLabel', style: const TextStyle(fontWeight: FontWeight.w600)),
+              const Spacer(),
+              TextButton(
+                onPressed: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedDate,
+                    firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                    lastDate: DateTime.now(),
+                    helpText: 'Su içme tarihini seç',
+                  );
+                  if (picked != null) setState(() => _selectedDate = picked);
+                },
+                child: const Text('Değiştir'),
+              ),
+            ],
+          ),
+          const Divider(height: 24),
           Center(
             child: Stack(
               alignment: Alignment.center,
@@ -662,7 +691,7 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
             onPressed: () {
-              widget.controller.addWater(_amount.round());
+              widget.controller.addWater(_amount.round(), date: _selectedDate);
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

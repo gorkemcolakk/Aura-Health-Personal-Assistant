@@ -245,10 +245,10 @@ class AuraController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addWater(int ml) async {
+  Future<void> addWater(int ml, {DateTime? date}) async {
     final newLog = WaterLog(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      timestamp: DateTime.now(),
+      timestamp: date ?? DateTime.now(),
       amountMl: ml,
     );
     profile = profile.copyWith(
