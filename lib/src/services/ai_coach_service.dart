@@ -132,7 +132,7 @@ Hastanın bilgileri:
 - Sağlık Hedefi: ${profile.healthGoal}
 - Günlük Su Hedefi: $waterTarget ml
 
-Görevin: Bu verileri okuyan uzman doktor için detaylı, kapsamlı ve açıklayıcı (yaklaşık 2-3 paragraf) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın durumunu, hedeflerini ve dikkat etmesi gereken noktaları profesyonel bir tıbbi dille anlat. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.''';
+Görevin: Bu verileri okuyan uzman doktor için sayfaya tam oturacak uzunlukta (yaklaşık 5-7 cümlelik) profesyonel bir tıbbi ön değerlendirme ve özet yazmak. Hastanın durumunu, hedeflerini ve dikkat etmesi gereken noktaları profesyonel bir tıbbi dille anlat. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.''';
 
       final body = jsonEncode({
         'model': _model,
@@ -151,7 +151,7 @@ Görevin: Bu verileri okuyan uzman doktor için detaylı, kapsamlı ve açıklay
           'Authorization': 'Bearer $key',
         },
         body: body,
-      ).timeout(const Duration(seconds: 5));
+      ).timeout(const Duration(seconds: 20));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);

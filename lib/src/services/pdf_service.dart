@@ -33,7 +33,7 @@ class PdfService {
     pdf.addPage(
       pw.Page(
         pageFormat: format,
-        margin: const pw.EdgeInsets.all(24),
+        margin: const pw.EdgeInsets.all(20),
         theme: pw.ThemeData.withFont(
           base: font,
           bold: fontBold,
@@ -51,13 +51,13 @@ class PdfService {
                 ],
               ),
               pw.Divider(thickness: 2, color: PdfColors.teal200),
-              pw.SizedBox(height: 24),
+              pw.SizedBox(height: 12),
               
               // Patient Info
               pw.Text('HASTA BİLGİLERİ', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.teal700)),
-              pw.SizedBox(height: 12),
+              pw.SizedBox(height: 8),
               pw.Container(
-                padding: const pw.EdgeInsets.all(16),
+                padding: const pw.EdgeInsets.all(12),
                 decoration: const pw.BoxDecoration(
                   color: PdfColors.grey100,
                   borderRadius: pw.BorderRadius.all(pw.Radius.circular(8)),
@@ -88,11 +88,11 @@ class PdfService {
                   ],
                 ),
               ),
-              pw.SizedBox(height: 32),
+              pw.SizedBox(height: 20),
 
               // Health Metrics
               pw.Text('SAĞLIK VERİLERİ (Son 7 Gün)', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.teal700)),
-              pw.SizedBox(height: 12),
+              pw.SizedBox(height: 8),
               
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
@@ -103,10 +103,10 @@ class PdfService {
                 ],
               ),
               
-              pw.SizedBox(height: 32),
+              pw.SizedBox(height: 20),
               
               pw.Text('Klinik Durum / Alerjiler:', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 8),
+              pw.SizedBox(height: 6),
               pw.Text(
                 [
                   if (profile.conditions.isNotEmpty) 'Durum/Tanı: ${profile.conditions}',
@@ -120,15 +120,15 @@ class PdfService {
                 style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
               ),
               
-              pw.SizedBox(height: 32),
+              pw.SizedBox(height: 20),
               pw.Divider(color: PdfColors.grey400),
-              pw.SizedBox(height: 24),
+              pw.SizedBox(height: 12),
 
               // AI Summary
               pw.Text('YAPAY ZEKA (AURA) DOKTOR ÖZETİ', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.indigo700)),
-              pw.SizedBox(height: 12),
+              pw.SizedBox(height: 8),
               pw.Container(
-                padding: const pw.EdgeInsets.all(20),
+                padding: const pw.EdgeInsets.all(16),
                 decoration: pw.BoxDecoration(
                   color: PdfColors.indigo50,
                   borderRadius: const pw.BorderRadius.all(pw.Radius.circular(12)),
@@ -145,11 +145,11 @@ class PdfService {
                 ),
               ),
               
-              pw.SizedBox(height: 32),
+              pw.Spacer(),
               
               // Footer
               pw.Container(
-                padding: const pw.EdgeInsets.all(12),
+                padding: const pw.EdgeInsets.all(10),
                 decoration: pw.BoxDecoration(
                   color: PdfColors.orange50,
                   borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
@@ -175,7 +175,7 @@ class PdfService {
   static pw.Widget _buildMetricBox(String title, String value, String unit) {
     return pw.Container(
       width: 160,
-      padding: const pw.EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+      padding: const pw.EdgeInsets.symmetric(vertical: 14, horizontal: 8),
       decoration: pw.BoxDecoration(
         border: pw.Border.all(color: PdfColors.teal300, width: 2),
         borderRadius: const pw.BorderRadius.all(pw.Radius.circular(16)),
