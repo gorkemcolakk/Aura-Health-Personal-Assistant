@@ -132,16 +132,16 @@ Hastanın bilgileri:
 - Sağlık Hedefi: ${profile.healthGoal}
 - Günlük Su Hedefi: $waterTarget ml
 
-Görevin: Bu verileri okuyan uzman doktor için en fazla 3-4 cümlelik, son derece profesyonel, objektif ve tıbbi bir dille hastanın genel özetini yazmak. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.''';
+Görevin: Bu verileri okuyan uzman doktor için detaylı, kapsamlı ve açıklayıcı (yaklaşık 2-3 paragraf) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın durumunu, hedeflerini ve dikkat etmesi gereken noktaları profesyonel bir tıbbi dille anlat. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.''';
 
       final body = jsonEncode({
         'model': _model,
         'messages': [
           {'role': 'system', 'content': systemPrompt},
-          {'role': 'user', 'content': 'Lütfen doktor raporu için hasta özetini oluştur.'},
+          {'role': 'user', 'content': 'Lütfen doktor raporu için kapsamlı hasta özetini oluştur.'},
         ],
         'temperature': 0.3,
-        'max_tokens': 500,
+        'max_tokens': 1000,
       });
 
       final response = await http.post(

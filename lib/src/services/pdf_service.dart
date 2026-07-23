@@ -145,14 +145,22 @@ class PdfService {
                 ),
               ),
               
-              pw.Spacer(),
+              pw.SizedBox(height: 32),
               
               // Footer
-              pw.Center(
-                child: pw.Text(
-                  'Bu rapor Aura Health AI tarafından otomatik oluşturulmuştur.\nTıbbi kesinlik taşımaz, hekim değerlendirmesine sunulmak üzere hazırlanmıştır.',
-                  textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontSize: 13, color: PdfColors.grey700, fontWeight: pw.FontWeight.bold),
+              pw.Container(
+                padding: const pw.EdgeInsets.all(12),
+                decoration: pw.BoxDecoration(
+                  color: PdfColors.orange50,
+                  borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
+                  border: pw.Border.all(color: PdfColors.orange200),
+                ),
+                child: pw.Center(
+                  child: pw.Text(
+                    'DİKKAT: Bu rapor Aura Health Yapay Zeka (AI) Asistanı tarafından hasta verileri baz alınarak otomatik oluşturulmuştur.\nHiçbir tıbbi kesinlik taşımaz ve reçete yerine geçmez. Sadece uzman hekim değerlendirmesine ön bilgi sunmak amacıyla hazırlanmıştır.',
+                    textAlign: pw.TextAlign.center,
+                    style: pw.TextStyle(fontSize: 12, color: PdfColors.orange900, fontWeight: pw.FontWeight.bold),
+                  ),
                 ),
               ),
             ],
