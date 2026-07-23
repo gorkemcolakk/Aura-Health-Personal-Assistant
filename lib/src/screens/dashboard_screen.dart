@@ -638,13 +638,32 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
             child: Slider(
               value: _amount,
               min: 50,
-              max: 3000,
-              divisions: 59,
+              max: 5000,
               label: '${_amount.round()} ml',
               onChanged: (val) {
                 setState(() {
                   _amount = val;
                 });
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Manuel klavye girişi
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: TextField(
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+              decoration: const InputDecoration(
+                hintText: 'Manuel ml girişi',
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              ),
+              onSubmitted: (val) {
+                final parsed = int.tryParse(val);
+                if (parsed != null && parsed >= 50 && parsed <= 5000) {
+                  setState(() => _amount = parsed.toDouble());
+                }
               },
             ),
           ),
