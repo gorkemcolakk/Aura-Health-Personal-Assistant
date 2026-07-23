@@ -135,7 +135,7 @@ class _WaterWaveChart extends StatelessWidget {
                     children: [
                       Text(
                         '${(day.amountMl / 1000).toStringAsFixed(1)}L',
-                        style: TextStyle(fontSize: 9, color: colors.onSurfaceVariant),
+                        style: TextStyle(fontSize: 11, color: colors.onSurfaceVariant, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 4),
                       AnimatedContainer(
@@ -157,8 +157,8 @@ class _WaterWaveChart extends StatelessWidget {
                       Text(
                         day.dayName,
                         style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: day.isToday ? FontWeight.bold : FontWeight.normal,
+                          fontSize: 12,
+                          fontWeight: day.isToday ? FontWeight.w800 : FontWeight.w600,
                           color: day.isToday ? colors.primary : colors.onSurfaceVariant,
                         ),
                       ),
@@ -219,8 +219,8 @@ class _SleepBars extends StatelessWidget {
               child: Row(
                 children: [
                   SizedBox(
-                    width: 32,
-                    child: Text(day.dayName, style: TextStyle(fontSize: 11, fontWeight: day.isToday ? FontWeight.bold : FontWeight.normal, color: day.isToday ? colors.primary : colors.onSurfaceVariant)),
+                    width: 36,
+                    child: Text(day.dayName, style: TextStyle(fontSize: 13, fontWeight: day.isToday ? FontWeight.w800 : FontWeight.w600, color: day.isToday ? colors.primary : colors.onSurfaceVariant)),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -258,15 +258,15 @@ class _SleepBars extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   SizedBox(
-                    width: 52,
+                    width: 56,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        if (reached) const Text('✅ ', style: TextStyle(fontSize: 12)),
+                        if (reached) const Text('✅ ', style: TextStyle(fontSize: 14)),
                         Text(
                           hasData ? '${day.hours.toStringAsFixed(1)}s' : '-',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: hasData ? colors.onSurface : colors.onSurfaceVariant),
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: hasData ? colors.onSurface : colors.onSurfaceVariant),
                         ),
                       ],
                     ),
@@ -296,9 +296,9 @@ class _SleepBars extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-        const SizedBox(width: 4),
-        Text(label, style: const TextStyle(fontSize: 10)),
+        Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 6),
+        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
       ],
     );
   }
