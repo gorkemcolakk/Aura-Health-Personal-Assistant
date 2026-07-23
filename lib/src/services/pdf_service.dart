@@ -41,6 +41,7 @@ class PdfService {
         build: (pw.Context context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
+            mainAxisSize: pw.MainAxisSize.max,
             children: [
               // Header
               pw.Row(
