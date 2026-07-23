@@ -106,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Text('Profil', style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white)),
                       const SizedBox(height: 2),
-                      Text('VKİ, su ihtiyacı ve AI önerileri bu bilgilerle hesaplanır.', style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13)),
+                      Text('VKİ, su ihtiyacı ve AI önerileri bu bilgilerle hesaplanır.', style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 14, fontWeight: FontWeight.w500)),
                     ],
                   ),
                 ),
