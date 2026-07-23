@@ -578,6 +578,7 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
                     firstDate: DateTime.now().subtract(const Duration(days: 365)),
                     lastDate: DateTime.now(),
                     helpText: 'Su içme tarihini seç',
+                    useRootNavigator: false,
                   );
                   if (picked != null) setState(() => _selectedDate = picked);
                 },
@@ -1110,6 +1111,7 @@ void _showSleepDialog(BuildContext context, AuraController controller) {
                           firstDate: DateTime.now().subtract(const Duration(days: 365)),
                           lastDate: DateTime.now(),
                           helpText: 'Uyku tarihini seç',
+                          useRootNavigator: false,
                         );
                         if (picked != null) setState(() => selectedDate = picked);
                       },
