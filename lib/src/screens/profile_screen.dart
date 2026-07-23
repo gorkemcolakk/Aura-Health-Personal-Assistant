@@ -189,41 +189,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                // Uyku hedefi — otomatik hesaplanır
+                // Otomatik hedefler — su & uyku
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Row(
+                  child: Column(
                     children: [
-                      const Icon(Icons.nights_stay, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Günlük uyku hedefi',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '🎯 ${HealthCalculator.recommendedSleepHours(AuraScope.of(context).profile).toStringAsFixed(1)} saat',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        'Otomatik',
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 11),
-                      ),
+                      _targetRow(context, Icons.water_drop, 'Günlük su hedefi',
+                          '${(HealthCalculator.dailyWaterTargetMl(profile) / 1000).toStringAsFixed(2)} L'),
+                      const Divider(height: 20),
+                      _targetRow(context, Icons.nights_stay, 'Günlük uyku hedefi',
+                          '${HealthCalculator.recommendedSleepHours(profile).toStringAsFixed(1)} saat'),
                     ],
                   ),
                 ),
@@ -442,6 +421,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _targetRow(BuildContext context, IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 22, color: Theme.of(context).colorScheme.primary),
+        const SizedBox(width: 12),
+        Text(label, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
+        const Spacer(),
+        Text(
+          value,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+          ),
+        ),
+      ],
     );
   }
 }
