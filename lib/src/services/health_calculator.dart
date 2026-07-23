@@ -92,6 +92,7 @@ class HealthCalculator {
       if (differenceFromMonday >= 0 && differenceFromMonday < 7) {
         hours[differenceFromMonday] = (hours[differenceFromMonday] ?? 0.0) + log.hours;
         feelings[differenceFromMonday] = log.feeling;
+      }
     }
 
     final weekdays = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
