@@ -237,7 +237,9 @@ class AuraController extends ChangeNotifier {
   }
 
   Future<void> saveProfile(HealthProfile nextProfile) async {
-    profile = nextProfile;
+    // Uyku hedefini yaş ve aktiviteye göre otomatik güncelle
+    final recommended = HealthCalculator.recommendedSleepHours(nextProfile);
+    profile = nextProfile.copyWith(sleepTargetHours: recommended);
     if (currentUserTc != null) {
       await db.saveProfile(currentUserTc!, profile);
     }
