@@ -31,7 +31,7 @@ class PdfService {
     final avgWater = weeklyWater.map((e) => e.amountMl).reduce((a, b) => a + b) / 7;
 
     pdf.addPage(
-      pw.Page(
+      pw.MultiPage(
         pageFormat: format,
         margin: const pw.EdgeInsets.all(32),
         theme: pw.ThemeData.withFont(
@@ -39,9 +39,7 @@ class PdfService {
           bold: fontBold,
         ),
         build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
+          return [
               // Header
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -134,7 +132,7 @@ class PdfService {
                 ),
               ),
               
-              pw.Spacer(),
+              pw.SizedBox(height: 40),
               
               // Footer
               pw.Center(
@@ -144,8 +142,7 @@ class PdfService {
                   style: const pw.TextStyle(fontSize: 11, color: PdfColors.grey500),
                 ),
               ),
-            ],
-          );
+            ];
         },
       ),
     );
