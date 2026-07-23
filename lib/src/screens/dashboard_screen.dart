@@ -8,6 +8,7 @@ import '../state/aura_controller.dart';
 import '../state/aura_scope.dart';
 import '../widgets/aura_card.dart';
 import '../widgets/emergency_card.dart';
+import 'charts_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -128,7 +129,8 @@ class DashboardScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 _SleepCard(controller: controller),
                 const SizedBox(height: 16),
-                _WeeklySleepChart(controller: controller),
+                // Haftalık Grafikler butonu
+                _ChartsButton(controller: controller),
                 const SizedBox(height: 16),
                 if (nextMedication.isEmpty)
                   AuraCard(
@@ -217,8 +219,6 @@ class DashboardScreen extends StatelessWidget {
                     if (i < nextMedication.length - 1)
                       const SizedBox(height: 16),
                   ],
-                const SizedBox(height: 16),
-                _WeeklyWaterChart(controller: controller),
                 const SizedBox(height: 16),
                 AuraCard(
                   color: const Color(0xFF172026),
@@ -754,6 +754,40 @@ class _WaterTimelineCard extends StatelessWidget {
             );
           }),
         ],
+      ),
+    );
+  }
+}
+
+class _ChartsButton extends StatelessWidget {
+  const _ChartsButton({required this.controller});
+
+  final AuraController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return AuraCard(
+      padding: const EdgeInsets.all(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const ChartsScreen()));
+        },
+        child: Row(
+          children: [
+            Container(
+              width: 40, height: 40,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.bar_chart, color: Theme.of(context).colorScheme.primary, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: Text('Haftalık Grafikler', style: Theme.of(context).textTheme.titleSmall)),
+            Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.primary),
+          ],
+        ),
       ),
     );
   }
