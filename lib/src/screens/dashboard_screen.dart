@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -10,8 +12,28 @@ import '../widgets/aura_card.dart';
 import '../widgets/emergency_card.dart';
 import 'charts_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> with TickerProviderStateMixin {
+  late final AnimationController _waveCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _waveCtrl = AnimationController(vsync: this, duration: const Duration(seconds: 3))
+      ..repeat();
+  }
+
+  @override
+  void dispose() {
+    _waveCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +42,7 @@ class DashboardScreen extends StatelessWidget {
     final bmi = HealthCalculator.bmi(profile);
     final waterTarget = HealthCalculator.dailyWaterTargetMl(profile);
     final waterProgress = HealthCalculator.waterProgress(profile);
+    final todayMl = HealthCalculator.todayWaterMl(profile);
     final nextMedication =
         controller.medications
             .where((item) => item.enabled)
@@ -51,6 +74,7 @@ class DashboardScreen extends StatelessWidget {
                   waterTarget: waterTarget,
                   waterProgress: waterProgress,
                   consumed: HealthCalculator.todayWaterMl(profile),
+                  animation: _waveCtrl,
                 ),
                 const SizedBox(height: 16),
                 _EmergencyRow(profile: profile),
@@ -319,6 +343,7 @@ class _HeroStatus extends StatelessWidget {
     required this.waterTarget,
     required this.waterProgress,
     required this.consumed,
+    required this.animation,
   });
 
   final String firstName;
@@ -327,6 +352,7 @@ class _HeroStatus extends StatelessWidget {
   final int waterTarget;
   final double waterProgress;
   final int consumed;
+  final Animation<double> animation;
 
   String _getPossessiveSuffix(String name) {
     if (name.isEmpty) return 'in';
@@ -372,10 +398,11 @@ class _HeroStatus extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _Ring(
+                child: _WaveCircle(
                   progress: waterProgress,
                   center: '${(consumed / 1000).toStringAsFixed(2)} L',
                   label: 'Su',
+                  animation: animation,
                 ),
               ),
               const SizedBox(width: 18),
@@ -1387,4 +1414,99 @@ class _WeeklySleepChart extends StatelessWidget {
       ),
     );
   }
+}
+
+// ─── Animasyonlu Wave Circle ──────────────────────────────
+class _WaveCircle extends StatelessWidget {
+  const _WaveCircle({
+    required this.progress,
+    required this.center,
+    required this.label,
+    required this.animation,
+  });
+
+  final double progress;
+  final String center;
+  final String label;
+  final Animation<double> animation;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return AspectRatio(
+      aspectRatio: 1,
+      child: AnimatedBuilder(
+        animation: animation,
+        builder: (context, _) {
+          return CustomPaint(
+            painter: _WavePainter(
+              progress: progress,
+              phase: animation.value * 2 * pi,
+              color: colors.primary,
+            ),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(center, style: Theme.of(context).textTheme.titleLarge?.copyWith(color: colors.primary, fontWeight: FontWeight.w900)),
+                  Text(label, style: TextStyle(color: colors.onSurfaceVariant)),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ─── Wave Painter ─────────────────────────────────────────
+class _WavePainter extends CustomPainter {
+  final double progress;
+  final double phase;
+  final Color color;
+
+  _WavePainter({required this.progress, required this.phase, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = Offset(size.width / 2, size.height / 2);
+    final r = size.width / 2 - 3;
+
+    canvas.drawCircle(c, r, Paint()..color = color.withValues(alpha: 0.07));
+    canvas.drawCircle(c, r, Paint()..color = color.withValues(alpha: 0.18)..style = PaintingStyle.stroke..strokeWidth = 3);
+
+    final waterY = c.dy + r - 2 * r * progress;
+    final clipPath = Path()
+      ..moveTo(c.dx - r - 10, size.height)
+      ..lineTo(c.dx - r - 10, waterY);
+
+    const amp = 5.0;
+    const freq = 0.045;
+    for (double x = c.dx - r - 10; x <= c.dx + r + 10; x++) {
+      clipPath.lineTo(x, waterY + amp * sin(freq * x + phase));
+    }
+    clipPath..lineTo(c.dx + r + 10, size.height)..close();
+
+    canvas.save();
+    canvas.clipPath(clipPath);
+    canvas.drawCircle(c, r, Paint()..shader = LinearGradient(
+      begin: Alignment.topCenter, end: Alignment.bottomCenter,
+      colors: [color.withValues(alpha: 0.7), color.withValues(alpha: 0.45)],
+    ).createShader(Rect.fromCircle(center: c, radius: r)));
+
+    final p2 = Path()..moveTo(c.dx - r - 10, waterY + 6);
+    for (double x = c.dx - r - 10; x <= c.dx + r + 10; x++) {
+      p2.lineTo(x, waterY + 6 + 4 * sin(freq * x + phase + pi / 3));
+    }
+    p2.lineTo(c.dx + r + 10, waterY + 6); p2.close();
+    canvas.drawPath(p2, Paint()..color = color.withValues(alpha: 0.2));
+    canvas.restore();
+
+    canvas.drawArc(Rect.fromCircle(center: c, radius: r), -pi / 2, 2 * pi * progress, false,
+      Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = 3..strokeCap = StrokeCap.round);
+  }
+
+  @override
+  bool shouldRepaint(_WavePainter old) => progress != old.progress || phase != old.phase;
 }
