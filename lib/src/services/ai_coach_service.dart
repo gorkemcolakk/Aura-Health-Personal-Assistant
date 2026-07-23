@@ -86,7 +86,8 @@ Hastanın profili:
 - Kilo: ${profile.weightKg} kg
 - Aktivite seviyesi: ${profile.activity.name}
 - Sağlık hedefi: ${profile.healthGoal}
-- Hastalıklar/Alerjiler/Durum: ${profile.conditions}
+- Hastalıklar/Durum: ${profile.conditions.isEmpty ? 'Belirtilmedi' : profile.conditions}
+- Alerjiler: ${profile.allergies.isEmpty ? 'Belirtilmedi' : profile.allergies}
 - Bugün İçilen Su: ${HealthCalculator.todayWaterMl(profile)} / $waterTarget ml$sleepText
 - Vücut Kitle İndeksi (VKİ): ${HealthCalculator.bmi(profile).toStringAsFixed(1)}
 
@@ -126,7 +127,8 @@ VKİ değerin yaklaşık ${bmi.toStringAsFixed(1)} ve kategori "$label". Günlü
       final systemPrompt = '''Sen uzman bir doktora ön değerlendirme sunan tıbbi asistan "Aura"sın.
 Hastanın bilgileri:
 - Yaş: ${profile.age}, Boy: ${profile.heightCm} cm, Kilo: ${profile.weightKg} kg, VKİ: ${bmi.toStringAsFixed(1)}
-- Mevcut Durum/Alerjiler: ${profile.conditions}
+- Mevcut Durum/Hastalık: ${profile.conditions.isEmpty ? 'Yok' : profile.conditions}
+- Alerjiler: ${profile.allergies.isEmpty ? 'Yok' : profile.allergies}
 - Sağlık Hedefi: ${profile.healthGoal}
 - Günlük Su Hedefi: $waterTarget ml
 

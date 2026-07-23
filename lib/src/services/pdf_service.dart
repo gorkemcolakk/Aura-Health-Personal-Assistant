@@ -107,7 +107,18 @@ class PdfService {
               
               pw.Text('Klinik Durum / Alerjiler:', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 8),
-              pw.Text(profile.conditions.isEmpty ? 'Belirtilen kritik durum yok.' : profile.conditions, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+              pw.Text(
+                [
+                  if (profile.conditions.isNotEmpty) 'Durum/Tanı: ${profile.conditions}',
+                  if (profile.allergies.isNotEmpty) 'Alerji: ${profile.allergies}',
+                ].isEmpty
+                    ? 'Belirtilen kritik durum veya alerji yok.'
+                    : [
+                        if (profile.conditions.isNotEmpty) 'Durum/Tanı: ${profile.conditions}',
+                        if (profile.allergies.isNotEmpty) 'Alerji: ${profile.allergies}',
+                      ].join('\n'),
+                style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+              ),
               
               pw.SizedBox(height: 32),
               pw.Divider(color: PdfColors.grey400),
