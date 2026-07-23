@@ -116,6 +116,20 @@ class _WaterWaveChart extends StatelessWidget {
             height: 180,
             child: LineChart(
               LineChartData(
+                lineTouchData: LineTouchData(
+                  enabled: true,
+                  touchTooltipData: LineTouchTooltipData(
+                    getTooltipItems: (spots) {
+                      return spots.map((s) {
+                        final day = weeklyData[s.spotIndex];
+                        return LineTooltipItem(
+                          '${day.dayName}\n${(s.y / 1000).toStringAsFixed(2)} L',
+                          TextStyle(color: colors.primary, fontWeight: FontWeight.w700, fontSize: 12),
+                        );
+                      }).toList();
+                    },
+                  ),
+                ),
                 gridData: FlGridData(
                   show: true,
                   drawHorizontalLine: true,
@@ -129,6 +143,7 @@ class _WaterWaveChart extends StatelessWidget {
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
+                      interval: 1,
                       getTitlesWidget: (value, meta) {
                         final days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
                         return Padding(
@@ -155,7 +170,7 @@ class _WaterWaveChart extends StatelessWidget {
                       getDotPainter: (spot, percent, barData, index) {
                         final dayData = weeklyData[index];
                         return FlDotCirclePainter(
-                          radius: dayData.isToday ? 5 : 3,
+                          radius: dayData.isToday ? 5 : 4,
                           color: dayData.isToday ? colors.primary : colors.primary.withValues(alpha: 0.4),
                           strokeWidth: 2,
                           strokeColor: Colors.white,
