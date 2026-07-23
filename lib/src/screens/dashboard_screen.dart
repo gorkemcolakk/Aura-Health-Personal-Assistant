@@ -637,9 +637,9 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
             ),
             child: Slider(
               value: _amount,
-              min: 100,
-              max: 1000,
-              divisions: 18,
+              min: 50,
+              max: 3000,
+              divisions: 59,
               label: '${_amount.round()} ml',
               onChanged: (val) {
                 setState(() {
@@ -651,7 +651,7 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [150, 330, 400, 600].map((preset) {
+            children: [150, 330, 500, 1000, 2000].map((preset) {
               final isSelected = _amount.round() == preset;
               return InkWell(
                 onTap: () {
