@@ -9,6 +9,7 @@ import '../models/medication.dart';
 import '../models/sleep_log.dart';
 import '../models/water_log.dart';
 import '../services/ai_coach_service.dart';
+import '../services/health_calculator.dart';
 import '../services/notification_service.dart';
 import '../services/storage_service.dart';
 import '../services/database_service.dart';
