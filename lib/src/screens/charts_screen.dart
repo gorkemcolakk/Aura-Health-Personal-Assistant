@@ -191,7 +191,7 @@ class _SleepBars extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final weeklyData = HealthCalculator.getWeeklySleepData(controller.profile);
-    final target = controller.profile.sleepTargetHours;
+    final target = HealthCalculator.recommendedSleepHours(controller.profile);
     final colors = Theme.of(context).colorScheme;
 
     return AuraCard(

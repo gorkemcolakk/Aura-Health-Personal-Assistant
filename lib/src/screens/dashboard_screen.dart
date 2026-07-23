@@ -970,7 +970,7 @@ class _SleepCard extends StatelessWidget {
     final displaySleep = todaySleep.isNotEmpty ? todaySleep.first : yesterdaySleep;
     final isToday = todaySleep.isNotEmpty;
 
-    final target = controller.profile.sleepTargetHours;
+    final target = HealthCalculator.recommendedSleepHours(controller.profile);
 
     return AuraCard(
       child: Column(

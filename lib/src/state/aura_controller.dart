@@ -87,12 +87,6 @@ class AuraController extends ChangeNotifier {
       
       profile = await db.loadProfile(currentUserTc!);
       medications = await db.loadMedications(currentUserTc!);
-
-      // Uyku hedefini yaş/aktiviteye göre otomatik güncelle
-      profile = profile.copyWith(
-        sleepTargetHours: HealthCalculator.recommendedSleepHours(profile),
-      );
-      await db.saveProfile(currentUserTc!, profile);
       
       for (final med in medications) {
         try {
@@ -244,9 +238,7 @@ class AuraController extends ChangeNotifier {
   }
 
   Future<void> saveProfile(HealthProfile nextProfile) async {
-    // Uyku hedefini yaş ve aktiviteye göre otomatik güncelle
-    final recommended = HealthCalculator.recommendedSleepHours(nextProfile);
-    profile = nextProfile.copyWith(sleepTargetHours: recommended);
+    profile = nextProfile;
     if (currentUserTc != null) {
       await db.saveProfile(currentUserTc!, profile);
     }
