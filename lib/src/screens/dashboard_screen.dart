@@ -974,21 +974,14 @@ class _SleepCard extends StatelessWidget {
           if (lastSleep != null) ...[
             Row(
               children: [
-                Text(
-                  'Son uyku: ${lastSleep.hours} saat',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
+                Text('Son uyku: ${lastSleep.hours} saat', style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(width: 8),
                 Text(lastSleep.feeling, style: const TextStyle(fontSize: 18)),
               ],
             ),
             const SizedBox(height: 4),
             Text(
-              _isToday(lastSleep.date)
-                  ? 'Bugün'
-                  : _isYesterday(lastSleep.date)
-                      ? 'Dün gece'
-                      : '${lastSleep.date.day}/${lastSleep.date.month} gecesi',
+              '${_isToday(lastSleep.date) ? "Bugün" : _isYesterday(lastSleep.date) ? "Dün gece" : "${lastSleep.date.day}/${lastSleep.date.month} gecesi"} • Hedef: ${controller.profile.sleepTargetHours.toStringAsFixed(0)} saat',
               style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
             ),
             const SizedBox(height: 12),

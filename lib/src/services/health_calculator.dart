@@ -84,13 +84,14 @@ class HealthCalculator {
     final mondayStart = todayStart.subtract(Duration(days: todayStart.weekday - 1));
     
     final Map<int, double> hours = {for (var i = 0; i < 7; i++) i: 0.0};
-    
+    final Map<int, String> feelings = {for (var i = 0; i < 7; i++) i: ''};
+
     for (final log in profile.sleepLogs) {
       final logDay = DateTime(log.date.year, log.date.month, log.date.day);
       final differenceFromMonday = logDay.difference(mondayStart).inDays;
       if (differenceFromMonday >= 0 && differenceFromMonday < 7) {
         hours[differenceFromMonday] = (hours[differenceFromMonday] ?? 0.0) + log.hours;
-      }
+        feelings[differenceFromMonday] = log.feeling;
     }
 
     final weekdays = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
@@ -99,7 +100,7 @@ class HealthCalculator {
     for (var i = 0; i < 7; i++) {
       final date = mondayStart.add(Duration(days: i));
       final isToday = date.isAtSameMomentAs(todayStart);
-      result.add(DailySleep(weekdays[i], hours[i]!, isToday: isToday));
+      result.add(DailySleep(weekdays[i], hours[i]!, isToday: isToday, feeling: feelings[i]!));
     }
     
     return result;
@@ -118,6 +119,7 @@ class DailySleep {
   final String dayName;
   final double hours;
   final bool isToday;
+  final String feeling;
 
-  const DailySleep(this.dayName, this.hours, {this.isToday = false});
+  const DailySleep(this.dayName, this.hours, {this.isToday = false, this.feeling = ''});
 }

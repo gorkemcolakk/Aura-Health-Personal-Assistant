@@ -180,9 +180,18 @@ class _SleepBars extends StatelessWidget {
 
   final dynamic controller;
 
+  Color _feelingColor(String feeling, BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    if (feeling.contains('Enerjik')) return const Color(0xFFFFB300); // Altın
+    if (feeling.contains('Yorgun')) return const Color(0xFFE76F51); // Mercan
+    if (feeling.contains('Normal')) return colors.primary; // Yeşil
+    return colors.surfaceContainerHighest; // Gri (veri yok)
+  }
+
   @override
   Widget build(BuildContext context) {
     final weeklyData = HealthCalculator.getWeeklySleepData(controller.profile);
+    final target = controller.profile.sleepTargetHours;
     final colors = Theme.of(context).colorScheme;
 
     return AuraCard(
@@ -195,65 +204,102 @@ class _SleepBars extends StatelessWidget {
               const SizedBox(width: 8),
               Text('Haftalık Uyku Düzeni', style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
-              Text('Hedef 7 saat', style: TextStyle(color: colors.onSurfaceVariant, fontSize: 12)),
+              Text('Hedef ${target.toStringAsFixed(0)} saat', style: TextStyle(color: colors.onSurfaceVariant, fontSize: 12)),
             ],
           ),
           const SizedBox(height: 16),
           ...weeklyData.map((day) {
-            final pct = (day.hours / 10.0).clamp(0.0, 1.0);
-            final reached = day.hours >= 7.0;
+            final pct = day.hours > 0 ? (day.hours / target).clamp(0.0, 1.0) : 0.0;
+            final reached = day.hours >= target;
+            final barColor = _feelingColor(day.feeling, context);
+            final hasData = day.hours > 0;
+
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Row(
                 children: [
                   SizedBox(
                     width: 32,
-                    child: Text(
-                      day.dayName,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: day.isToday ? FontWeight.bold : FontWeight.normal,
-                        color: day.isToday ? colors.primary : colors.onSurfaceVariant,
-                      ),
-                    ),
+                    child: Text(day.dayName, style: TextStyle(fontSize: 11, fontWeight: day.isToday ? FontWeight.bold : FontWeight.normal, color: day.isToday ? colors.primary : colors.onSurfaceVariant)),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(7),
-                      child: LinearProgressIndicator(
-                        value: pct,
-                        minHeight: 24,
-                        backgroundColor: colors.surfaceContainerHighest,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          day.isToday
-                              ? colors.primary
-                              : reached
-                                  ? const Color(0xFF52B788)
-                                  : colors.primary.withValues(alpha: 0.4),
+                    child: Stack(
+                      children: [
+                        // Arka plan
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(7),
+                          child: Container(
+                            height: 24,
+                            color: colors.surfaceContainerHighest,
+                          ),
                         ),
-                      ),
+                        // Doluluk
+                        if (hasData)
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(7),
+                            child: FractionallySizedBox(
+                              widthFactor: pct,
+                              child: Container(height: 24, color: barColor),
+                            ),
+                          ),
+                        // Hedef çizgisi
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          top: 2,
+                          child: Align(
+                            alignment: Alignment(1.0.clamp(0.0, 1.0) * 2 - 1, 0),
+                            child: Container(width: 2, height: 20, color: colors.primary.withValues(alpha: 0.3)),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 8),
                   SizedBox(
-                    width: 48,
-                    child: Text(
-                      '${day.hours.toStringAsFixed(1)} s',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: reached ? const Color(0xFF2D6A4F) : colors.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.right,
+                    width: 52,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if (reached) const Text('✅ ', style: TextStyle(fontSize: 12)),
+                        Text(
+                          hasData ? '${day.hours.toStringAsFixed(1)}s' : '-',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: hasData ? colors.onSurface : colors.onSurfaceVariant),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             );
           }),
+          const SizedBox(height: 8),
+          // Lejant
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _legendDot(context, const Color(0xFFFFB300), 'Enerjik'),
+              const SizedBox(width: 16),
+              _legendDot(context, colors.primary, 'Normal'),
+              const SizedBox(width: 16),
+              _legendDot(context, const Color(0xFFE76F51), 'Yorgun'),
+            ],
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _legendDot(BuildContext context, Color color, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 4),
+        Text(label, style: const TextStyle(fontSize: 10)),
+      ],
     );
   }
 }

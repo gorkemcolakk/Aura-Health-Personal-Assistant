@@ -31,6 +31,7 @@ class HealthProfile {
     this.allergies = '',
     this.emergencyContact = '',
     this.emergencyPhone = '',
+    this.sleepTargetHours = 8,
   });
 
   factory HealthProfile.initial({String name = ''}) {
@@ -76,6 +77,7 @@ class HealthProfile {
       allergies: json['allergies'] as String? ?? '',
       emergencyContact: json['emergencyContact'] as String? ?? '',
       emergencyPhone: json['emergencyPhone'] as String? ?? '',
+      sleepTargetHours: (json['sleepTargetHours'] as num?)?.toDouble() ?? 8,
     );
   }
 
@@ -93,6 +95,7 @@ class HealthProfile {
   final String allergies;
   final String emergencyContact;
   final String emergencyPhone;
+  final double sleepTargetHours;
 
   String get initials {
     final parts = name.trim().split(RegExp(r'\s+'));
@@ -117,6 +120,7 @@ class HealthProfile {
     String? allergies,
     String? emergencyContact,
     String? emergencyPhone,
+    double? sleepTargetHours,
   }) {
     return HealthProfile(
       name: name ?? this.name,
@@ -133,6 +137,7 @@ class HealthProfile {
       allergies: allergies ?? this.allergies,
       emergencyContact: emergencyContact ?? this.emergencyContact,
       emergencyPhone: emergencyPhone ?? this.emergencyPhone,
+      sleepTargetHours: sleepTargetHours ?? this.sleepTargetHours,
     );
   }
 
@@ -152,6 +157,7 @@ class HealthProfile {
       'allergies': allergies,
       'emergencyContact': emergencyContact,
       'emergencyPhone': emergencyPhone,
+      'sleepTargetHours': sleepTargetHours,
     });
   }
 }

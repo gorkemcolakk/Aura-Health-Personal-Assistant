@@ -24,6 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _allergies = TextEditingController();
   final _emergencyContact = TextEditingController();
   final _emergencyPhone = TextEditingController();
+  final _sleepTarget = TextEditingController();
   bool _didFill = false;
   ActivityLevel _activity = ActivityLevel.balanced;
 
@@ -44,6 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _allergies.text = profile.allergies;
     _emergencyContact.text = profile.emergencyContact;
     _emergencyPhone.text = profile.emergencyPhone;
+    _sleepTarget.text = profile.sleepTargetHours.toString();
     _activity = profile.activity;
     _didFill = true;
   }
@@ -60,6 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _allergies.dispose();
     _emergencyContact.dispose();
     _emergencyPhone.dispose();
+    _sleepTarget.dispose();
     super.dispose();
   }
 
@@ -189,6 +192,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 12),
                 TextField(
+                  controller: _sleepTarget,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                    labelText: 'Günlük uyku hedefi (saat)',
+                    prefixIcon: Icon(Icons.nights_stay),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
                   controller: _goal,
                   maxLines: 2,
                   decoration: const InputDecoration(
@@ -279,6 +291,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         allergies: _allergies.text.trim(),
                         emergencyContact: _emergencyContact.text.trim(),
                         emergencyPhone: _emergencyPhone.text.trim(),
+                        sleepTargetHours: double.tryParse(_sleepTarget.text.replaceAll(',', '.')) ?? profile.sleepTargetHours,
                       ),
                     );
                     if (context.mounted) {
