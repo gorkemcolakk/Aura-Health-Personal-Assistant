@@ -41,6 +41,7 @@ class AuraTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
+        labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF3E2723)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
           borderSide: BorderSide(color: sage.withValues(alpha: .25)),
