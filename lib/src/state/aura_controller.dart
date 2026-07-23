@@ -246,15 +246,32 @@ class AuraController extends ChangeNotifier {
   }
 
   Future<void> addWater(int ml, {DateTime? date}) async {
-    final newLog = WaterLog(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      timestamp: date ?? DateTime.now(),
-      amountMl: ml,
-    );
-    profile = profile.copyWith(
-      waterConsumedMl: profile.waterConsumedMl + ml,
-      waterLogs: [...profile.waterLogs, newLog],
-    );
+    final logDate = date ?? DateTime.now();
+    final isToday = _isSameDay(logDate, DateTime.now());
+
+    if (!isToday) {
+      // Başka gün: o günün eski kayıtlarını sil, direkt bu değeri yaz
+      final filtered = profile.waterLogs
+          .where((l) => !_isSameDay(l.timestamp, logDate))
+          .toList();
+      filtered.add(WaterLog(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        timestamp: logDate,
+        amountMl: ml,
+      ));
+      profile = profile.copyWith(waterLogs: filtered);
+    } else {
+      // Bugün: üstüne ekle
+      final newLog = WaterLog(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        timestamp: logDate,
+        amountMl: ml,
+      );
+      profile = profile.copyWith(
+        waterConsumedMl: profile.waterConsumedMl + ml,
+        waterLogs: [...profile.waterLogs, newLog],
+      );
+    }
     if (currentUserTc != null) {
       await db.saveProfile(currentUserTc!, profile);
     }
