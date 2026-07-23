@@ -14,7 +14,6 @@ class PdfService {
       PdfPageFormat format, HealthProfile profile, String aiSummary) async {
     final pdf = pw.Document();
 
-    // Roboto fontlarının yüklenmesi
     final font = await PdfGoogleFonts.robotoRegular();
     final fontBold = await PdfGoogleFonts.robotoBold();
 
@@ -56,10 +55,10 @@ class PdfService {
                       style: pw.TextStyle(
                           fontSize: 32,
                           font: fontBold,
-                          color: PdfColors.teal900)),
+                          color: PdfColors.teal800)),
                   pw.Text('Doktor Raporu',
                       style: pw.TextStyle(
-                          fontSize: 22, font: font, color: PdfColors.grey800)),
+                          fontSize: 22, font: fontBold, color: PdfColors.grey700)),
                 ],
               ),
               pw.Divider(thickness: 2, color: PdfColors.teal300),
@@ -141,10 +140,10 @@ class PdfService {
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
                 children: [
-                  _buildMetricBox('VKİ', bmi.toStringAsFixed(1), 'kg/m2', font, fontBold),
-                  _buildMetricBox('Ort. Su', '${avgWater.round()}', 'ml/gün', font, fontBold),
+                  _buildMetricBox('VKİ', bmi.toStringAsFixed(1), 'kg/m2', fontBold),
+                  _buildMetricBox('Ort. Su', '${avgWater.round()}', 'ml/gün', fontBold),
                   _buildMetricBox(
-                      'Ort. Uyku', avgSleep.toStringAsFixed(1), 'saat/gün', font, fontBold),
+                      'Ort. Uyku', avgSleep.toStringAsFixed(1), 'saat/gün', fontBold),
                 ],
               ),
               pw.SizedBox(height: 20),
@@ -159,7 +158,7 @@ class PdfService {
                     ? 'Belirtilen kritik durum veya alerji yok.'
                     : clinicalText,
                 style: pw.TextStyle(
-                    fontSize: 16, font: fontBold, color: PdfColors.grey900),
+                    fontSize: 16, font: fontBold, color: PdfColors.black),
               ),
               pw.SizedBox(height: 20),
               pw.Divider(color: PdfColors.grey400),
@@ -179,15 +178,15 @@ class PdfService {
                   color: PdfColors.indigo50,
                   borderRadius:
                       const pw.BorderRadius.all(pw.Radius.circular(12)),
-                  border: pw.Border.all(color: PdfColors.indigo200),
+                  border: pw.Border.all(color: PdfColors.indigo200, width: 1.5),
                 ),
                 child: pw.Text(
                   aiSummary,
                   style: pw.TextStyle(
-                    fontSize: 14,
-                    lineSpacing: 5,
-                    font: font, // Metnin çamur gibi durmaması için Regular, ama kontrastı yüksek siyah yapıldı
-                    color: PdfColors.black,
+                    fontSize: 15,
+                    lineSpacing: 4,
+                    font: fontBold, // Kalın, belirgin ve net font!
+                    color: PdfColors.blueGrey900,
                   ),
                 ),
               ),
@@ -195,9 +194,9 @@ class PdfService {
               // Boşluğu değerlendirip footer'ı en alta iten yapıcı
               pw.Spacer(),
 
-              // Shortened Warning Footer
+              // Warning Footer
               pw.Container(
-                padding: const pw.EdgeInsets.all(8),
+                padding: const pw.EdgeInsets.all(10),
                 decoration: pw.BoxDecoration(
                   color: PdfColors.orange50,
                   borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
@@ -208,7 +207,7 @@ class PdfService {
                     'ÖNEMLİ: Bu rapor AI tarafından üretilmiştir, tıbbi kesinlik taşımaz ve hekim değerlendirmesi yerine geçemez.',
                     textAlign: pw.TextAlign.center,
                     style: pw.TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         font: fontBold,
                         color: PdfColors.orange900),
                   ),
@@ -223,7 +222,7 @@ class PdfService {
     return await pdf.save();
   }
 
-  static pw.Widget _buildMetricBox(String title, String value, String unit, pw.Font font, pw.Font fontBold) {
+  static pw.Widget _buildMetricBox(String title, String value, String unit, pw.Font fontBold) {
     return pw.Container(
       width: 160,
       padding: const pw.EdgeInsets.symmetric(vertical: 14, horizontal: 8),
