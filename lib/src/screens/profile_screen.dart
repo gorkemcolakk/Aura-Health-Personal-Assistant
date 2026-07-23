@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/health_profile.dart';
+import '../services/health_calculator.dart';
 import '../state/aura_scope.dart';
 import '../widgets/aura_card.dart';
 import '../services/pdf_service.dart';
@@ -194,9 +195,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 TextField(
                   controller: _sleepTarget,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Günlük uyku hedefi (saat)',
-                    prefixIcon: Icon(Icons.nights_stay),
+                    prefixIcon: const Icon(Icons.nights_stay),
+                    helperText: 'Önerilen: ${HealthCalculator.recommendedSleepHours(AuraScope.of(context).profile).toStringAsFixed(1)} saat',
+                    helperMaxLines: 1,
                   ),
                 ),
                 const SizedBox(height: 12),

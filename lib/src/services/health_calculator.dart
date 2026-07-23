@@ -35,6 +35,15 @@ class HealthCalculator {
         .round();
   }
 
+  static double recommendedSleepHours(HealthProfile profile) {
+    double base = 8;
+    if (profile.age < 18) base = 9;
+    if (profile.age > 64) base = 7;
+    if (profile.activity == ActivityLevel.active) base += 0.5;
+    if (profile.activity == ActivityLevel.athletic) base += 1;
+    return base;
+  }
+
   static int todayWaterMl(HealthProfile profile) {
     final today = DateTime.now();
     return profile.waterLogs
