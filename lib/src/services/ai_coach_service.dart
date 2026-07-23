@@ -132,7 +132,7 @@ Hastanın bilgileri:
 - Sağlık Hedefi: ${profile.healthGoal}
 - Günlük Su Hedefi: $waterTarget ml
 
-Görevin: Bu verileri okuyan uzman doktor için kısa, net ve öz (en fazla 3-4 cümlelik) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın durumunu, hedeflerini ve dikkat etmesi gereken noktaları profesyonel bir tıbbi dille anlat. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.''';
+Görevin: Bu verileri okuyan uzman doktor için detaylı ve kapsamlı (yaklaşık 4-6 cümlelik) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın durumunu, alerjilerini, mevcut sağlık sorunlarını, hedeflerini ve dikkat etmesi gereken kritik noktaları profesyonel bir tıbbi dille açıkla. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.''';
 
       final body = jsonEncode({
         'model': _model,

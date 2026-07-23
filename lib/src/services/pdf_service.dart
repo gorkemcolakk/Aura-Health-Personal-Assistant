@@ -139,8 +139,9 @@ class PdfService {
                   child: pw.Text(
                     aiSummary,
                     style: pw.TextStyle(
-                      fontSize: 12,
-                      lineSpacing: 2,
+                      fontSize: 14,
+                      lineSpacing: 5,
+                      fontWeight: pw.FontWeight.bold,
                       color: PdfColors.blueGrey900,
                     ),
                   ),
