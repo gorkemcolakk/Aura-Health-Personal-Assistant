@@ -283,20 +283,26 @@ class AuraController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addSleep(double hours, String feeling) async {
-    final log = SleepLog(
-      date: DateTime.now(),
-      hours: hours,
-      feeling: feeling,
-    );
-    profile = profile.copyWith(
-      sleepLogs: [...profile.sleepLogs, log],
-    );
+  Future<void> addSleep(double hours, String feeling, {DateTime? date}) async {
+    final logDate = date ?? DateTime.now();
+    final log = SleepLog(date: logDate, hours: hours, feeling: feeling);
+
+    // Aynı tarihli eski uyku kaydını ez, yenisiyle değiştir
+    final updated = profile.sleepLogs
+        .where((l) => !_isSameDay(l.date, logDate))
+        .toList();
+    updated.add(log);
+    updated.sort((a, b) => b.date.compareTo(a.date));
+
+    profile = profile.copyWith(sleepLogs: updated);
     if (currentUserTc != null) {
       await db.saveProfile(currentUserTc!, profile);
     }
     notifyListeners();
   }
+
+  bool _isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
 
   Future<void> upsertMedication(Medication medication) async {
     final index = medications.indexWhere((item) => item.id == medication.id);

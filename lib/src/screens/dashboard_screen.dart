@@ -979,11 +979,17 @@ class _SleepCard extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  lastSleep.feeling,
-                  style: const TextStyle(fontSize: 18),
-                ),
+                Text(lastSleep.feeling, style: const TextStyle(fontSize: 18)),
               ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              _isToday(lastSleep.date)
+                  ? 'Bugün'
+                  : _isYesterday(lastSleep.date)
+                      ? 'Dün gece'
+                      : '${lastSleep.date.day}/${lastSleep.date.month} gecesi',
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
             ),
             const SizedBox(height: 12),
           ],
@@ -1001,28 +1007,67 @@ class _SleepCard extends StatelessWidget {
   }
 }
 
+bool _isToday(DateTime d) {
+  final now = DateTime.now();
+  return d.year == now.year && d.month == now.month && d.day == now.day;
+}
+
+bool _isYesterday(DateTime d) {
+  final yesterday = DateTime.now().subtract(const Duration(days: 1));
+  return d.year == yesterday.year && d.month == yesterday.month && d.day == yesterday.day;
+}
+
 void _showSleepDialog(BuildContext context, AuraController controller) {
   double hours = 7.5;
   String selectedFeeling = '😐 Normal';
+  DateTime selectedDate = DateTime.now().subtract(const Duration(days: 1)); // Varsayılan: dün
 
   showDialog(
     context: context,
     builder: (context) {
       return StatefulBuilder(
         builder: (context, setState) {
+          final dateLabel = _isToday(selectedDate)
+              ? 'Bugün'
+              : _isYesterday(selectedDate)
+                  ? 'Dün'
+                  : '${selectedDate.day}/${selectedDate.month}';
+
           return AlertDialog(
-            title: const Text('Bugün nasıl uyudun?'),
+            title: const Text('Uyku Ekle'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Tarih seçici
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_today, size: 18),
+                    const SizedBox(width: 8),
+                    Text('Tarih: $dateLabel', style: const TextStyle(fontWeight: FontWeight.w600)),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate,
+                          firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                          lastDate: DateTime.now(),
+                          helpText: 'Uyku tarihini seç',
+                        );
+                        if (picked != null) setState(() => selectedDate = picked);
+                      },
+                      child: const Text('Değiştir'),
+                    ),
+                  ],
+                ),
+                const Divider(height: 24),
+                // Süre
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
                       onPressed: () {
-                        if (hours > 0.5) {
-                          setState(() => hours -= 0.5);
-                        }
+                        if (hours > 0.5) setState(() => hours -= 0.5);
                       },
                       icon: const Icon(Icons.remove_circle_outline),
                       iconSize: 32,
@@ -1035,9 +1080,7 @@ void _showSleepDialog(BuildContext context, AuraController controller) {
                     const SizedBox(width: 16),
                     IconButton(
                       onPressed: () {
-                        if (hours < 24.0) {
-                          setState(() => hours += 0.5);
-                        }
+                        if (hours < 24.0) setState(() => hours += 0.5);
                       },
                       icon: const Icon(Icons.add_circle_outline),
                       iconSize: 32,
@@ -1079,7 +1122,7 @@ void _showSleepDialog(BuildContext context, AuraController controller) {
               ),
               FilledButton(
                 onPressed: () {
-                  controller.addSleep(hours, selectedFeeling);
+                  controller.addSleep(hours, selectedFeeling, date: selectedDate);
                   Navigator.pop(context);
                 },
                 child: const Text('Kaydet'),
