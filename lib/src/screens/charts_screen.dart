@@ -34,7 +34,7 @@ class ChartsScreen extends StatelessWidget {
 
     double maxY = target.toDouble() * 1.5;
     for (final day in weeklyData) {
-      if (day.ml > maxY) maxY = day.ml.toDouble();
+      if (day.amountMl > maxY) maxY = day.amountMl.toDouble();
     }
     maxY = maxY * 1.15;
 
@@ -61,7 +61,7 @@ class ChartsScreen extends StatelessWidget {
                     x: entry.key,
                     barRods: [
                       BarChartRodData(
-                        toY: dayData.ml.toDouble(),
+                        toY: dayData.amountMl.toDouble(),
                         color: dayData.isToday
                             ? Theme.of(context).colorScheme.primary
                             : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
