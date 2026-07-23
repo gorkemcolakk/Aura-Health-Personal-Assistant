@@ -16,10 +16,43 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _error;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = AuraScope.of(context, listen: false);
+      if (controller.biometricEnabled) {
+        _loginWithBiometrics();
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _tcController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void _loginWithBiometrics() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    final controller = AuraScope.of(context, listen: false);
+    final success = await controller.loginWithBiometrics();
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (!success) {
+      setState(() {
+        _error = 'Biyometrik doğrulama başarısız oldu veya iptal edildi.';
+      });
+    }
   }
 
   void _login() async {
@@ -57,6 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = AuraScope.of(context);
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -116,15 +150,41 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: FilledButton(
-                    onPressed: _isLoading ? null : _login,
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Giriş Yap', style: TextStyle(fontSize: 16)),
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 50,
+                        child: FilledButton(
+                          onPressed: _isLoading ? null : _login,
+                          child: _isLoading
+                              ? const CircularProgressIndicator(color: Colors.white)
+                              : const Text('Giriş Yap', style: TextStyle(fontSize: 16)),
+                        ),
+                      ),
+                    ),
+                    if (controller.biometricEnabled) ...[
+                      const SizedBox(width: 12),
+                      SizedBox(
+                        height: 50,
+                        width: 50,
+                        child: OutlinedButton(
+                          onPressed: _isLoading ? null : _loginWithBiometrics,
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.fingerprint,
+                            size: 28,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 16),
                 TextButton(

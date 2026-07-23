@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../models/health_profile.dart';
 import '../state/aura_scope.dart';
 import '../widgets/aura_card.dart';
+import '../services/pdf_service.dart';
+import 'pdf_preview_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -289,6 +291,100 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   label: const Text('Kaydet'),
                 ),
               ],
+            ),
+          ),
+          const SizedBox(height: 18),
+          AuraCard(
+            child: FutureBuilder<bool>(
+              future: controller.biometric.isBiometricsSupported(),
+              builder: (context, snapshot) {
+                final isSupported = snapshot.data ?? false;
+                if (!isSupported) {
+                  return const Text(
+                    'Cihazınızda biyometrik doğrulama (Face ID / Parmak İzi) desteği bulunamadı.',
+                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                  );
+                }
+
+                return SwitchListTile(
+                  title: const Text('Biyometrik Giriş'),
+                  subtitle: const Text('Face ID / Parmak izi ile hızlı giriş yapın'),
+                  secondary: const Icon(Icons.fingerprint),
+                  contentPadding: EdgeInsets.zero,
+                  value: controller.isBiometricEnabledForCurrentUser,
+                  onChanged: (bool value) async {
+                    final success = await controller.setBiometricEnabled(value);
+                    if (!context.mounted) return;
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(value
+                              ? 'Biyometrik giriş aktif edildi'
+                              : 'Biyometrik giriş kapatıldı'),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Biyometrik doğrulama başarısız oldu'),
+                        ),
+                      );
+                    }
+                  },
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 18),
+          AuraCard(
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: () {
+                // Navigate to PDF Preview screen
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => PdfPreviewScreen(
+                      profile: controller.profile,
+                      apiKey: controller.apiKey,
+                    ),
+                  ),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.indigo.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.picture_as_pdf, color: Colors.indigo),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Doktor Raporu Oluştur (PDF)',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Yapay zeka destekli sağlık özeti',
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right, color: Colors.indigo),
+                  ],
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 32),

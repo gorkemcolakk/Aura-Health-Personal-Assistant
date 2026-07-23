@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 
@@ -13,6 +12,7 @@ import '../services/ai_coach_service.dart';
 import '../services/notification_service.dart';
 import '../services/storage_service.dart';
 import '../services/database_service.dart';
+import '../services/biometric_service.dart';
 
 class AuraController extends ChangeNotifier {
   AuraController({
@@ -25,11 +25,17 @@ class AuraController extends ChangeNotifier {
   final NotificationService notifications;
   final AiCoachService ai;
   final DatabaseService db = DatabaseService();
+  final BiometricService biometric = BiometricService();
 
   HealthProfile profile = HealthProfile.initial();
   List<Medication> medications = const [];
   String? apiKey;
   ThemeMode themeMode = ThemeMode.system;
+
+  bool biometricEnabled = false;
+  String? biometricUserTc;
+
+  bool get isBiometricEnabledForCurrentUser => biometricEnabled && biometricUserTc == currentUserTc;
 
   String? currentUserTc;
   String? currentUserName;
@@ -57,6 +63,8 @@ class AuraController extends ChangeNotifier {
   Future<void> load() async {
     apiKey = await storage.loadApiKey();
     themeMode = await storage.loadThemeMode();
+    biometricEnabled = await storage.loadBiometricEnabled();
+    biometricUserTc = await storage.loadBiometricUserTc();
     // Do not load profile/medications until user logs in.
     
     _medicationTimer?.cancel();
@@ -113,6 +121,59 @@ class AuraController extends ChangeNotifier {
       ),
     ];
     notifyListeners();
+  }
+
+  // --- Biometric Auth ---
+  Future<bool> setBiometricEnabled(bool enabled) async {
+    if (currentUserTc == null) return false;
+
+    if (enabled) {
+      final success = await biometric.authenticate();
+      if (!success) return false;
+      
+      biometricEnabled = true;
+      biometricUserTc = currentUserTc;
+      await storage.saveBiometricEnabled(true);
+      await storage.saveBiometricUserTc(currentUserTc);
+    } else {
+      biometricEnabled = false;
+      biometricUserTc = null;
+      await storage.saveBiometricEnabled(false);
+      await storage.saveBiometricUserTc(null);
+    }
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> loginWithBiometrics() async {
+    final isSupported = await biometric.isBiometricsSupported();
+    final hasEnrolled = await biometric.hasEnrolledBiometrics();
+    if (!isSupported || !hasEnrolled || !biometricEnabled || biometricUserTc == null) {
+      return false;
+    }
+
+    final success = await biometric.authenticate();
+    if (success) {
+      final user = await db.getUser(biometricUserTc!);
+      if (user != null) {
+        currentUserTc = biometricUserTc;
+        currentUserName = user['name'] as String;
+        
+        profile = await db.loadProfile(currentUserTc!);
+        medications = await db.loadMedications(currentUserTc!);
+        
+        for (final med in medications) {
+          try {
+            await notifications.scheduleMedication(med);
+          } catch (_) {}
+        }
+        await loadChatSessions();
+        _activeSessionId = null;
+        notifyListeners();
+        return true;
+      }
+    }
+    return false;
   }
 
   void _checkMedications() {

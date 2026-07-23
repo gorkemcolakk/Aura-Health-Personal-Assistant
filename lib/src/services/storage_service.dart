@@ -74,4 +74,28 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('aura.theme_mode', mode.name);
   }
+
+  Future<bool> loadBiometricEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('aura.biometric_enabled') ?? false;
+  }
+
+  Future<void> saveBiometricEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('aura.biometric_enabled', enabled);
+  }
+
+  Future<String?> loadBiometricUserTc() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('aura.biometric_user_tc');
+  }
+
+  Future<void> saveBiometricUserTc(String? tc) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (tc == null) {
+      await prefs.remove('aura.biometric_user_tc');
+    } else {
+      await prefs.setString('aura.biometric_user_tc', tc);
+    }
+  }
 }

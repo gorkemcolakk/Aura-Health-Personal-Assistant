@@ -77,6 +77,33 @@ class HealthCalculator {
     
     return result;
   }
+
+  static List<DailySleep> getWeeklySleepData(HealthProfile profile) {
+    final now = DateTime.now();
+    final todayStart = DateTime(now.year, now.month, now.day);
+    final mondayStart = todayStart.subtract(Duration(days: todayStart.weekday - 1));
+    
+    final Map<int, double> hours = {for (var i = 0; i < 7; i++) i: 0.0};
+    
+    for (final log in profile.sleepLogs) {
+      final logDay = DateTime(log.date.year, log.date.month, log.date.day);
+      final differenceFromMonday = logDay.difference(mondayStart).inDays;
+      if (differenceFromMonday >= 0 && differenceFromMonday < 7) {
+        hours[differenceFromMonday] = (hours[differenceFromMonday] ?? 0.0) + log.hours;
+      }
+    }
+
+    final weekdays = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+    final result = <DailySleep>[];
+    
+    for (var i = 0; i < 7; i++) {
+      final date = mondayStart.add(Duration(days: i));
+      final isToday = date.isAtSameMomentAs(todayStart);
+      result.add(DailySleep(weekdays[i], hours[i]!, isToday: isToday));
+    }
+    
+    return result;
+  }
 }
 
 class DailyWater {
@@ -85,4 +112,12 @@ class DailyWater {
   final bool isToday;
 
   const DailyWater(this.dayName, this.amountMl, {this.isToday = false});
+}
+
+class DailySleep {
+  final String dayName;
+  final double hours;
+  final bool isToday;
+
+  const DailySleep(this.dayName, this.hours, {this.isToday = false});
 }

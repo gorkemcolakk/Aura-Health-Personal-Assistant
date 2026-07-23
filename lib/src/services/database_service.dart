@@ -101,6 +101,19 @@ class DatabaseService {
     return null;
   }
 
+  Future<Map<String, dynamic>?> getUser(String tc) async {
+    final db = await database;
+    final results = await db.query(
+      'users',
+      where: 'tc = ?',
+      whereArgs: [tc],
+    );
+    if (results.isNotEmpty) {
+      return results.first;
+    }
+    return null;
+  }
+
   // --- Profile ---
   Future<HealthProfile> loadProfile(String tc) async {
     final db = await database;

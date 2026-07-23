@@ -59,15 +59,12 @@ class AiCoachService {
         return 'DeepSeek hesabında yeterli bakiye yok.\n\n${_offlineAnswer(profile, question)}';
       }
       if (response.statusCode == 429) {
-        return 'Çok fazla istek gönderildi, lütfen biraz bekle.\n\n${_offlineAnswer(profile, question)}';
+        return 'Çok fazla soru sordun, biraz dinlen.\n(Offline mod: Bol su iç, uykunu al.)';
       }
       return 'API hatası (${response.statusCode}): $errorMsg\n\n${_offlineAnswer(profile, question)}';
     } catch (e) {
-      final s = e.toString().toLowerCase();
-      if (s.contains('socket') || s.contains('host') || s.contains('network')) {
-        return 'İnternet bağlantını kontrol et.\n\n${_offlineAnswer(profile, question)}';
-      }
-      return 'AI servisine bağlanılamadı.\n\n${_offlineAnswer(profile, question)}';
+      // Show real error to diagnose the issue
+      return 'HATA DETAYI: $e\n\n${_offlineAnswer(profile, question)}';
     }
   }
 
@@ -112,4 +109,58 @@ VKİ değerin yaklaşık ${bmi.toStringAsFixed(1)} ve kategori "$label". Günlü
 "$question" için güvenli önerim: belirti, ağrı, ilaç yan etkisi veya ani değişim varsa bunu kişisel tıbbi karar gibi ele alma; hekim ya da eczacıya danış. Günlük takip, uyku, su ve ilaç düzeni tarafında yardımcı olabilirim.
 ''';
   }
+
+  Future<String> generateDoctorSummary({
+    required HealthProfile profile,
+    String? apiKey,
+  }) async {
+    final key = (apiKey ?? '').trim();
+    if (key.isEmpty) {
+      return 'Yapay zeka asistanı aktif değil. Hastanın genel sağlık durumu ekteki verilerde sunulmuştur. Ortalama değerlere dikkat edilmesi önerilir.';
+    }
+
+    try {
+      final waterTarget = HealthCalculator.dailyWaterTargetMl(profile);
+      final bmi = HealthCalculator.bmi(profile);
+      
+      final systemPrompt = '''Sen uzman bir doktora ön değerlendirme sunan tıbbi asistan "Aura"sın.
+Hastanın bilgileri:
+- Yaş: ${profile.age}, Boy: ${profile.heightCm} cm, Kilo: ${profile.weightKg} kg, VKİ: ${bmi.toStringAsFixed(1)}
+- Mevcut Durum/Alerjiler: ${profile.conditions}
+- Sağlık Hedefi: ${profile.healthGoal}
+- Günlük Su Hedefi: $waterTarget ml
+
+Görevin: Bu verileri okuyan uzman doktor için en fazla 3-4 cümlelik, son derece profesyonel, objektif ve tıbbi bir dille hastanın genel özetini yazmak. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.''';
+
+      final body = jsonEncode({
+        'model': _model,
+        'messages': [
+          {'role': 'system', 'content': systemPrompt},
+          {'role': 'user', 'content': 'Lütfen doktor raporu için hasta özetini oluştur.'},
+        ],
+        'temperature': 0.3,
+        'max_tokens': 500,
+      });
+
+      final response = await http.post(
+        Uri.parse(_endpoint),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $key',
+        },
+        body: body,
+      ).timeout(const Duration(seconds: 5));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['choices']?[0]?['message']?['content']?.toString().trim() ?? 'Yapay zeka ozeti olusturulamadi.';
+      }
+      return 'Yapay zeka ozeti olusturulamadi (Hata kodu: ${response.statusCode}).';
+    } catch (e) {
+      final bmi = HealthCalculator.bmi(profile);
+      final bmiText = HealthCalculator.bmiLabel(bmi);
+      return 'Yapay zeka sunucusuna baglanilamadi. Yerel Sistem Ozeti: Hastanin VKI degeri ${bmi.toStringAsFixed(1)} ($bmiText). Su hedefine ve uyku duzenine dikkat edilmesi saglikli yasam icin tavsiye edilir.';
+    }
+  }
 }
+

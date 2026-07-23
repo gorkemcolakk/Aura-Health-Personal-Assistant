@@ -66,5 +66,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Aura Health uygulamasına biyometrik kimlik doğrulama ile hızlıca giriş yapabilmek için Face ID izni gereklidir.</string>
 </dict>
 </plist>

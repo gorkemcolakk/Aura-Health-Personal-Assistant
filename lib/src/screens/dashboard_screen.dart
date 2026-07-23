@@ -128,6 +128,8 @@ class DashboardScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 _SleepCard(controller: controller),
                 const SizedBox(height: 16),
+                _WeeklySleepChart(controller: controller),
+                const SizedBox(height: 16),
                 if (nextMedication.isEmpty)
                   AuraCard(
                     child: Row(
@@ -1145,3 +1147,153 @@ class _EmergencyRow extends StatelessWidget {
   }
 }
 
+class _WeeklySleepChart extends StatelessWidget {
+  const _WeeklySleepChart({required this.controller});
+
+  final AuraController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final weeklyData = HealthCalculator.getWeeklySleepData(controller.profile);
+    const double target = 7.0; // Daily sleep target in hours
+
+    double maxY = 10.0; // Default max 10 hours
+    for (final day in weeklyData) {
+      if (day.hours > maxY) maxY = day.hours;
+    }
+    maxY = maxY + (maxY * 0.15);
+
+    return AuraCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.nights_stay, color: Theme.of(context).colorScheme.secondary),
+              const SizedBox(width: 8),
+              Text(
+                'Haftalık Uyku Düzeni',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          AspectRatio(
+            aspectRatio: 1.8,
+            child: BarChart(
+              BarChartData(
+                alignment: BarChartAlignment.spaceAround,
+                maxY: maxY,
+                barTouchData: BarTouchData(
+                  enabled: false,
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipColor: (_) => Colors.transparent,
+                    tooltipPadding: EdgeInsets.zero,
+                    tooltipMargin: 4,
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      return BarTooltipItem(
+                        rod.toY.toStringAsFixed(1),
+                        TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                titlesData: FlTitlesData(
+                  show: true,
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (double value, TitleMeta meta) {
+                        final index = value.toInt();
+                        if (index < 0 || index >= weeklyData.length) {
+                          return const SizedBox.shrink();
+                        }
+                        final dayData = weeklyData[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            dayData.dayName,
+                            style: TextStyle(
+                              color: dayData.isToday ? Theme.of(context).colorScheme.secondary : Colors.grey.shade600,
+                              fontWeight: dayData.isToday ? FontWeight.bold : FontWeight.w500,
+                              fontSize: 12,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  leftTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                ),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: target,
+                  getDrawingHorizontalLine: (value) {
+                    return FlLine(
+                      color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
+                      strokeWidth: 2,
+                      dashArray: [5, 5],
+                    );
+                  },
+                ),
+                borderData: FlBorderData(show: false),
+                barGroups: weeklyData.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final day = entry.value;
+                  final isReached = day.hours >= target;
+
+                  return BarChartGroupData(
+                    x: index,
+                    showingTooltipIndicators: day.hours > 0 ? [0] : [],
+                    barRods: [
+                      BarChartRodData(
+                        toY: day.hours,
+                        color: isReached ? Theme.of(context).colorScheme.secondary : Colors.indigo.shade300,
+                        width: 18,
+                        borderRadius: BorderRadius.circular(6),
+                        backDrawRodData: BackgroundBarChartRodData(
+                          show: true,
+                          toY: maxY,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 20,
+                height: 2,
+                color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Hedef: ${target.toInt()} saat',
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
