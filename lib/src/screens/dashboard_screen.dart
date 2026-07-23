@@ -953,8 +953,24 @@ class _SleepCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sleepLogs = controller.profile.sleepLogs;
-    final lastSleep = sleepLogs.isNotEmpty ? sleepLogs.last : null;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    // Bugünün uykusunu bul, yoksa dünün, o da yoksa null
+    final todaySleep = controller.profile.sleepLogs
+        .where((l) => l.date.year == today.year && l.date.month == today.month && l.date.day == today.day)
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+
+    final yesterdaySleep = controller.profile.sleepLogs
+        .where((l) => l.date.year == yesterday.year && l.date.month == yesterday.month && l.date.day == yesterday.day)
+        .firstOrNull;
+
+    final displaySleep = todaySleep.isNotEmpty ? todaySleep.first : yesterdaySleep;
+    final isToday = todaySleep.isNotEmpty;
+
+    final target = controller.profile.sleepTargetHours;
 
     return AuraCard(
       child: Column(
@@ -964,28 +980,33 @@ class _SleepCard extends StatelessWidget {
             children: [
               const Icon(Icons.bedtime_outlined),
               const SizedBox(width: 10),
-              Text(
-                'Uyku Takibi',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+              Text('Uyku Takibi', style: Theme.of(context).textTheme.titleMedium),
             ],
           ),
           const SizedBox(height: 12),
-          if (lastSleep != null) ...[
+          if (displaySleep != null) ...[
             Row(
               children: [
-                Text('Son uyku: ${lastSleep.hours} saat', style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  '${isToday ? "Bugün" : "Dün"}: ${displaySleep.hours} saat',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(width: 8),
-                Text(lastSleep.feeling, style: const TextStyle(fontSize: 18)),
+                Text(displaySleep.feeling, style: const TextStyle(fontSize: 18)),
               ],
             ),
             const SizedBox(height: 4),
             Text(
-              '${_isToday(lastSleep.date) ? "Bugün" : _isYesterday(lastSleep.date) ? "Dün gece" : "${lastSleep.date.day}/${lastSleep.date.month} gecesi"} • Hedef: ${controller.profile.sleepTargetHours.toStringAsFixed(0)} saat',
+              'Hedef: ${target.toStringAsFixed(0)} saat',
               style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
             ),
-            const SizedBox(height: 12),
+          ] else ...[
+            Text(
+              'Henüz uyku kaydı yok',
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
           ],
+          const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
