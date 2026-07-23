@@ -410,63 +410,31 @@ class _HeroStatus extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(bmi.toStringAsFixed(1), style: Theme.of(context).textTheme.headlineLarge),
+                        const SizedBox(width: 12),
+                        Text('VKİ • $bmiLabel', style: Theme.of(context).textTheme.bodyMedium),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
                     Text(
-                      bmi.toStringAsFixed(1),
-                      style: Theme.of(context).textTheme.headlineLarge,
+                      '%${(waterProgress * 100).toStringAsFixed(0)}',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
-                    Text('VKİ • $bmiLabel'),
-                    const SizedBox(height: 12),
-                    LinearProgressIndicator(
-                      value: waterProgress,
-                      minHeight: 10,
-                      borderRadius: BorderRadius.circular(99),
+                    Text(
+                      'Hedef ${(waterTarget / 1000).toStringAsFixed(2)} L',
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 13, fontWeight: FontWeight.w500),
                     ),
-                    const SizedBox(height: 8),
-                    Text('Hedef ${(waterTarget / 1000).toStringAsFixed(2)} L'),
                   ],
                 ),
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Ring extends StatelessWidget {
-  const _Ring({
-    required this.progress,
-    required this.center,
-    required this.label,
-  });
-
-  final double progress;
-  final String center;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          CircularProgressIndicator(
-            value: progress,
-            strokeWidth: 13,
-            backgroundColor: const Color(0xFFE7EFED),
-            color: Theme.of(context).colorScheme.primary,
-            strokeCap: StrokeCap.round,
-          ),
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(center, style: Theme.of(context).textTheme.titleLarge),
-                Text(label),
-              ],
-            ),
           ),
         ],
       ),
