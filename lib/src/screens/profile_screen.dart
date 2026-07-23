@@ -202,7 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           '${(HealthCalculator.dailyWaterTargetMl(profile) / 1000).toStringAsFixed(2)} L'),
                       const Divider(height: 20),
                       _targetRow(context, Icons.nights_stay, 'Günlük uyku hedefi',
-                          '${HealthCalculator.recommendedSleepHours(profile).toStringAsFixed(1)} saat'),
+                          '${profile.sleepTargetHours.toStringAsFixed(1)} saat'),
                     ],
                   ),
                 ),
@@ -429,7 +429,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Icon(icon, size: 22, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 12),
-        Text(label, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
+        Text(label, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
         const Spacer(),
         Text(
           value,
