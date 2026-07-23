@@ -652,17 +652,30 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
           // Manuel klavye girişi
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: TextField(
-              keyboardType: TextInputType.number,
-              textAlign: TextAlign.center,
-              decoration: const InputDecoration(
-                hintText: 'Manuel ml girişi',
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: SizedBox(
+              height: 40,
+              child: TextField(
+                keyboardType: TextInputType.number,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'Manuel ml girişi',
+                  hintStyle: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                  isDense: true,
+                ),
+                onSubmitted: (val) {
+                  final parsed = int.tryParse(val);
+                  if (parsed != null && parsed >= 50 && parsed <= 5000) {
+                    setState(() => _amount = parsed.toDouble());
+                  }
+                },
               ),
-              onSubmitted: (val) {
-                final parsed = int.tryParse(val);
-                if (parsed != null && parsed >= 50 && parsed <= 5000) {
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
                   setState(() => _amount = parsed.toDouble());
                 }
               },
