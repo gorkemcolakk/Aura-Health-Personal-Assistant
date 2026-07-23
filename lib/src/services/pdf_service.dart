@@ -127,25 +127,28 @@ class PdfService {
               // AI Summary
               pw.Text('YAPAY ZEKA (AURA) DOKTOR ÖZETİ', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.indigo700)),
               pw.SizedBox(height: 8),
-              pw.Container(
-                padding: const pw.EdgeInsets.all(16),
-                decoration: pw.BoxDecoration(
-                  color: PdfColors.indigo50,
-                  borderRadius: const pw.BorderRadius.all(pw.Radius.circular(12)),
-                  border: pw.Border.all(color: PdfColors.indigo200),
-                ),
-                child: pw.Text(
-                  aiSummary,
-                  style: pw.TextStyle(
-                    fontSize: 17,
-                    lineSpacing: 6,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.blueGrey900,
+              pw.Expanded(
+                child: pw.Container(
+                  width: double.infinity,
+                  padding: const pw.EdgeInsets.all(16),
+                  decoration: pw.BoxDecoration(
+                    color: PdfColors.indigo50,
+                    borderRadius: const pw.BorderRadius.all(pw.Radius.circular(12)),
+                    border: pw.Border.all(color: PdfColors.indigo100),
+                  ),
+                  child: pw.Text(
+                    aiSummary,
+                    style: pw.TextStyle(
+                      fontSize: 15,
+                      lineSpacing: 4,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.blueGrey900,
+                    ),
                   ),
                 ),
               ),
               
-              pw.Spacer(),
+              pw.SizedBox(height: 16),
               
               // Footer
               pw.Container(
