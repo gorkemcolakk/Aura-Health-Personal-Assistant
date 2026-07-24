@@ -32,11 +32,13 @@ class HealthProfile {
     this.emergencyContact = '',
     this.emergencyPhone = '',
     this.sleepTargetHours = 8,
+    this.gender = 'Belirtilmedi',
   });
 
-  factory HealthProfile.initial({String name = ''}) {
+  factory HealthProfile.initial({String name = '', String gender = 'Belirtilmedi'}) {
     return HealthProfile(
       name: name,
+      gender: gender,
       age: 0,
       heightCm: 0,
       weightKg: 0,
@@ -78,10 +80,12 @@ class HealthProfile {
       emergencyContact: json['emergencyContact'] as String? ?? '',
       emergencyPhone: json['emergencyPhone'] as String? ?? '',
       sleepTargetHours: (json['sleepTargetHours'] as num?)?.toDouble() ?? 8,
+      gender: json['gender'] as String? ?? 'Belirtilmedi',
     );
   }
 
   final String name;
+  final String gender;
   final int age;
   final double heightCm;
   final double weightKg;
@@ -107,6 +111,7 @@ class HealthProfile {
 
   HealthProfile copyWith({
     String? name,
+    String? gender,
     int? age,
     double? heightCm,
     double? weightKg,
@@ -124,6 +129,7 @@ class HealthProfile {
   }) {
     return HealthProfile(
       name: name ?? this.name,
+      gender: gender ?? this.gender,
       age: age ?? this.age,
       heightCm: heightCm ?? this.heightCm,
       weightKg: weightKg ?? this.weightKg,
@@ -144,6 +150,7 @@ class HealthProfile {
   String toJson() {
     return jsonEncode({
       'name': name,
+      'gender': gender,
       'age': age,
       'heightCm': heightCm,
       'weightKg': weightKg,

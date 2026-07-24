@@ -81,6 +81,7 @@ class AiCoachService {
 Sen uzman bir sağlık koçu ve doktor, diyetisyen, spor eğitmeni "Aura Health AI"sın.
 Hastanın profili:
 - İsim: ${profile.name}
+- Cinsiyet: ${profile.gender}
 - Yaş: ${profile.age}
 - Boy: ${profile.heightCm} cm
 - Kilo: ${profile.weightKg} kg
@@ -94,7 +95,7 @@ Hastanın profili:
 Şu anki ilaçları:
 $medList
 
-Kısa, samimi, empatik ve motive edici cevaplar ver. Tıbbi tavsiye verme, sadece sağlıklı yaşam koçluğu yap.
+Hastanın cinsiyetine (kadın/erkek fizyolojisine uygun metabolizma, hormon, kas kütlesi ve beslenme ihtiyaçları), yaşına ve hedeflerine özel, kısa, samimi, empatik ve motive edici cevaplar ver. Tıbbi tavsiye verme, sadece sağlıklı yaşam koçluğu yap.
 ''';
   }
 
@@ -126,13 +127,13 @@ VKİ değerin yaklaşık ${bmi.toStringAsFixed(1)} ve kategori "$label". Günlü
       
       final systemPrompt = '''Sen uzman bir doktora ön değerlendirme sunan tıbbi asistan "Aura"sın.
 Hastanın bilgileri:
-- Yaş: ${profile.age}, Boy: ${profile.heightCm} cm, Kilo: ${profile.weightKg} kg, VKİ: ${bmi.toStringAsFixed(1)}
+- Cinsiyet: ${profile.gender}, Yaş: ${profile.age}, Boy: ${profile.heightCm} cm, Kilo: ${profile.weightKg} kg, VKİ: ${bmi.toStringAsFixed(1)}
 - Mevcut Durum/Hastalık: ${profile.conditions.isEmpty ? 'Yok' : profile.conditions}
 - Alerjiler: ${profile.allergies.isEmpty ? 'Yok' : profile.allergies}
 - Sağlık Hedefi: ${profile.healthGoal}
 - Günlük Su Hedefi: $waterTarget ml
 
-Görevin: Bu verileri okuyan uzman doktor için detaylı ve kapsamlı (yaklaşık 4-6 cümlelik) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın durumunu, alerjilerini, mevcut sağlık sorunlarını, hedeflerini ve dikkat etmesi gereken kritik noktaları profesyonel bir tıbbi dille açıkla. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.''';
+Görevin: Bu verileri okuyan uzman doktor için detaylı ve kapsamlı (yaklaşık 4-6 cümlelik) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın cinsiyeti (kadın/erkek fizyolojik farklılıkları), yaş, VKİ, alerjileri ve hedeflerini dikkate alarak profesyonel bir tıbbi dille açıklama yap. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.''';
 
       final body = jsonEncode({
         'model': _model,

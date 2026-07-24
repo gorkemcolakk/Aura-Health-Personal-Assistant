@@ -27,6 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _emergencyPhone = TextEditingController();
   bool _didFill = false;
   ActivityLevel _activity = ActivityLevel.balanced;
+  String _gender = 'Belirtilmedi';
 
   @override
   void didChangeDependencies() {
@@ -46,6 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _emergencyContact.text = profile.emergencyContact;
     _emergencyPhone.text = profile.emergencyPhone;
     _activity = profile.activity;
+    _gender = profile.gender;
     _didFill = true;
   }
 
@@ -126,6 +128,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Row(
                   children: [
                     Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: ['Erkek', 'Kadın', 'Belirtilmedi'].contains(_gender) ? _gender : 'Belirtilmedi',
+                        decoration: const InputDecoration(
+                          labelText: 'Cinsiyet',
+                          prefixIcon: Icon(Icons.wc),
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: 'Erkek', child: Text('Erkek')),
+                          DropdownMenuItem(value: 'Kadın', child: Text('Kadın')),
+                          DropdownMenuItem(value: 'Belirtilmedi', child: Text('Belirtilmedi')),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() => _gender = value);
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
                       child: TextField(
                         controller: _age,
                         keyboardType: TextInputType.number,
@@ -135,30 +157,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: DropdownButtonFormField<ActivityLevel>(
-                        initialValue: _activity,
-                        decoration: const InputDecoration(
-                          labelText: 'Aktivite',
-                          prefixIcon: Icon(Icons.directions_run),
-                        ),
-                        items: ActivityLevel.values
-                            .map(
-                              (item) => DropdownMenuItem(
-                                value: item,
-                                child: Text(item.label),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() => _activity = value);
-                          }
-                        },
-                      ),
-                    ),
                   ],
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<ActivityLevel>(
+                  initialValue: _activity,
+                  decoration: const InputDecoration(
+                    labelText: 'Aktivite',
+                    prefixIcon: Icon(Icons.directions_run),
+                  ),
+                  items: ActivityLevel.values
+                      .map(
+                        (item) => DropdownMenuItem(
+                          value: item,
+                          child: Text(item.label),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _activity = value);
+                    }
+                  },
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -292,6 +312,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ) ??
                             profile.weightKg,
                         activity: _activity,
+                        gender: _gender,
                         healthGoal: _goal.text.trim(),
                         conditions: _conditions.text.trim(),
                         bloodType: _bloodType.text.trim(),

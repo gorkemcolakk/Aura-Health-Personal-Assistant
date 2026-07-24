@@ -12,6 +12,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _tcController = TextEditingController();
   final _nameController = TextEditingController();
   final _passwordController = TextEditingController();
+  String _gender = 'Erkek';
   bool _isLoading = false;
   String? _error;
 
@@ -47,7 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     final controller = AuraScope.of(context, listen: false);
-    final success = await controller.registerUser(tc, name, password);
+    final success = await controller.registerUser(tc, name, password, gender: _gender);
 
     if (!mounted) return;
 
@@ -103,6 +104,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     labelText: 'Ad Soyad',
                     prefixIcon: Icon(Icons.person_outline),
                   ),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: _gender,
+                  decoration: const InputDecoration(
+                    labelText: 'Cinsiyet',
+                    prefixIcon: Icon(Icons.wc),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'Erkek', child: Text('Erkek')),
+                    DropdownMenuItem(value: 'Kadın', child: Text('Kadın')),
+                    DropdownMenuItem(value: 'Belirtilmedi', child: Text('Belirtilmedi')),
+                  ],
+                  onChanged: (val) {
+                    if (val != null) setState(() => _gender = val);
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextField(

@@ -75,8 +75,12 @@ class AuraController extends ChangeNotifier {
   }
 
   // --- Auth ---
-  Future<bool> registerUser(String tc, String name, String password) async {
-    return await db.registerUser(tc, name, password);
+  Future<bool> registerUser(String tc, String name, String password, {String gender = 'Belirtilmedi'}) async {
+    final success = await db.registerUser(tc, name, password);
+    if (success) {
+      await db.saveProfile(tc, HealthProfile.initial(name: name, gender: gender));
+    }
+    return success;
   }
 
   Future<bool> login(String tc, String password) async {

@@ -89,6 +89,12 @@ class PdfService {
                                 font: fontBold,
                                 color: PdfColors.black)),
                         pw.SizedBox(height: 6),
+                        pw.Text('Cinsiyet: ${profile.gender}',
+                            style: pw.TextStyle(
+                                fontSize: 16,
+                                font: fontBold,
+                                color: PdfColors.black)),
+                        pw.SizedBox(height: 6),
                         pw.Text('Yaş: ${profile.age}',
                             style: pw.TextStyle(
                                 fontSize: 16,
