@@ -1,7 +1,5 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
-import 'package:pdf/pdf.dart';
 
 import '../models/health_profile.dart';
 import '../services/ai_coach_service.dart';

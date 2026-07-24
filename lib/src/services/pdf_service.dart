@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 
 import '../models/health_profile.dart';
 import 'health_calculator.dart';
-import 'ai_coach_service.dart';
 
 class PdfService {
   static Future<Uint8List> buildPdf(

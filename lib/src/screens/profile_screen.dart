@@ -4,7 +4,6 @@ import '../models/health_profile.dart';
 import '../services/health_calculator.dart';
 import '../state/aura_scope.dart';
 import '../widgets/aura_card.dart';
-import '../services/pdf_service.dart';
 import 'pdf_preview_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -129,7 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: ['Erkek', 'Kadın', 'Belirtilmedi'].contains(_gender) ? _gender : 'Belirtilmedi',
+                        initialValue: ['Erkek', 'Kadın', 'Belirtilmedi'].contains(_gender) ? _gender : 'Belirtilmedi',
                         decoration: const InputDecoration(
                           labelText: 'Cinsiyet',
                           prefixIcon: Icon(Icons.wc),
