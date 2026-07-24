@@ -1080,7 +1080,7 @@ bool _isYesterday(DateTime d) {
 void _showSleepDialog(BuildContext context, AuraController controller) {
   double hours = 7.5;
   String selectedFeeling = '😐 Normal';
-  DateTime selectedDate = DateTime.now().subtract(const Duration(days: 1)); // Varsayılan: dün
+  DateTime selectedDate = DateTime.now(); // Varsayılan: bugün
 
   showDialog(
     context: context,
