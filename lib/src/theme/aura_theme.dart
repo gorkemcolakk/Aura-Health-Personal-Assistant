@@ -29,8 +29,9 @@ class AuraTheme {
         headlineMedium: TextStyle(fontWeight: FontWeight.w700, height: 1.1),
         titleLarge: TextStyle(fontWeight: FontWeight.w700),
         titleMedium: TextStyle(fontWeight: FontWeight.w600),
-        bodyLarge: TextStyle(height: 1.4),
-        bodyMedium: TextStyle(height: 1.4),
+        bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, height: 1.4),
+        bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, height: 1.4),
+        bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, height: 1.4),
       ),
       cardTheme: CardThemeData(
         color: Colors.white,
@@ -90,8 +91,9 @@ class AuraTheme {
         headlineMedium: TextStyle(fontWeight: FontWeight.w800, height: 1.1),
         titleLarge: TextStyle(fontWeight: FontWeight.w800),
         titleMedium: TextStyle(fontWeight: FontWeight.w700),
-        bodyLarge: TextStyle(height: 1.35),
-        bodyMedium: TextStyle(height: 1.35),
+        bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, height: 1.35),
+        bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, height: 1.35),
+        bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, height: 1.35),
       ),
       cardTheme: CardThemeData(
         color: surface,

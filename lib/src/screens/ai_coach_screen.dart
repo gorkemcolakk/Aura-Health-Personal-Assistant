@@ -55,7 +55,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                     builder: (ctx) => IconButton(
                       icon: const Icon(Icons.menu),
                       onPressed: () => Scaffold.of(ctx).openDrawer(),
-                      tooltip: 'Sohbetler',
+                      tooltip: controller.tr('ai_coach_chats'),
                     ),
                   ),
                   Expanded(
@@ -65,7 +65,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                         Text('Aura AI', style: Theme.of(context).textTheme.headlineMedium),
                         if (controller.activeSessionId != null)
                           Text(
-                            'Kayıtlı sohbet',
+                            controller.tr('ai_coach_saved_chat'),
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Theme.of(context).colorScheme.primary,
                             ),
@@ -77,13 +77,13 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                   IconButton(
                     onPressed: () => _saveChat(controller),
                     icon: const Icon(Icons.save_outlined),
-                    tooltip: 'Sohbeti Kaydet',
+                    tooltip: controller.tr('ai_coach_save_chat'),
                   ),
                   // Clear button
                   IconButton(
                     onPressed: controller.clearMessages,
                     icon: const Icon(Icons.delete_sweep),
-                    tooltip: 'Temizle',
+                    tooltip: controller.tr('ai_coach_clear'),
                   ),
                 ],
               ),
@@ -111,18 +111,18 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     children: [
-                      _QuickButton(label: 'Bugünkü sağlık özetim', onTap: () {
-                        _question.text = 'Bugünkü sağlık özetimi çıkar';
+                      _QuickButton(label: controller.tr('ai_coach_quick1'), onTap: () {
+                        _question.text = controller.tr('ai_coach_quick1');
                         _send(controller);
                       }),
                       const SizedBox(width: 8),
-                      _QuickButton(label: 'Su tüketimim nasıl?', onTap: () {
-                        _question.text = 'Su tüketimimi değerlendir';
+                      _QuickButton(label: controller.tr('ai_coach_quick2'), onTap: () {
+                        _question.text = controller.tr('ai_coach_quick2');
                         _send(controller);
                       }),
                       const SizedBox(width: 8),
-                      _QuickButton(label: 'Kilo kontrolü tavsiyesi', onTap: () {
-                        _question.text = 'Kilo kontrolü için tavsiye ver';
+                      _QuickButton(label: controller.tr('ai_coach_quick3'), onTap: () {
+                        _question.text = controller.tr('ai_coach_quick3');
                         _send(controller);
                       }),
                     ],
@@ -139,8 +139,8 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                       controller: _question,
                       minLines: 1,
                       maxLines: 4,
-                      decoration: const InputDecoration(
-                        hintText: 'Bugünkü durumumu yorumla...',
+                      decoration: InputDecoration(
+                        hintText: controller.tr('ai_coach_hint'),
                         prefixIcon: Icon(Icons.chat_bubble_outline),
                       ),
                       onSubmitted: (_) => _send(controller),
@@ -148,7 +148,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                   ),
                   const SizedBox(width: 10),
                   IconButton.filled(
-                    tooltip: 'Gönder',
+                    tooltip: controller.tr('ai_coach_send'),
                     onPressed: controller.isThinking ? null : () => _send(controller),
                     icon: const Icon(Icons.arrow_upward),
                   ),
@@ -190,14 +190,14 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sohbeti Kaydet'),
+        title: Text(controller.tr('ai_coach_save_chat_title')),
         content: TextField(
           controller: titleController,
-          decoration: const InputDecoration(hintText: 'Sohbet başlığı'),
+          decoration: InputDecoration(hintText: controller.tr('ai_coach_chat_title_hint')),
           autofocus: true,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(controller.tr('btn_cancel'))),
           FilledButton(
             onPressed: () {
               final title = titleController.text.trim().isEmpty ? 'Yeni Sohbet' : titleController.text.trim();
@@ -207,7 +207,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                 const SnackBar(content: Text('Sohbet kaydedildi ✅'), duration: Duration(seconds: 2)),
               );
             },
-            child: const Text('Kaydet'),
+            child: Text(controller.tr('btn_save')),
           ),
         ],
       ),
@@ -220,11 +220,11 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('DeepSeek API Anahtarı Gerekli'),
+          title: Text(controller.tr('ai_coach_api_key_required')),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('AI ile konuşmak için API anahtarı gerekli.'),
+              Text(controller.tr('ai_coach_api_key_desc')),
               const SizedBox(height: 12),
               TextField(
                 controller: keyController,
@@ -233,7 +233,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('İptal')),
+            TextButton(onPressed: () => Navigator.pop(context), child: Text(controller.tr('btn_cancel'))),
             FilledButton(
               onPressed: () {
                 if (keyController.text.trim().isNotEmpty) {
@@ -242,7 +242,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                   _send(controller);
                 }
               },
-              child: const Text('Kaydet'),
+              child: Text(controller.tr('btn_save')),
             ),
           ],
         );
@@ -271,7 +271,7 @@ class _ChatDrawer extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 16, 16, 8),
               child: Row(
                 children: [
-                  Text('Sohbetler', style: Theme.of(context).textTheme.headlineSmall),
+                  Text(controller.tr('ai_coach_chats'), style: Theme.of(context).textTheme.headlineSmall),
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.add),
@@ -279,16 +279,16 @@ class _ChatDrawer extends StatelessWidget {
                       controller.newChat();
                       Navigator.pop(context);
                     },
-                    tooltip: 'Yeni Sohbet',
+                    tooltip: controller.tr('ai_coach_new_chat'),
                   ),
                 ],
               ),
             ),
             const Divider(),
             if (sessions.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(20),
-                child: Text('Henüz kayıtlı sohbet yok.\nBir sohbeti kaydet butonu ile kaydedebilirsin.'),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(controller.tr('ai_coach_no_chats')),
               )
             else
               Expanded(
@@ -315,7 +315,7 @@ class _ChatDrawer extends StatelessWidget {
                         ),
                       ),
                       subtitle: Text(
-                        '${session.messages.length} mesaj',
+                        '${session.messages.length} ${controller.tr('ai_coach_messages')}',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       trailing: PopupMenuButton<String>(
@@ -325,8 +325,8 @@ class _ChatDrawer extends StatelessWidget {
                           if (action == 'delete') _deleteSession(context, session);
                         },
                         itemBuilder: (ctx) => [
-                          const PopupMenuItem(value: 'rename', child: Text('Yeniden Adlandır')),
-                          const PopupMenuItem(value: 'delete', child: Text('Sil', style: TextStyle(color: Colors.red))),
+                          PopupMenuItem(value: 'rename', child: Text(controller.tr('ai_coach_rename'))),
+                          PopupMenuItem(value: 'delete', child: Text(controller.tr('btn_delete'), style: const TextStyle(color: Colors.red))),
                         ],
                       ),
                       onTap: () {
@@ -348,10 +348,10 @@ class _ChatDrawer extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Yeniden Adlandır'),
-        content: TextField(controller: ctrl, decoration: const InputDecoration(hintText: 'Yeni başlık'), autofocus: true),
+        title: Text(controller.tr('ai_coach_rename')),
+        content: TextField(controller: ctrl, decoration: InputDecoration(hintText: controller.tr('ai_coach_new_title')), autofocus: true),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(controller.tr('btn_cancel'))),
           FilledButton(
             onPressed: () {
               final name = ctrl.text.trim();
@@ -360,7 +360,7 @@ class _ChatDrawer extends StatelessWidget {
                 Navigator.pop(ctx);
               }
             },
-            child: const Text('Kaydet'),
+            child: Text(controller.tr('btn_save')),
           ),
         ],
       ),
@@ -371,17 +371,17 @@ class _ChatDrawer extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sohbeti Sil'),
-        content: Text('"${session.title}" silinecek. Emin misin?'),
+        title: Text(controller.tr('ai_coach_delete_chat')),
+        content: Text('"${session.title}" ${controller.tr('ai_coach_delete_confirm')}'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(controller.tr('btn_cancel'))),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               controller.deleteSession(session);
               Navigator.pop(ctx);
             },
-            child: const Text('Sil'),
+            child: Text(controller.tr('btn_delete')),
           ),
         ],
       ),

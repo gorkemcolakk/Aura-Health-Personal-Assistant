@@ -7,10 +7,11 @@ import 'package:intl/intl.dart';
 
 import '../models/health_profile.dart';
 import 'health_calculator.dart';
+import 'translation_service.dart';
 
 class PdfService {
   static Future<Uint8List> buildPdf(
-      PdfPageFormat format, HealthProfile profile, String aiSummary) async {
+      PdfPageFormat format, HealthProfile profile, String aiSummary, String langCode) async {
     final pdf = pw.Document();
 
     final font = await PdfGoogleFonts.robotoRegular();
@@ -30,8 +31,8 @@ class PdfService {
         weeklyWater.map((e) => e.amountMl).reduce((a, b) => a + b) / 7;
 
     final clinicalText = [
-      if (profile.conditions.isNotEmpty) 'Durum/Tanı: ${profile.conditions}',
-      if (profile.allergies.isNotEmpty) 'Alerji: ${profile.allergies}',
+      if (profile.conditions.isNotEmpty) '${TranslationService.get('pdf_condition', langCode)}: ${profile.conditions}',
+      if (profile.allergies.isNotEmpty) '${TranslationService.get('pdf_allergy', langCode)}: ${profile.allergies}',
     ].join('\n');
 
     pdf.addPage(
@@ -55,7 +56,7 @@ class PdfService {
                           fontSize: 32,
                           font: fontBold,
                           color: PdfColors.teal800)),
-                  pw.Text('Doktor Raporu',
+                  pw.Text(TranslationService.get('pdf_title', langCode),
                       style: pw.TextStyle(
                           fontSize: 22, font: fontBold, color: PdfColors.grey700)),
                 ],
@@ -64,7 +65,7 @@ class PdfService {
               pw.SizedBox(height: 12),
 
               // ── Hasta Bilgileri ──────────────────────────────────────
-              pw.Text('HASTA BİLGİLERİ',
+              pw.Text(TranslationService.get('pdf_patient_info', langCode),
                   style: pw.TextStyle(
                       fontSize: 18,
                       font: fontBold,
@@ -82,25 +83,25 @@ class PdfService {
                     pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        pw.Text('İsim: ${profile.name}',
+                        pw.Text('${TranslationService.get('pdf_name', langCode)}: ${profile.name}',
                             style: pw.TextStyle(
                                 fontSize: 16,
                                 font: fontBold,
                                 color: PdfColors.black)),
                         pw.SizedBox(height: 6),
-                        pw.Text('Cinsiyet: ${profile.gender}',
+                        pw.Text('${TranslationService.get('pdf_gender', langCode)}: ${TranslationService.get(profile.gender == 'Erkek' ? 'prof_gender_m' : profile.gender == 'Kadın' ? 'prof_gender_f' : 'prof_gender_u', langCode)}',
                             style: pw.TextStyle(
                                 fontSize: 16,
                                 font: fontBold,
                                 color: PdfColors.black)),
                         pw.SizedBox(height: 6),
-                        pw.Text('Yaş: ${profile.age}',
+                        pw.Text('${TranslationService.get('pdf_age', langCode)}: ${profile.age}',
                             style: pw.TextStyle(
                                 fontSize: 16,
                                 font: fontBold,
                                 color: PdfColors.black)),
                         pw.SizedBox(height: 6),
-                        pw.Text('Tarih: $formattedDate',
+                        pw.Text('${TranslationService.get('pdf_date', langCode)}: $formattedDate',
                             style: pw.TextStyle(
                                 fontSize: 16,
                                 font: fontBold,
@@ -110,20 +111,20 @@ class PdfService {
                     pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        pw.Text('Boy: ${profile.heightCm} cm',
+                        pw.Text('${TranslationService.get('pdf_height', langCode)}: ${profile.heightCm} cm',
                             style: pw.TextStyle(
                                 fontSize: 16,
                                 font: fontBold,
                                 color: PdfColors.black)),
                         pw.SizedBox(height: 6),
-                        pw.Text('Kilo: ${profile.weightKg} kg',
+                        pw.Text('${TranslationService.get('pdf_weight', langCode)}: ${profile.weightKg} kg',
                             style: pw.TextStyle(
                                 fontSize: 16,
                                 font: fontBold,
                                 color: PdfColors.black)),
                         pw.SizedBox(height: 6),
                         pw.Text(
-                            'Kan Grubu: ${profile.bloodType.isEmpty ? "Belirtilmemiş" : profile.bloodType}',
+                            '${TranslationService.get('pdf_blood_type', langCode)}: ${profile.bloodType.isEmpty ? TranslationService.get('pdf_not_specified', langCode) : profile.bloodType}',
                             style: pw.TextStyle(
                                 fontSize: 16,
                                 font: fontBold,
@@ -133,10 +134,10 @@ class PdfService {
                   ],
                 ),
               ),
-              pw.SizedBox(height: 20),
+              pw.SizedBox(height: 16),
 
               // ── Sağlık Verileri ──────────────────────────────────────
-              pw.Text('SAĞLIK VERİLERİ (Son 7 Gün)',
+              pw.Text(TranslationService.get('pdf_health_data', langCode),
                   style: pw.TextStyle(
                       fontSize: 18,
                       font: fontBold,
@@ -145,63 +146,69 @@ class PdfService {
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
                 children: [
-                  _buildMetricBox('VKİ', bmi.toStringAsFixed(1), 'kg/m2', fontBold),
-                  _buildMetricBox('Ort. Su', '${avgWater.round()}', 'ml/gün', fontBold),
+                  _buildMetricBox(TranslationService.get('pdf_bmi', langCode), bmi.toStringAsFixed(1), 'kg/m2', fontBold),
+                  _buildMetricBox(TranslationService.get('pdf_avg_water', langCode), '${avgWater.round()}', 'ml/gün', fontBold),
                   _buildMetricBox(
-                      'Ort. Uyku', avgSleep.toStringAsFixed(1), 'saat/gün', fontBold),
+                      TranslationService.get('pdf_avg_sleep', langCode), avgSleep.toStringAsFixed(1), 'saat/gün', fontBold),
                 ],
               ),
-              pw.SizedBox(height: 20),
+              pw.SizedBox(height: 16),
 
               // ── Klinik Durum ─────────────────────────────────────────
-              pw.Text('Klinik Durum / Alerjiler:',
+              pw.Text(TranslationService.get('pdf_clinical_status', langCode),
                   style: pw.TextStyle(
                       fontSize: 16, font: fontBold, color: PdfColors.black)),
               pw.SizedBox(height: 6),
               pw.Text(
                 clinicalText.isEmpty
-                    ? 'Belirtilen kritik durum veya alerji yok.'
+                    ? TranslationService.get('pdf_no_critical', langCode)
                     : clinicalText,
                 style: pw.TextStyle(
                     fontSize: 16, font: fontBold, color: PdfColors.black),
               ),
-              pw.SizedBox(height: 20),
+              pw.SizedBox(height: 16),
               pw.Divider(color: PdfColors.grey400),
-              pw.SizedBox(height: 12),
+              pw.SizedBox(height: 8),
 
               // ── Yapay Zeka Özeti ─────────────────────────────────────
-              pw.Text('YAPAY ZEKA (AURA) DOKTOR ÖZETİ',
+              pw.Text(TranslationService.get('pdf_ai_summary_title', langCode),
                   style: pw.TextStyle(
                       fontSize: 18,
                       font: fontBold,
                       color: PdfColors.indigo800)),
               pw.SizedBox(height: 8),
-              pw.Container(
-                width: double.infinity,
-                padding: const pw.EdgeInsets.all(16),
-                decoration: pw.BoxDecoration(
-                  color: PdfColors.indigo50,
-                  borderRadius:
-                      const pw.BorderRadius.all(pw.Radius.circular(12)),
-                  border: pw.Border.all(color: PdfColors.indigo200, width: 1.5),
-                ),
-                child: pw.Text(
-                  aiSummary,
-                  style: pw.TextStyle(
-                    fontSize: 15,
-                    lineSpacing: 4,
-                    font: fontBold, // Kalın, belirgin ve net font!
-                    color: PdfColors.blueGrey900,
+              pw.Flexible(
+                fit: pw.FlexFit.loose,
+                child: pw.Container(
+                  width: double.infinity,
+                  padding: const pw.EdgeInsets.all(12),
+                  decoration: pw.BoxDecoration(
+                    color: PdfColors.indigo50,
+                    borderRadius:
+                        const pw.BorderRadius.all(pw.Radius.circular(12)),
+                    border: pw.Border.all(color: PdfColors.indigo200, width: 1.5),
+                  ),
+                  child: pw.FittedBox(
+                    fit: pw.BoxFit.scaleDown,
+                    alignment: pw.Alignment.topLeft,
+                    child: pw.Text(
+                      aiSummary,
+                      style: pw.TextStyle(
+                        fontSize: 15,
+                        lineSpacing: 4,
+                        font: fontBold,
+                        color: PdfColors.blueGrey900,
+                      ),
+                    ),
                   ),
                 ),
               ),
               
-              // Boşluğu değerlendirip footer'ı en alta iten yapıcı
               pw.Spacer(),
 
               // Warning Footer
               pw.Container(
-                padding: const pw.EdgeInsets.all(10),
+                padding: const pw.EdgeInsets.all(8),
                 decoration: pw.BoxDecoration(
                   color: PdfColors.orange50,
                   borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
@@ -209,7 +216,7 @@ class PdfService {
                 ),
                 child: pw.Center(
                   child: pw.Text(
-                    'ÖNEMLİ: Bu rapor AI tarafından üretilmiştir, tıbbi kesinlik taşımaz ve hekim değerlendirmesi yerine geçemez.',
+                    TranslationService.get('pdf_footer_warning', langCode),
                     textAlign: pw.TextAlign.center,
                     style: pw.TextStyle(
                         fontSize: 12,

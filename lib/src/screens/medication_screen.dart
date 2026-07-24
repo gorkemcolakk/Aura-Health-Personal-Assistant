@@ -34,36 +34,34 @@ class _MedicationScreenState extends State<MedicationScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 22, 20, 120),
         children: [
-          Text('İlaç Planı', style: Theme.of(context).textTheme.headlineMedium),
+          Text(controller.tr('med_title'), style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 8),
-          const Text(
-            'Günlük ilaç saatleri için yerel bildirim alarmı kurulur.',
-          ),
+          Text(controller.tr('med_subtitle')),
           const SizedBox(height: 18),
           AuraCard(
             child: Column(
               children: [
                 TextField(
                   controller: _name,
-                  decoration: const InputDecoration(
-                    labelText: 'İlaç adı',
-                    prefixIcon: Icon(Icons.medication_outlined),
+                  decoration: InputDecoration(
+                    labelText: controller.tr('med_name'),
+                    prefixIcon: const Icon(Icons.medication),
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _dosage,
-                  decoration: const InputDecoration(
-                    labelText: 'Doz',
-                    prefixIcon: Icon(Icons.local_pharmacy_outlined),
+                  decoration: InputDecoration(
+                    labelText: controller.tr('med_dosage'),
+                    prefixIcon: const Icon(Icons.local_pharmacy_outlined),
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _notes,
-                  decoration: const InputDecoration(
-                    labelText: 'Not',
-                    prefixIcon: Icon(Icons.notes_outlined),
+                  decoration: InputDecoration(
+                    labelText: controller.tr('med_notes'),
+                    prefixIcon: const Icon(Icons.notes_outlined),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -79,14 +77,14 @@ class _MedicationScreenState extends State<MedicationScreen> {
                     }
                   },
                   icon: const Icon(Icons.schedule),
-                  label: Text('Saat ${_time.format(context)}'),
+                  label: Text('${controller.tr('med_hour')} ${_time.format(context)}'),
                 ),
                 const SizedBox(height: 12),
                 SegmentedButton<String>(
-                  segments: const [
-                    ButtonSegment(value: 'Aç', label: Text('Aç')),
-                    ButtonSegment(value: 'Tok', label: Text('Tok')),
-                    ButtonSegment(value: 'Farketmez', label: Text('Fark etmez')),
+                  segments: [
+                    ButtonSegment(value: 'Aç', label: Text(controller.tr('med_meal_before'))),
+                    ButtonSegment(value: 'Tok', label: Text(controller.tr('med_meal_after'))),
+                    ButtonSegment(value: 'Farketmez', label: Text(controller.tr('med_meal_any'))),
                   ],
                   selected: {_mealTiming},
                   onSelectionChanged: (set) {
@@ -104,7 +102,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
                         id: DateTime.now().microsecondsSinceEpoch.toString(),
                         name: _name.text.trim(),
                         dosage: _dosage.text.trim().isEmpty
-                            ? 'Doz belirtilmedi'
+                            ? controller.tr('med_no_dosage')
                             : _dosage.text.trim(),
                         hour: _time.hour,
                         minute: _time.minute,
@@ -121,12 +119,12 @@ class _MedicationScreenState extends State<MedicationScreen> {
                     });
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('İlaç alarmı kuruldu')),
+                        SnackBar(content: Text(controller.tr('med_add_success'))),
                       );
                     }
                   },
                   icon: const Icon(Icons.add_alert),
-                  label: const Text('Alarm Ekle'),
+                  label: Text(controller.tr('med_btn_add')),
                 ),
               ],
             ),
@@ -178,7 +176,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
                             ),
                           ),
                           Text(
-                            '${medication.dosage} • ${medication.timeLabel} • ${medication.mealTiming}',
+                            '${medication.dosage} • ${medication.timeLabel} • ${controller.tr(medication.mealTiming == 'Aç' ? 'med_meal_before' : medication.mealTiming == 'Tok' ? 'med_meal_after' : 'med_meal_any')}',
                             style: TextStyle(
                               color: medication.isTakenToday ? Colors.grey : null,
                             ),
@@ -200,7 +198,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
                       },
                     ),
                     IconButton(
-                      tooltip: 'Sil',
+                      tooltip: controller.tr('btn_delete'),
                       onPressed: () => controller.removeMedication(medication),
                       icon: const Icon(Icons.delete_outline),
                     ),

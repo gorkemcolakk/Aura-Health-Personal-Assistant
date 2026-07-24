@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../services/places_service.dart';
+import '../state/aura_scope.dart';
 import '../widgets/aura_card.dart';
 
 class NearbyScreen extends StatefulWidget {
@@ -96,7 +97,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
     if (coords == null) {
       setState(() {
         _loading = false;
-        _error = '"$query" bulunamadı';
+        _error = '"$query" ${AuraScope.of(context, listen: false).tr('nearby_not_found')}';
       });
       return;
     }
@@ -141,7 +142,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
     } catch (e) {
       setState(() {
         _loading = false;
-        _error = 'Sağlık kuruluşları yüklenemedi';
+        _error = AuraScope.of(context, listen: false).tr('nearby_load_error');
       });
     }
   }
@@ -247,7 +248,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                     _openDirections(facility);
                   },
                   icon: const Icon(Icons.map),
-                  label: const Text('Haritada Göster'),
+                  label: Text(AuraScope.of(context).tr('nearby_show_map')),
                 ),
               ),
             ],
@@ -282,6 +283,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = AuraScope.of(context);
     final colors = Theme.of(context).colorScheme;
 
     return SafeArea(
@@ -293,7 +295,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
               children: [
                 Icon(Icons.local_hospital, color: colors.primary, size: 28),
                 const SizedBox(width: 10),
-                Text('Yakın Sağlık Kuruluşları', style: Theme.of(context).textTheme.titleLarge),
+                Text(controller.tr('nearby_title'), style: Theme.of(context).textTheme.titleLarge),
                 const Spacer(),
                 if (!_loading)
                   IconButton(
@@ -302,7 +304,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                       _initLocation();
                     },
                     icon: const Icon(Icons.refresh),
-                    tooltip: 'Yenile',
+                    tooltip: controller.tr('nearby_refresh'),
                   ),
               ],
             ),
@@ -329,7 +331,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Adres veya semt ara (örn: Kadıköy)',
+                hintText: controller.tr('nearby_search_hint'),
                 prefixIcon: const Icon(Icons.search, size: 20),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.send, size: 18),
@@ -351,11 +353,11 @@ class _NearbyScreenState extends State<NearbyScreen> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               children: [
-                _filterChip('Tümü', null),
-                _filterChip('🏥 Hastane', 'Hastane'),
-                _filterChip('💊 Eczane', 'Eczane'),
-                _filterChip('🩺 Klinik', 'Klinik'),
-                _filterChip('🏚️ Sağlık Ocağı', 'Sağlık Ocağı'),
+                _filterChip(controller.tr('nearby_filter_all'), null),
+                _filterChip('🏥 ${controller.tr('nearby_type_hospital')}', 'Hastane'),
+                _filterChip('💊 ${controller.tr('nearby_type_pharmacy')}', 'Eczane'),
+                _filterChip('🩺 ${controller.tr('nearby_type_clinic')}', 'Klinik'),
+                _filterChip('🏚️ ${controller.tr('nearby_type_health_center')}', 'Sağlık Ocağı'),
               ],
             ),
           ),
@@ -395,10 +397,10 @@ class _NearbyScreenState extends State<NearbyScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _legendItem(Colors.red, 'Hastane'),
-                          _legendItem(Colors.green, 'Eczane'),
-                          _legendItem(Colors.blue, 'Klinik'),
-                          _legendItem(Colors.orange, 'Sağlık Ocağı'),
+                          _legendItem(Colors.red, controller.tr('nearby_type_hospital')),
+                          _legendItem(Colors.green, controller.tr('nearby_type_pharmacy')),
+                          _legendItem(Colors.blue, controller.tr('nearby_type_clinic')),
+                          _legendItem(Colors.orange, controller.tr('nearby_type_health_center')),
                         ],
                       ),
                     ),
@@ -412,7 +414,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
             child: _facilities.isEmpty && !_loading
                 ? Center(
                     child: Text(
-                      _error ?? 'Yakında sağlık kuruluşu bulunamadı',
+                      _error ?? controller.tr('nearby_no_facilities'),
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   )
@@ -424,7 +426,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                       if (filtered.isEmpty) {
                         return Center(
                           child: Text(
-                            'Bu kategoride sonuç bulunamadı',
+                            controller.tr('nearby_no_results'),
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         );

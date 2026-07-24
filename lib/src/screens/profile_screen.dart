@@ -103,9 +103,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Profil', style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white)),
+                      Text(controller.tr('prof_title'), style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white)),
                       const SizedBox(height: 2),
-                      Text('VKİ, su ihtiyacı ve AI önerileri bu bilgilerle hesaplanır.', style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 14, fontWeight: FontWeight.w500)),
+                      Text(controller.tr('prof_subtitle'), style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 14, fontWeight: FontWeight.w500)),
                     ],
                   ),
                 ),
@@ -118,8 +118,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 TextField(
                   controller: _name,
-                  decoration: const InputDecoration(
-                    labelText: 'Ad soyad',
+                  decoration: InputDecoration(
+                    labelText: controller.tr('prof_name'),
                     prefixIcon: Icon(Icons.badge_outlined),
                   ),
                 ),
@@ -129,14 +129,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         initialValue: ['Erkek', 'Kadın', 'Belirtilmedi'].contains(_gender) ? _gender : 'Belirtilmedi',
-                        decoration: const InputDecoration(
-                          labelText: 'Cinsiyet',
+                        decoration: InputDecoration(
+                          labelText: controller.tr('prof_gender'),
                           prefixIcon: Icon(Icons.wc),
                         ),
-                        items: const [
-                          DropdownMenuItem(value: 'Erkek', child: Text('Erkek')),
-                          DropdownMenuItem(value: 'Kadın', child: Text('Kadın')),
-                          DropdownMenuItem(value: 'Belirtilmedi', child: Text('Belirtilmedi')),
+                        items: [
+                          DropdownMenuItem(value: 'Erkek', child: Text(controller.tr('prof_gender_m'))),
+                          DropdownMenuItem(value: 'Kadın', child: Text(controller.tr('prof_gender_f'))),
+                          DropdownMenuItem(value: 'Belirtilmedi', child: Text(controller.tr('prof_gender_u'))),
                         ],
                         onChanged: (value) {
                           if (value != null) {
@@ -150,8 +150,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: TextField(
                         controller: _age,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Yaş',
+                        decoration: InputDecoration(
+                          labelText: controller.tr('prof_age'),
                           prefixIcon: Icon(Icons.cake_outlined),
                         ),
                       ),
@@ -161,8 +161,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 12),
                 DropdownButtonFormField<ActivityLevel>(
                   initialValue: _activity,
-                  decoration: const InputDecoration(
-                    labelText: 'Aktivite',
+                  decoration: InputDecoration(
+                    labelText: controller.tr('prof_activity'),
                     prefixIcon: Icon(Icons.directions_run),
                   ),
                   items: ActivityLevel.values
@@ -186,8 +186,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: TextField(
                         controller: _height,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Boy (cm)',
+                        decoration: InputDecoration(
+                          labelText: controller.tr('prof_height'),
                           prefixIcon: Icon(Icons.straighten),
                         ),
                       ),
@@ -199,8 +199,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
-                        decoration: const InputDecoration(
-                          labelText: 'Kilo (kg)',
+                        decoration: InputDecoration(
+                          labelText: controller.tr('prof_weight'),
                           prefixIcon: Icon(Icons.scale),
                         ),
                       ),
@@ -217,10 +217,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   child: Column(
                     children: [
-                      _targetRow(context, Icons.water_drop, 'Günlük su hedefi',
+                      _targetRow(context, Icons.water_drop, controller.tr('prof_water_target'),
                           '${(HealthCalculator.dailyWaterTargetMl(profile) / 1000).toStringAsFixed(2)} L'),
                       const Divider(height: 20),
-                      _targetRow(context, Icons.nights_stay, 'Günlük uyku hedefi',
+                      _targetRow(context, Icons.nights_stay, controller.tr('prof_sleep_target'),
                           '${HealthCalculator.recommendedSleepHours(profile).toStringAsFixed(1)} saat'),
                     ],
                   ),
@@ -229,8 +229,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 TextField(
                   controller: _goal,
                   maxLines: 2,
-                  decoration: const InputDecoration(
-                    labelText: 'Sağlık hedefi',
+                  decoration: InputDecoration(
+                    labelText: controller.tr('prof_goal'),
                     prefixIcon: Icon(Icons.flag_outlined),
                   ),
                 ),
@@ -238,8 +238,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 TextField(
                   controller: _conditions,
                   maxLines: 3,
-                  decoration: const InputDecoration(
-                    labelText: 'Notlar, hassasiyetler, tanılar',
+                  decoration: InputDecoration(
+                    labelText: controller.tr('prof_conditions'),
                     prefixIcon: Icon(Icons.note_alt_outlined),
                   ),
                 ),
@@ -252,7 +252,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Icon(Icons.emergency, color: Colors.red, size: 20),
                     const SizedBox(width: 8),
                     Text(
-                      'Acil Durum Bilgileri',
+                      controller.tr('prof_emerg_info'),
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.red),
                     ),
                   ],
@@ -260,8 +260,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: _bloodType,
-                  decoration: const InputDecoration(
-                    labelText: 'Kan Grubu (örn: A Rh+)',
+                  decoration: InputDecoration(
+                    labelText: controller.tr('prof_blood'),
                     prefixIcon: Icon(Icons.bloodtype),
                   ),
                 ),
@@ -269,16 +269,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 TextField(
                   controller: _allergies,
                   maxLines: 2,
-                  decoration: const InputDecoration(
-                    labelText: 'Alerjiler (örn: Penisilin, Fıstık)',
+                  decoration: InputDecoration(
+                    labelText: controller.tr('prof_allergies'),
                     prefixIcon: Icon(Icons.warning_amber),
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _emergencyContact,
-                  decoration: const InputDecoration(
-                    labelText: 'Acil Durumda Aranacak Kişi',
+                  decoration: InputDecoration(
+                    labelText: controller.tr('prof_emerg_contact'),
                     prefixIcon: Icon(Icons.person_add),
                   ),
                 ),
@@ -286,8 +286,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 TextField(
                   controller: _emergencyPhone,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'Acil Durum Telefonu',
+                  decoration: InputDecoration(
+                    labelText: controller.tr('prof_emerg_phone'),
                     prefixIcon: Icon(Icons.phone),
                   ),
                 ),
@@ -327,7 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     }
                   },
                   icon: const Icon(Icons.check),
-                  label: const Text('Kaydet'),
+                  label: Text(controller.tr('btn_save')),
                 ),
               ],
             ),
@@ -339,15 +339,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               builder: (context, snapshot) {
                 final isSupported = snapshot.data ?? false;
                 if (!isSupported) {
-                  return const Text(
-                    'Cihazınızda biyometrik doğrulama (Face ID / Parmak İzi) desteği bulunamadı.',
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                  return Text(
+                    controller.tr('prof_bio_not_supported'),
+                    style: const TextStyle(color: Colors.grey, fontSize: 13),
                   );
                 }
 
                 return SwitchListTile(
-                  title: const Text('Biyometrik Giriş'),
-                  subtitle: const Text('Face ID / Parmak izi ile hızlı giriş yapın'),
+                  title: Text(controller.tr('settings_biometric')),
+                  subtitle: Text(controller.tr('settings_biometric_sub')),
                   secondary: const Icon(Icons.fingerprint),
                   contentPadding: EdgeInsets.zero,
                   value: controller.isBiometricEnabledForCurrentUser,
@@ -358,14 +358,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(value
-                              ? 'Biyometrik giriş aktif edildi'
-                              : 'Biyometrik giriş kapatıldı'),
+                              ? controller.tr('prof_bio_on')
+                              : controller.tr('prof_bio_off')),
                         ),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Biyometrik doğrulama başarısız oldu'),
+                        SnackBar(
+                          content: Text(controller.tr('prof_bio_fail')),
                         ),
                       );
                     }
@@ -385,6 +385,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     builder: (context) => PdfPreviewScreen(
                       profile: controller.profile,
                       apiKey: controller.apiKey,
+                      langCode: controller.languageCode,
                     ),
                   ),
                 );
@@ -407,15 +408,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Doktor Raporu Oluştur (PDF)',
+                            controller.tr('prof_pdf'),
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
-                            'Yapay zeka destekli sağlık özeti',
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          Text(
+                            controller.tr('prof_pdf_sub'),
+                            style: const TextStyle(color: Colors.grey, fontSize: 12),
                           ),
                         ],
                       ),
@@ -437,7 +438,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
             icon: const Icon(Icons.logout),
-            label: const Text('Hesaptan Çıkış Yap', style: TextStyle(fontSize: 16)),
+            label: Text(controller.tr('prof_logout'), style: const TextStyle(fontSize: 16)),
           ),
         ],
       ),

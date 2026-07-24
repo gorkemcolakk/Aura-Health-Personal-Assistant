@@ -58,7 +58,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               child: _Header(
                 initials: profile.initials,
                 name: profile.name,
-                subtitle: '${profile.activity.label} gün • ${profile.age} yaş',
+                subtitle: '${profile.activity.label} ${controller.tr('day_today').toLowerCase()} • ${profile.age} yaş',
               ),
             ),
           ),
@@ -83,7 +83,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     Expanded(
                       child: _MetricTile(
                         icon: Icons.straighten,
-                        label: 'Boy',
+                        label: controller.tr('dash_height'),
                         value: '${profile.heightCm.toStringAsFixed(0)} cm',
                       ),
                     ),
@@ -91,7 +91,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     Expanded(
                       child: _MetricTile(
                         icon: Icons.scale,
-                        label: 'Kilo',
+                        label: controller.tr('dash_weight'),
                         value: '${profile.weightKg.toStringAsFixed(1)} kg',
                       ),
                     ),
@@ -107,7 +107,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           const Icon(Icons.water_drop_outlined),
                           const SizedBox(width: 10),
                           Text(
-                            'Su takibi',
+                            controller.tr('dash_water_track'),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const Spacer(),
@@ -131,7 +131,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                             onTap: () => controller.addWater(750),
                           ),
                           _WaterButton(
-                            label: '+ Özel',
+                            label: '+ ${controller.tr('dash_custom_water')}',
                             icon: Icons.tune,
                             onTap: () => _showCustomWaterDialog(context, controller),
                           ),
@@ -172,11 +172,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Bugün planlı ilaç yok',
+                                controller.tr('dash_no_meds'),
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               const SizedBox(height: 4),
-                              const Text('İlaç sekmesinden günlük alarm ekleyebilirsin.'),
+                              Text(controller.tr('dash_no_meds_sub')),
                             ],
                           ),
                         ),
@@ -251,7 +251,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Aura içgörüsü',
+                          controller.tr('dash_insight'),
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(color: Colors.white),
                         ),
@@ -286,6 +286,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = AuraScope.of(context);
     return Row(
       children: [
         Container(
@@ -326,7 +327,7 @@ class _Header extends StatelessWidget {
         ),
         IconButton(
           icon: const Icon(Icons.settings_outlined),
-          tooltip: 'Uygulama Ayarları',
+          tooltip: controller.tr('settings_title'),
           onPressed: () {
             Navigator.push(
               context,
@@ -387,6 +388,7 @@ class _HeroStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = AuraScope.of(context);
     return AuraCard(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -394,8 +396,8 @@ class _HeroStatus extends StatelessWidget {
         children: [
           Text(
             firstName.isEmpty
-                ? 'Sağlık Paneli'
-                : "$firstName'${_getPossessiveSuffix(firstName)} Sağlık Paneli",
+                ? controller.tr('dash_health_panel')
+                : "$firstName'${_getPossessiveSuffix(firstName)} ${controller.tr('dash_health_panel')}",
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 18),
@@ -524,9 +526,9 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
     final colors = Theme.of(context).colorScheme;
     final media = MediaQuery.of(context);
     final dateLabel = _isToday(_selectedDate)
-        ? 'Bugün'
+        ? widget.controller.tr('day_today')
         : _isYesterday(_selectedDate)
-            ? 'Dün'
+            ? widget.controller.tr('day_yesterday')
             : '${_selectedDate.day}/${_selectedDate.month}';
 
     return Container(
@@ -562,7 +564,7 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
               ),
               const SizedBox(width: 10),
               Text(
-                'Özel Su Ekle',
+                widget.controller.tr('water_add_custom'),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
               const Spacer(),
@@ -574,7 +576,7 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
                     initialDate: _selectedDate,
                     firstDate: DateTime.now().subtract(const Duration(days: 365)),
                     lastDate: DateTime.now(),
-                    helpText: 'Su içme tarihini seç',
+                    helpText: widget.controller.tr('water_select_date'),
                   );
                   if (picked != null) setState(() => _selectedDate = picked);
                 },
@@ -658,7 +660,7 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
                 style: const TextStyle(fontSize: 14),
                 contextMenuBuilder: (context, editableTextState) => const SizedBox.shrink(),
                 decoration: InputDecoration(
-                  hintText: 'Manuel ml girişi',
+                  hintText: widget.controller.tr('water_manual_entry'),
                   hintStyle: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
@@ -774,7 +776,7 @@ class _WaterTimelineCard extends StatelessWidget {
             children: [
               const Icon(Icons.history, size: 20),
               const SizedBox(width: 10),
-              Text('Bugünkü su geçmişi', style: Theme.of(context).textTheme.titleMedium),
+              Text(controller.tr('dash_water_history'), style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
               Text('${(todayTotal / 1000).toStringAsFixed(2)} L', style: TextStyle(color: colors.primary, fontWeight: FontWeight.w700)),
             ],
@@ -835,7 +837,7 @@ class _ChartsButton extends StatelessWidget {
               child: Icon(Icons.bar_chart, color: Theme.of(context).colorScheme.primary, size: 20),
             ),
             const SizedBox(width: 12),
-            Expanded(child: Text('Haftalık Grafikler', style: Theme.of(context).textTheme.titleSmall)),
+            Expanded(child: Text(controller.tr('dash_charts'), style: Theme.of(context).textTheme.titleSmall)),
             Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.primary),
           ],
         ),
@@ -1031,7 +1033,7 @@ class _SleepCard extends StatelessWidget {
             children: [
               const Icon(Icons.bedtime_outlined),
               const SizedBox(width: 10),
-              Text('Uyku Takibi', style: Theme.of(context).textTheme.titleMedium),
+              Text(controller.tr('dash_sleep_track'), style: Theme.of(context).textTheme.titleMedium),
             ],
           ),
           const SizedBox(height: 12),
@@ -1039,7 +1041,7 @@ class _SleepCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '${isToday ? "Bugün" : "Dün"}: ${displaySleep.hours} saat',
+                  '${isToday ? controller.tr('day_today') : controller.tr('day_yesterday')}: ${displaySleep.hours} saat',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 8),
@@ -1048,7 +1050,7 @@ class _SleepCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Hedef: ${target.toStringAsFixed(1)} saat',
+              '${controller.tr('dash_target')}: ${target.toStringAsFixed(1)} saat',
               style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
             ),
           ] else ...[
@@ -1063,7 +1065,7 @@ class _SleepCard extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: () => _showSleepDialog(context, controller),
               icon: const Icon(Icons.add),
-              label: const Text('+ Uyku Ekle'),
+              label: Text('+ ${controller.tr('sleep_add')}'),
             ),
           ),
         ],
@@ -1085,7 +1087,7 @@ bool _isYesterday(DateTime d) {
 void _showSleepDialog(BuildContext context, AuraController controller) {
   double hours = 7.5;
   String selectedFeeling = '😐 Normal';
-  DateTime selectedDate = DateTime.now(); // Varsayılan: bugün
+  DateTime selectedDate = DateTime.now();
 
   showDialog(
     context: context,
@@ -1093,13 +1095,13 @@ void _showSleepDialog(BuildContext context, AuraController controller) {
       return StatefulBuilder(
         builder: (context, setState) {
           final dateLabel = _isToday(selectedDate)
-              ? 'Bugün'
+              ? controller.tr('day_today')
               : _isYesterday(selectedDate)
-                  ? 'Dün'
+                  ? controller.tr('day_yesterday')
                   : '${selectedDate.day}/${selectedDate.month}';
 
           return AlertDialog(
-            title: const Text('Uyku Ekle'),
+            title: Text(controller.tr('sleep_add')),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -1108,7 +1110,7 @@ void _showSleepDialog(BuildContext context, AuraController controller) {
                   children: [
                     const Icon(Icons.calendar_today, size: 18),
                     const SizedBox(width: 8),
-                    Text('Tarih: $dateLabel', style: const TextStyle(fontWeight: FontWeight.w600)),
+                    Text('${controller.tr('sleep_date')}: $dateLabel', style: const TextStyle(fontWeight: FontWeight.w600)),
                     const Spacer(),
                     TextButton(
                       onPressed: () async {
@@ -1122,7 +1124,7 @@ void _showSleepDialog(BuildContext context, AuraController controller) {
                         );
                         if (picked != null) setState(() => selectedDate = picked);
                       },
-                      child: const Text('Değiştir'),
+                      child: Text(controller.tr('btn_change')),
                     ),
                   ],
                 ),
@@ -1140,7 +1142,7 @@ void _showSleepDialog(BuildContext context, AuraController controller) {
                     ),
                     const SizedBox(width: 16),
                     Text(
-                      '${hours.toStringAsFixed(1)} saat',
+                      '${hours.toStringAsFixed(1)} ${controller.tr('sleep_hours_unit')}',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(width: 16),
@@ -1154,26 +1156,26 @@ void _showSleepDialog(BuildContext context, AuraController controller) {
                   ],
                 ),
                 const SizedBox(height: 24),
-                const Text('Uyanma Hissi:', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('${controller.tr('sleep_feeling')}:', style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _FeelingButton(
                       emoji: '😴',
-                      label: 'Yorgun',
+                      label: controller.tr('feeling_tired'),
                       isSelected: selectedFeeling == '😴 Yorgun',
                       onTap: () => setState(() => selectedFeeling = '😴 Yorgun'),
                     ),
                     _FeelingButton(
                       emoji: '😐',
-                      label: 'Normal',
+                      label: controller.tr('feeling_normal'),
                       isSelected: selectedFeeling == '😐 Normal',
                       onTap: () => setState(() => selectedFeeling = '😐 Normal'),
                     ),
                     _FeelingButton(
                       emoji: '🤩',
-                      label: 'Enerjik',
+                      label: controller.tr('feeling_energetic'),
                       isSelected: selectedFeeling == '🤩 Enerjik',
                       onTap: () => setState(() => selectedFeeling = '🤩 Enerjik'),
                     ),
@@ -1184,14 +1186,14 @@ void _showSleepDialog(BuildContext context, AuraController controller) {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('İptal'),
+                child: Text(controller.tr('btn_cancel')),
               ),
               FilledButton(
                 onPressed: () {
                   controller.addSleep(hours, selectedFeeling, date: selectedDate);
                   Navigator.pop(context);
                 },
-                child: const Text('Kaydet'),
+                child: Text(controller.tr('btn_save')),
               ),
             ],
           );
@@ -1249,6 +1251,7 @@ class _EmergencyRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasData = profile.bloodType.isNotEmpty || profile.allergies.isNotEmpty;
+    final controller = AuraScope.of(context);
 
     return AuraCard(
       padding: const EdgeInsets.all(14),
@@ -1278,7 +1281,7 @@ class _EmergencyRow extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                hasData ? 'Acil Durum Kartı' : 'Acil durum bilgisi ekle',
+                hasData ? controller.tr('prof_sos_card') : controller.tr('prof_sos_add_info'),
                 style: Theme.of(context).textTheme.titleSmall,
               ),
             ),

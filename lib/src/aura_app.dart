@@ -100,35 +100,35 @@ class _AuraShellState extends State<AuraShell> {
                 child: Row(
                   children: [
                     _DockItem(
-                      label: 'Bugün',
+                      label: controller.tr('nav_today'),
                       icon: Icons.monitor_heart_outlined,
                       selectedIcon: Icons.monitor_heart,
                       selected: _selectedIndex == 0,
                       onTap: () => _select(0),
                     ),
                     _DockItem(
-                      label: 'Profil',
+                      label: controller.tr('nav_profile'),
                       icon: Icons.person_outline,
                       selectedIcon: Icons.person,
                       selected: _selectedIndex == 1,
                       onTap: () => _select(1),
                     ),
                     _DockItem(
-                      label: 'İlaç',
+                      label: controller.tr('nav_meds'),
                       icon: Icons.medication_liquid_outlined,
                       selectedIcon: Icons.medication_liquid,
                       selected: _selectedIndex == 2,
                       onTap: () => _select(2),
                     ),
                     _DockItem(
-                      label: 'AI',
+                      label: controller.tr('nav_ai'),
                       icon: Icons.auto_awesome_outlined,
                       selectedIcon: Icons.auto_awesome,
                       selected: _selectedIndex == 3,
                       onTap: () => _select(3),
                     ),
                     _DockItem(
-                      label: 'Yakınlar',
+                      label: controller.tr('nav_nearby'),
                       icon: Icons.local_hospital_outlined,
                       selectedIcon: Icons.local_hospital,
                       selected: _selectedIndex == 4,

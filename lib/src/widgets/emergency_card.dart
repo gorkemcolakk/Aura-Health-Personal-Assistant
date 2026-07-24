@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/health_profile.dart';
+import '../state/aura_scope.dart';
 
 class EmergencyCard extends StatelessWidget {
   const EmergencyCard({super.key, required this.profile});
@@ -10,6 +11,7 @@ class EmergencyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final controller = AuraScope.of(context);
 
     return Scaffold(
       backgroundColor: colors.surface,
@@ -20,7 +22,7 @@ class EmergencyCard extends StatelessWidget {
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('🆘 Acil Durum Kartı'),
+        title: Text('🆘 ${controller.tr('prof_sos_card')}'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -45,9 +47,9 @@ class EmergencyCard extends StatelessWidget {
                 children: [
                   const Icon(Icons.emergency, color: Colors.white, size: 48),
                   const SizedBox(height: 12),
-                  const Text(
-                    'ACİL DURUM BİLGİLERİ',
-                    style: TextStyle(
+                  Text(
+                    controller.tr('prof_sos_info'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -59,7 +61,7 @@ class EmergencyCard extends StatelessWidget {
                   // İsim & Kan Grubu
                   _infoRow(
                     icon: Icons.person,
-                    label: profile.name.isNotEmpty ? profile.name : 'İsim girilmemiş',
+                    label: profile.name.isNotEmpty ? profile.name : controller.tr('pdf_not_specified'),
                     value: profile.bloodType.isNotEmpty ? profile.bloodType : '?',
                     valueStyle: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
                   ),
@@ -71,7 +73,7 @@ class EmergencyCard extends StatelessWidget {
                     const SizedBox(height: 16),
                     _infoRow(
                       icon: Icons.straighten,
-                      label: 'Boy / Kilo',
+                      label: controller.tr('prof_sos_height_weight'),
                       value: '${profile.heightCm.toInt()} cm / ${profile.weightKg.toInt()} kg',
                     ),
                     const SizedBox(height: 16),
@@ -82,8 +84,8 @@ class EmergencyCard extends StatelessWidget {
                   const SizedBox(height: 16),
                   _infoSection(
                     icon: Icons.warning_amber,
-                    label: 'Alerjiler',
-                    content: profile.allergies.isNotEmpty ? profile.allergies : 'Belirtilmemiş',
+                    label: controller.tr('prof_sos_allergies'),
+                    content: profile.allergies.isNotEmpty ? profile.allergies : controller.tr('pdf_not_specified'),
                     highlight: profile.allergies.isNotEmpty,
                   ),
 
@@ -94,7 +96,7 @@ class EmergencyCard extends StatelessWidget {
                     const SizedBox(height: 16),
                     _infoSection(
                       icon: Icons.monitor_heart,
-                      label: 'Kronik Durumlar',
+                      label: controller.tr('prof_sos_chronic'),
                       content: profile.conditions,
                       highlight: true,
                     ),
@@ -107,13 +109,13 @@ class EmergencyCard extends StatelessWidget {
                   if (profile.emergencyContact.isNotEmpty)
                     _infoRow(
                       icon: Icons.contact_phone,
-                      label: 'Acil Kişi',
+                      label: controller.tr('prof_sos_contact'),
                       value: profile.emergencyContact,
                     ),
                   if (profile.emergencyPhone.isNotEmpty)
                     _infoRow(
                       icon: Icons.phone,
-                      label: 'Acil Telefon',
+                      label: controller.tr('prof_sos_phone'),
                       value: profile.emergencyPhone,
                       valueStyle: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                     ),
@@ -130,15 +132,14 @@ class EmergencyCard extends StatelessWidget {
                 color: colors.surfaceContainerHighest.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.info_outline, size: 20),
-                  SizedBox(width: 12),
+                  const Icon(Icons.info_outline, size: 20),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Bu kart acil durumlarda sağlık personeline yardımcı olmak içindir. '
-                      'Bilgilerinizi Profil sayfasından güncelleyebilirsiniz.',
-                      style: TextStyle(fontSize: 13),
+                      controller.tr('prof_sos_disclaimer'),
+                      style: const TextStyle(fontSize: 13),
                     ),
                   ),
                 ],

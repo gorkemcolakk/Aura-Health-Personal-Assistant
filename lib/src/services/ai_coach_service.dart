@@ -14,6 +14,7 @@ class AiCoachService {
     required HealthProfile profile,
     required List<Medication> medications,
     required String question,
+    required String langCode,
     String? apiKey,
   }) async {
     final key = (apiKey ?? '').trim();
@@ -22,7 +23,7 @@ class AiCoachService {
     }
 
     try {
-      final systemPrompt = _buildPrompt(profile, medications);
+      final systemPrompt = _buildPrompt(profile, medications, langCode);
 
       final body = jsonEncode({
         'model': _model,
@@ -68,7 +69,7 @@ class AiCoachService {
     }
   }
 
-  String _buildPrompt(HealthProfile profile, List<Medication> medications) {
+  String _buildPrompt(HealthProfile profile, List<Medication> medications, String langCode) {
     final waterTarget = HealthCalculator.dailyWaterTargetMl(profile);
     final sleepLogs = profile.sleepLogs;
     final lastSleep = sleepLogs.isNotEmpty ? sleepLogs.last : null;
@@ -96,6 +97,8 @@ Hastanın profili:
 $medList
 
 Hastanın cinsiyetine (kadın/erkek fizyolojisine uygun metabolizma, hormon, kas kütlesi ve beslenme ihtiyaçları), yaşına ve hedeflerine özel, kısa, samimi, empatik ve motive edici cevaplar ver. Tıbbi tavsiye verme, sadece sağlıklı yaşam koçluğu yap.
+
+IMPORTANT: You MUST reply in the language specified by the ISO code: "$langCode". If it's "en", reply entirely in English. If it's "tr", reply entirely in Turkish.
 ''';
   }
 
@@ -114,6 +117,7 @@ VKİ değerin yaklaşık ${bmi.toStringAsFixed(1)} ve kategori "$label". Günlü
 
   Future<String> generateDoctorSummary({
     required HealthProfile profile,
+    required String langCode,
     String? apiKey,
   }) async {
     final key = (apiKey ?? '').trim();
@@ -133,32 +137,52 @@ Hastanın bilgileri:
 - Sağlık Hedefi: ${profile.healthGoal}
 - Günlük Su Hedefi: $waterTarget ml
 
-Görevin: Bu verileri okuyan uzman doktor için detaylı ve kapsamlı (yaklaşık 4-6 cümlelik) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın cinsiyeti (kadın/erkek fizyolojik farklılıkları), yaş, VKİ, alerjileri ve hedeflerini dikkate alarak profesyonel bir tıbbi dille açıklama yap. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.''';
+Görevin: Bu verileri okuyan uzman doktor için kısa ve öz (maksimum 2-3 cümlelik) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın cinsiyeti, yaş, VKİ, alerjileri ve hedeflerini dikkate alarak profesyonel bir tıbbi dille açıklama yap. Sadece doktorun okuyacağı kısa bir not olarak hazırla. Selamlama veya kapanış yapma.
+
+IMPORTANT: You MUST write the report in the language specified by the ISO code: "$langCode". If it's "en", write entirely in English. If it's "tr", write entirely in Turkish.''';
+
+      final userContent = langCode == 'en' 
+          ? 'Please generate a short and concise patient summary for the doctor report. Maximum 3 sentences.' 
+          : 'Lütfen doktor raporu için kısa ve öz (en fazla 3 cümle) hasta özetini oluştur.';
 
       final body = jsonEncode({
         'model': _model,
         'messages': [
           {'role': 'system', 'content': systemPrompt},
-          {'role': 'user', 'content': 'Lütfen doktor raporu için kapsamlı hasta özetini oluştur.'},
+          {'role': 'user', 'content': userContent},
         ],
         'temperature': 0.3,
         'max_tokens': 1000,
       });
 
-      final response = await http.post(
-        Uri.parse(_endpoint),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $key',
-        },
-        body: body,
-      ).timeout(const Duration(seconds: 20));
+      int retries = 2;
+      while (retries >= 0) {
+        try {
+          final response = await http.post(
+            Uri.parse(_endpoint),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $key',
+            },
+            body: body,
+          ).timeout(const Duration(seconds: 15));
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data['choices']?[0]?['message']?['content']?.toString().trim() ?? 'Yapay zeka ozeti olusturulamadi.';
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            final text = data['choices']?[0]?['message']?['content']?.toString().trim();
+            if (text != null && text.isNotEmpty) {
+              return text;
+            }
+          }
+        } catch (_) {}
+        
+        retries--;
+        if (retries >= 0) await Future.delayed(const Duration(seconds: 1));
       }
-      return 'Yapay zeka ozeti olusturulamadi (Hata kodu: ${response.statusCode}).';
+
+      return langCode == 'en' 
+          ? 'AI summary could not be generated. (Empty response)'
+          : 'Yapay zeka ozeti olusturulamadi (Bos yanit).';
     } catch (e) {
       final bmi = HealthCalculator.bmi(profile);
       final bmiText = HealthCalculator.bmiLabel(bmi);

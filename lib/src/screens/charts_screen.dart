@@ -37,7 +37,7 @@ class _ChartsScreenState extends State<ChartsScreen> with TickerProviderStateMix
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('📊 Haftalık Grafikler'),
+        title: Text(controller.tr('chart_title')),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
       body: ListView(
@@ -75,10 +75,10 @@ class _WaterWaveChart extends StatelessWidget {
             children: [
               Icon(Icons.water_drop, color: colors.primary),
               const SizedBox(width: 8),
-              Text('Haftalık Su Tüketimi', style: Theme.of(context).textTheme.titleMedium),
+              Text(controller.tr('chart_water_title'), style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
               Text(
-                'Hedef ${(target / 1000).toStringAsFixed(2)} L',
+                '${controller.tr('chart_target')} ${(target / 1000).toStringAsFixed(2)} L',
                 style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700),
               ),
             ],
@@ -100,7 +100,7 @@ class _WaterWaveChart extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text('${(todayMl / 1000).toStringAsFixed(2)} L', style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: colors.primary, fontWeight: FontWeight.w900)),
-                          Text('Bugün', style: TextStyle(color: colors.onSurfaceVariant, fontSize: 13)),
+                          Text(controller.tr('day_today'), style: TextStyle(color: colors.onSurfaceVariant, fontSize: 13)),
                         ],
                       ),
                     ),
@@ -123,7 +123,7 @@ class _WaterWaveChart extends StatelessWidget {
                       return spots.map((s) {
                         final day = weeklyData[s.spotIndex];
                         return LineTooltipItem(
-                          '${day.dayName}  ${(s.y / 1000).toStringAsFixed(2)} L',
+                          '${controller.tr(day.dayName)}  ${(s.y / 1000).toStringAsFixed(2)} L',
                           const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
                         );
                       }).toList();
@@ -137,11 +137,10 @@ class _WaterWaveChart extends StatelessWidget {
                       showTitles: true,
                       interval: 1,
                       getTitlesWidget: (value, meta) {
-                        final days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
                         final dayData = weeklyData[value.toInt()];
                         return Padding(
                           padding: const EdgeInsets.only(top: 8),
-                          child: Text(days[value.toInt()], style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: dayData.isToday ? colors.primary : colors.onSurfaceVariant)),
+                          child: Text(controller.tr(dayData.dayName), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: dayData.isToday ? colors.primary : colors.onSurfaceVariant)),
                         );
                       },
                     ),
@@ -187,7 +186,7 @@ class _WaterWaveChart extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Center(
-            child: Text('Hedef ${(target / 1000).toStringAsFixed(2)} L', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
+            child: Text('${controller.tr('chart_target')} ${(target / 1000).toStringAsFixed(2)} L', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -223,9 +222,9 @@ class _SleepBars extends StatelessWidget {
             children: [
               Icon(Icons.nights_stay, color: colors.secondary),
               const SizedBox(width: 8),
-              Text('Haftalık Uyku Düzeni', style: Theme.of(context).textTheme.titleMedium),
+              Text(controller.tr('chart_sleep_title'), style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
-              Text('Hedef ${target.toStringAsFixed(1)} saat', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
+              Text('${controller.tr('chart_target')} ${target.toStringAsFixed(1)} saat', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
             ],
           ),
           const SizedBox(height: 16),
@@ -241,7 +240,7 @@ class _SleepBars extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: 36,
-                    child: Text(day.dayName, style: TextStyle(fontSize: 13, fontWeight: day.isToday ? FontWeight.w800 : FontWeight.w600, color: day.isToday ? colors.primary : colors.onSurfaceVariant)),
+                    child: Text(controller.tr(day.dayName), style: TextStyle(fontSize: 13, fontWeight: day.isToday ? FontWeight.w800 : FontWeight.w600, color: day.isToday ? colors.primary : colors.onSurfaceVariant)),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -298,14 +297,14 @@ class _SleepBars extends StatelessWidget {
           }),
           const SizedBox(height: 8),
           // Lejant
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 16,
+            runSpacing: 8,
             children: [
-              _legendDot(context, const Color(0xFFFFB300), 'Enerjik'),
-              const SizedBox(width: 16),
-              _legendDot(context, colors.primary, 'Normal'),
-              const SizedBox(width: 16),
-              _legendDot(context, const Color(0xFFE76F51), 'Yorgun'),
+              _legendDot(context, const Color(0xFFFFB300), controller.tr('chart_sleep_feeling_energetic')),
+              _legendDot(context, colors.primary, controller.tr('chart_sleep_feeling_normal')),
+              _legendDot(context, const Color(0xFFE76F51), controller.tr('chart_sleep_feeling_tired')),
             ],
           ),
         ],

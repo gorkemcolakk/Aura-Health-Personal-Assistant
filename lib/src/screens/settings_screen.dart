@@ -18,38 +18,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       backgroundColor: colors.surface,
       appBar: AppBar(
-        title: const Text('Uygulama Ayarları'),
+        title: Text(controller.tr('settings_title')),
         centerTitle: true,
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
-          _SectionTitle(title: 'Görünüm ve Dil'),
+          _SectionTitle(title: controller.tr('settings_appearance')),
           _SettingsCard(
             child: Column(
               children: [
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.palette_outlined),
-                  title: const Text('Tema Modu'),
-                  subtitle: const Text('Uygulamanın renk temasını belirleyin'),
+                  title: Text(controller.tr('settings_theme')),
+                  subtitle: Text(controller.tr('settings_theme_sub')),
                 ),
                 SegmentedButton<ThemeMode>(
-                  segments: const [
+                  segments: [
                     ButtonSegment<ThemeMode>(
                       value: ThemeMode.light,
-                      icon: Icon(Icons.light_mode_outlined),
-                      label: Text('Açık'),
+                      icon: const Icon(Icons.light_mode_outlined),
+                      label: Text(controller.tr('theme_light')),
                     ),
                     ButtonSegment<ThemeMode>(
                       value: ThemeMode.dark,
-                      icon: Icon(Icons.dark_mode_outlined),
-                      label: Text('Koyu'),
+                      icon: const Icon(Icons.dark_mode_outlined),
+                      label: Text(controller.tr('theme_dark')),
                     ),
                     ButtonSegment<ThemeMode>(
                       value: ThemeMode.system,
-                      icon: Icon(Icons.settings_suggest_outlined),
-                      label: Text('Sistem'),
+                      icon: const Icon(Icons.settings_suggest_outlined),
+                      label: Text(controller.tr('theme_system')),
                     ),
                   ],
                   selected: {controller.themeMode},
@@ -61,8 +61,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.language_outlined),
-                  title: const Text('Dil / Language'),
-                  subtitle: const Text('Arayüz ve yapay zeka dilini seçin'),
+                  title: Text(controller.tr('settings_lang')),
+                  subtitle: Text(controller.tr('settings_lang_sub')),
                 ),
                 SegmentedButton<String>(
                   segments: const [
@@ -78,29 +78,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   selected: {controller.languageCode},
                   onSelectionChanged: (Set<String> newSelection) {
                     controller.setLanguageCode(newSelection.first);
-                    // App needs to handle language changes later, for now we set state.
                   },
                 ),
               ],
             ),
           ),
           const SizedBox(height: 24),
-          _SectionTitle(title: 'Veri ve Gizlilik'),
+          _SectionTitle(title: controller.tr('settings_data_privacy')),
           _SettingsCard(
             child: Column(
               children: [
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.fingerprint),
-                  title: const Text('Biyometrik Giriş'),
-                  subtitle: const Text('Face ID veya parmak izi ile giriş yapın'),
+                  title: Text(controller.tr('settings_biometric')),
+                  subtitle: Text(controller.tr('settings_biometric_sub')),
                   trailing: Switch(
                     value: controller.isBiometricEnabledForCurrentUser,
                     onChanged: (val) async {
                       final success = await controller.setBiometricEnabled(val);
                       if (!success && mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Biyometrik doğrulama kurulamadı.')),
+                          SnackBar(content: Text(controller.tr('msg_biometric_fail'))),
                         );
                       }
                     },
@@ -110,8 +109,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: Icon(Icons.delete_forever_outlined, color: colors.error),
-                  title: Text('Verileri Sıfırla', style: TextStyle(color: colors.error, fontWeight: FontWeight.bold)),
-                  subtitle: const Text('Su, uyku ve ilaç kayıtlarınızı siler'),
+                  title: Text(controller.tr('settings_reset'), style: TextStyle(color: colors.error, fontWeight: FontWeight.bold)),
+                  subtitle: Text(controller.tr('settings_reset_sub')),
                   onTap: () => _showResetDialog(context, controller),
                 ),
               ],
@@ -148,15 +147,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Verileri Sıfırla'),
-        content: const Text(
-          'Su, uyku ve ilaç kayıtlarınız kalıcı olarak silinecektir. '
-          'Bu işlem geri alınamaz. Onaylıyor musunuz?'
-        ),
+        title: Text(controller.tr('dialog_reset_title')),
+        content: Text(controller.tr('dialog_reset_msg')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('İptal'),
+            child: Text(controller.tr('btn_cancel')),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -167,10 +163,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               controller.resetAllData();
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Verileriniz başarıyla sıfırlandı.')),
+                SnackBar(content: Text(controller.tr('msg_reset_success'))),
               );
             },
-            child: const Text('Sıfırla'),
+            child: Text(controller.tr('btn_reset')),
           ),
         ],
       ),

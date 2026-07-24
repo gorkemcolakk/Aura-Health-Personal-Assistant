@@ -14,6 +14,7 @@ import '../services/notification_service.dart';
 import '../services/storage_service.dart';
 import '../services/database_service.dart';
 import '../services/biometric_service.dart';
+import '../services/translation_service.dart';
 
 class AuraController extends ChangeNotifier {
   AuraController({
@@ -41,6 +42,8 @@ class AuraController extends ChangeNotifier {
 
   String? currentUserTc;
   String? currentUserName;
+
+  String tr(String key) => TranslationService.get(key, languageCode);
 
   Medication? activeAlarm;
   final Set<String> _dismissedAlarms = {};
@@ -400,6 +403,7 @@ class AuraController extends ChangeNotifier {
       profile: profile,
       medications: medications,
       question: trimmed,
+      langCode: languageCode,
       apiKey: apiKey,
     );
     messages = [

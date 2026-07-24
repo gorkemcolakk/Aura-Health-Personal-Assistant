@@ -4,12 +4,15 @@ import 'package:printing/printing.dart';
 import '../models/health_profile.dart';
 import '../services/ai_coach_service.dart';
 import '../services/pdf_service.dart';
+import '../services/translation_service.dart';
+import '../state/aura_scope.dart';
 
 class PdfPreviewScreen extends StatefulWidget {
   final HealthProfile profile;
   final String? apiKey;
+  final String langCode;
 
-  const PdfPreviewScreen({super.key, required this.profile, this.apiKey});
+  const PdfPreviewScreen({super.key, required this.profile, this.apiKey, required this.langCode});
 
   @override
   State<PdfPreviewScreen> createState() => _PdfPreviewScreenState();
@@ -32,6 +35,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
       final summary = await aiService.generateDoctorSummary(
         profile: widget.profile,
         apiKey: widget.apiKey,
+        langCode: widget.langCode,
       );
       if (mounted) {
         setState(() {
@@ -53,16 +57,16 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Doktor Raporu (PDF)'),
+        title: Text(TranslationService.get('pdf_title', widget.langCode)),
       ),
       body: _isLoading
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Yapay zeka doktor özetini hazırlıyor, lütfen bekleyin...'),
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(TranslationService.get('pdf_preparing', widget.langCode)),
                 ],
               ),
             )
@@ -73,6 +77,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     format,
                     widget.profile,
                     _aiSummary!,
+                    widget.langCode,
                   ),
                   allowPrinting: true,
                   allowSharing: true,

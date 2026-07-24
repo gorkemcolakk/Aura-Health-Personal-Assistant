@@ -75,7 +75,7 @@ class HealthCalculator {
       }
     }
 
-    final weekdays = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+    final weekdays = ['day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun'];
     final result = <DailyWater>[];
     
     for (var i = 0; i < 7; i++) {
@@ -104,7 +104,7 @@ class HealthCalculator {
       }
     }
 
-    final weekdays = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+    final weekdays = ['day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun'];
     final result = <DailySleep>[];
     
     for (var i = 0; i < 7; i++) {
