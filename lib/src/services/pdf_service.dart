@@ -38,7 +38,7 @@ class PdfService {
     pdf.addPage(
       pw.Page(
         pageFormat: format,
-        margin: const pw.EdgeInsets.all(20),
+        margin: const pw.EdgeInsets.symmetric(horizontal: 24, vertical: 28),
         theme: pw.ThemeData.withFont(
           base: font,
           bold: fontBold,
@@ -177,29 +177,22 @@ class PdfService {
                       font: fontBold,
                       color: PdfColors.indigo800)),
               pw.SizedBox(height: 8),
-              pw.Flexible(
-                fit: pw.FlexFit.loose,
-                child: pw.Container(
-                  width: double.infinity,
-                  padding: const pw.EdgeInsets.all(12),
-                  decoration: pw.BoxDecoration(
-                    color: PdfColors.indigo50,
-                    borderRadius:
-                        const pw.BorderRadius.all(pw.Radius.circular(12)),
-                    border: pw.Border.all(color: PdfColors.indigo200, width: 1.5),
-                  ),
-                  child: pw.FittedBox(
-                    fit: pw.BoxFit.scaleDown,
-                    alignment: pw.Alignment.topLeft,
-                    child: pw.Text(
-                      aiSummary,
-                      style: pw.TextStyle(
-                        fontSize: 15,
-                        lineSpacing: 4,
-                        font: fontBold,
-                        color: PdfColors.blueGrey900,
-                      ),
-                    ),
+              pw.Container(
+                width: double.infinity,
+                padding: const pw.EdgeInsets.all(12),
+                decoration: pw.BoxDecoration(
+                  color: PdfColors.indigo50,
+                  borderRadius:
+                      const pw.BorderRadius.all(pw.Radius.circular(12)),
+                  border: pw.Border.all(color: PdfColors.indigo200, width: 1.5),
+                ),
+                child: pw.Text(
+                  aiSummary,
+                  style: pw.TextStyle(
+                    fontSize: 15,
+                    lineSpacing: 4,
+                    font: fontBold,
+                    color: PdfColors.blueGrey900,
                   ),
                 ),
               ),

@@ -137,13 +137,13 @@ Hastanın bilgileri:
 - Sağlık Hedefi: ${profile.healthGoal}
 - Günlük Su Hedefi: $waterTarget ml
 
-Görevin: Bu verileri okuyan uzman doktor için kısa ve öz (maksimum 2-3 cümlelik) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın cinsiyeti, yaş, VKİ, alerjileri ve hedeflerini dikkate alarak profesyonel bir tıbbi dille açıklama yap. Sadece doktorun okuyacağı kısa bir not olarak hazırla. Selamlama veya kapanış yapma.
+Görevin: Bu verileri okuyan uzman doktor için anlaşılır ve kapsamlı (yaklaşık 3-5 cümlelik) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın cinsiyeti, yaş, VKİ, alerjileri ve hedeflerini dikkate alarak profesyonel bir tıbbi dille açıklama yap. Sadece doktorun okuyacağı bir not olarak hazırla. Selamlama veya kapanış yapma.
 
 IMPORTANT: You MUST write the report in the language specified by the ISO code: "$langCode". If it's "en", write entirely in English. If it's "tr", write entirely in Turkish.''';
 
       final userContent = langCode == 'en' 
-          ? 'Please generate a short and concise patient summary for the doctor report. Maximum 3 sentences.' 
-          : 'Lütfen doktor raporu için kısa ve öz (en fazla 3 cümle) hasta özetini oluştur.';
+          ? 'Please generate a concise patient summary for the doctor report. Approximately 3 to 5 sentences.' 
+          : 'Lütfen doktor raporu için yaklaşık 3-5 cümlelik hasta özetini oluştur.';
 
       final body = jsonEncode({
         'model': _model,

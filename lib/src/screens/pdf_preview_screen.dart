@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 
 import '../models/health_profile.dart';
 import '../services/ai_coach_service.dart';
 import '../services/pdf_service.dart';
 import '../services/translation_service.dart';
-import '../state/aura_scope.dart';
 
 class PdfPreviewScreen extends StatefulWidget {
   final HealthProfile profile;
@@ -55,6 +55,18 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Ekranın en-boy oranına göre PDF sayfası oluştur
+    final screenSize = MediaQuery.of(context).size;
+    final appBarHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
+    final availableHeight = screenSize.height - appBarHeight;
+    final availableWidth = screenSize.width;
+
+    // Ekrana tam oturacak özel sayfa boyutu (piksel → PDF birimi dönüşümü)
+    // PdfPageFormat birim: 1 pt = 1/72 inç
+    // Ekranı doldurmak için aspect ratio'yu telefon ekranı oranına eşitliyoruz
+    final pageWidth = 595.0; // A4 genişliği pt cinsinden
+    final pageHeight = pageWidth * (availableHeight / availableWidth);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(TranslationService.get('pdf_title', widget.langCode)),
@@ -71,10 +83,10 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
               ),
             )
           : _error != null
-              ? Center(child: Text('Hata: \$_error'))
+              ? Center(child: Text('Hata: $_error'))
               : PdfPreview(
                   build: (format) => PdfService.buildPdf(
-                    format,
+                    PdfPageFormat(pageWidth, pageHeight, marginAll: 0),
                     widget.profile,
                     _aiSummary!,
                     widget.langCode,
@@ -84,6 +96,12 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                   canChangeOrientation: false,
                   canChangePageFormat: false,
                   canDebug: false,
+                  padding: EdgeInsets.zero,
+                  pagesInitialScrollOffset: 0,
+                  initialPageFormat: PdfPageFormat(pageWidth, pageHeight),
+                  scrollViewDecoration: const BoxDecoration(
+                    color: Color(0xFFF5F5F5),
+                  ),
                 ),
     );
   }
