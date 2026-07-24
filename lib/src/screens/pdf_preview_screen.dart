@@ -97,7 +97,6 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                   canChangePageFormat: false,
                   canDebug: false,
                   padding: EdgeInsets.zero,
-                  pagesInitialScrollOffset: 0,
                   initialPageFormat: PdfPageFormat(pageWidth, pageHeight),
                   scrollViewDecoration: const BoxDecoration(
                     color: Color(0xFFF5F5F5),
