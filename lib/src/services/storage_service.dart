@@ -75,6 +75,16 @@ class StorageService {
     await prefs.setString('aura.theme_mode', mode.name);
   }
 
+  Future<String?> loadLanguageCode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('aura.language_code');
+  }
+
+  Future<void> saveLanguageCode(String code) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('aura.language_code', code);
+  }
+
   Future<bool> loadBiometricEnabled() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('aura.biometric_enabled') ?? false;

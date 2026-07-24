@@ -32,6 +32,7 @@ class AuraController extends ChangeNotifier {
   List<Medication> medications = const [];
   String? apiKey;
   ThemeMode themeMode = ThemeMode.system;
+  String languageCode = 'tr';
 
   bool biometricEnabled = false;
   String? biometricUserTc;
@@ -64,6 +65,7 @@ class AuraController extends ChangeNotifier {
   Future<void> load() async {
     apiKey = await storage.loadApiKey();
     themeMode = await storage.loadThemeMode();
+    languageCode = await storage.loadLanguageCode() ?? 'tr';
     biometricEnabled = await storage.loadBiometricEnabled();
     biometricUserTc = await storage.loadBiometricUserTc();
     // Do not load profile/medications until user logs in.
@@ -241,6 +243,12 @@ class AuraController extends ChangeNotifier {
     await storage.saveThemeMode(mode);
   }
 
+  Future<void> setLanguageCode(String code) async {
+    languageCode = code;
+    notifyListeners();
+    await storage.saveLanguageCode(code);
+  }
+
   Future<void> saveProfile(HealthProfile nextProfile) async {
     profile = nextProfile;
     if (currentUserTc != null) {
@@ -301,6 +309,20 @@ class AuraController extends ChangeNotifier {
     );
     if (currentUserTc != null) {
       await db.saveProfile(currentUserTc!, profile);
+    }
+    notifyListeners();
+  }
+
+  Future<void> resetAllData() async {
+    profile = profile.copyWith(
+      waterConsumedMl: 0,
+      waterLogs: const [],
+      sleepLogs: const [],
+    );
+    medications = [];
+    if (currentUserTc != null) {
+      await db.saveProfile(currentUserTc!, profile);
+      await db.saveMedications(currentUserTc!, medications);
     }
     notifyListeners();
   }

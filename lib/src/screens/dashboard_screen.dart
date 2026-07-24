@@ -10,6 +10,7 @@ import '../state/aura_scope.dart';
 import '../widgets/aura_card.dart';
 import '../widgets/emergency_card.dart';
 import 'charts_screen.dart';
+import 'settings_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -110,11 +111,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const Spacer(),
-                          IconButton(
-                            tooltip: 'Sıfırla',
-                            onPressed: controller.resetWater,
-                            icon: const Icon(Icons.restart_alt),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -332,8 +328,10 @@ class _Header extends StatelessWidget {
           icon: const Icon(Icons.settings_outlined),
           tooltip: 'Uygulama Ayarları',
           onPressed: () {
-            final controller = AuraScope.of(context, listen: false);
-            _showSettingsSheet(context, controller);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            );
           },
         ),
       ],
@@ -507,100 +505,6 @@ void _showCustomWaterDialog(BuildContext context, AuraController controller) {
   );
 }
 
-void _showSettingsSheet(BuildContext context, AuraController controller) {
-  showModalBottomSheet<void>(
-    context: context,
-    backgroundColor: Colors.transparent,
-    builder: (context) {
-      final colors = Theme.of(context).colorScheme;
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return Container(
-            decoration: BoxDecoration(
-              color: colors.surface,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            ),
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 46,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: colors.onSurfaceVariant.withValues(alpha: .2),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    const Icon(Icons.settings_outlined, size: 22),
-                    const SizedBox(width: 10),
-                    Text(
-                      'Uygulama Ayarları',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Görünüm ve Tema',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: colors.primary,
-                      ),
-                ),
-                const SizedBox(height: 12),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Tema Modu', style: TextStyle(fontWeight: FontWeight.w600)),
-                  subtitle: const Text('Uygulama görünümünü değiştirin'),
-                ),
-                const SizedBox(height: 8),
-                SegmentedButton<ThemeMode>(
-                  segments: const [
-                    ButtonSegment<ThemeMode>(
-                      value: ThemeMode.light,
-                      icon: Icon(Icons.light_mode_outlined),
-                      label: Text('Açık'),
-                    ),
-                    ButtonSegment<ThemeMode>(
-                      value: ThemeMode.dark,
-                      icon: Icon(Icons.dark_mode_outlined),
-                      label: Text('Koyu'),
-                    ),
-                    ButtonSegment<ThemeMode>(
-                      value: ThemeMode.system,
-                      icon: Icon(Icons.settings_suggest_outlined),
-                      label: Text('Sistem'),
-                    ),
-                  ],
-                  selected: {controller.themeMode},
-                  onSelectionChanged: (Set<ThemeMode> newSelection) {
-                    setState(() {
-                      controller.setThemeMode(newSelection.first);
-                    });
-                  },
-                ),
-                const SizedBox(height: 24),
-                FilledButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Kapat'),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    },
-  );
-}
 
 class _CustomWaterSheet extends StatefulWidget {
   const _CustomWaterSheet({required this.controller});
