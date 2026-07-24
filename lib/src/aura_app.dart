@@ -75,11 +75,6 @@ class _AuraShellState extends State<AuraShell> {
               child: _screens[_selectedIndex],
             ),
           ),
-          const Positioned(
-            top: 56,
-            right: 16,
-            child: _ThemeToggleButton(),
-          ),
         ],
       ),
       bottomNavigationBar: SafeArea(
@@ -221,44 +216,3 @@ class _DockItem extends StatelessWidget {
   }
 }
 
-class _ThemeToggleButton extends StatelessWidget {
-  const _ThemeToggleButton();
-
-  @override
-  Widget build(BuildContext context) {
-    final controller = AuraScope.of(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final mode = controller.themeMode;
-
-    IconData icon;
-    if (mode == ThemeMode.system) {
-      icon = Icons.brightness_medium;
-    } else if (mode == ThemeMode.dark) {
-      icon = Icons.dark_mode;
-    } else {
-      icon = Icons.light_mode;
-    }
-
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
-      shape: const CircleBorder(),
-      elevation: 4,
-      shadowColor: Colors.black26,
-      child: IconButton(
-        icon: Icon(icon, color: Theme.of(context).colorScheme.primary),
-        tooltip: 'Tema Değiştir',
-        onPressed: () {
-          ThemeMode nextMode;
-          if (mode == ThemeMode.system) {
-            nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
-          } else if (mode == ThemeMode.dark) {
-            nextMode = ThemeMode.light;
-          } else {
-            nextMode = ThemeMode.system;
-          }
-          controller.setThemeMode(nextMode);
-        },
-      ),
-    );
-  }
-}

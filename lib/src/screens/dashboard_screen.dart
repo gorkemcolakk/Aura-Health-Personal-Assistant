@@ -4,7 +4,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import '../models/health_profile.dart';
-import '../models/water_log.dart';
 import '../services/health_calculator.dart';
 import '../state/aura_controller.dart';
 import '../state/aura_scope.dart';
@@ -42,7 +41,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     final bmi = HealthCalculator.bmi(profile);
     final waterTarget = HealthCalculator.dailyWaterTargetMl(profile);
     final waterProgress = HealthCalculator.waterProgress(profile);
-    final todayMl = HealthCalculator.todayWaterMl(profile);
     final nextMedication =
         controller.medications
             .where((item) => item.enabled)
@@ -330,6 +328,14 @@ class _Header extends StatelessWidget {
             ],
           ),
         ),
+        IconButton(
+          icon: const Icon(Icons.settings_outlined),
+          tooltip: 'Uygulama Ayarları',
+          onPressed: () {
+            final controller = AuraScope.of(context, listen: false);
+            _showSettingsSheet(context, controller);
+          },
+        ),
       ],
     );
   }
@@ -501,6 +507,101 @@ void _showCustomWaterDialog(BuildContext context, AuraController controller) {
   );
 }
 
+void _showSettingsSheet(BuildContext context, AuraController controller) {
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      final colors = Theme.of(context).colorScheme;
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Container(
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 46,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: colors.onSurfaceVariant.withValues(alpha: .2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const Icon(Icons.settings_outlined, size: 22),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Uygulama Ayarları',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Görünüm ve Tema',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colors.primary,
+                      ),
+                ),
+                const SizedBox(height: 12),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Tema Modu', style: TextStyle(fontWeight: FontWeight.w600)),
+                  subtitle: const Text('Uygulama görünümünü değiştirin'),
+                ),
+                const SizedBox(height: 8),
+                SegmentedButton<ThemeMode>(
+                  segments: const [
+                    ButtonSegment<ThemeMode>(
+                      value: ThemeMode.light,
+                      icon: Icon(Icons.light_mode_outlined),
+                      label: Text('Açık'),
+                    ),
+                    ButtonSegment<ThemeMode>(
+                      value: ThemeMode.dark,
+                      icon: Icon(Icons.dark_mode_outlined),
+                      label: Text('Koyu'),
+                    ),
+                    ButtonSegment<ThemeMode>(
+                      value: ThemeMode.system,
+                      icon: Icon(Icons.settings_suggest_outlined),
+                      label: Text('Sistem'),
+                    ),
+                  ],
+                  selected: {controller.themeMode},
+                  onSelectionChanged: (Set<ThemeMode> newSelection) {
+                    setState(() {
+                      controller.setThemeMode(newSelection.first);
+                    });
+                  },
+                ),
+                const SizedBox(height: 24),
+                FilledButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Kapat'),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
 class _CustomWaterSheet extends StatefulWidget {
   const _CustomWaterSheet({required this.controller});
 
@@ -525,9 +626,9 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
             : '${_selectedDate.day}/${_selectedDate.month}';
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: EdgeInsets.fromLTRB(24, 16, 24, media.viewInsets.bottom + 16),
       child: Column(
@@ -549,11 +650,11 @@ class _CustomWaterSheetState extends State<_CustomWaterSheet> {
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFE3F2FD),
+                decoration: BoxDecoration(
+                  color: colors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.water_drop, color: Color(0xFF1E88E5), size: 20),
+                child: Icon(Icons.water_drop, color: colors.primary, size: 20),
               ),
               const SizedBox(width: 10),
               Text(
