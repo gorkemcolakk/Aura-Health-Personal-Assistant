@@ -11,8 +11,9 @@ class PdfPreviewScreen extends StatefulWidget {
   final HealthProfile profile;
   final String? apiKey;
   final String langCode;
+  final int days;
 
-  const PdfPreviewScreen({super.key, required this.profile, this.apiKey, required this.langCode});
+  const PdfPreviewScreen({super.key, required this.profile, this.apiKey, required this.langCode, this.days = 7});
 
   @override
   State<PdfPreviewScreen> createState() => _PdfPreviewScreenState();
@@ -90,6 +91,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     widget.profile,
                     _aiSummary!,
                     widget.langCode,
+                    widget.days,
                   ),
                   allowPrinting: true,
                   allowSharing: true,

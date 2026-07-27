@@ -338,15 +338,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: InkWell(
               borderRadius: BorderRadius.circular(14),
               onTap: () {
-                // Navigate to PDF Preview screen
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => PdfPreviewScreen(
-                      profile: controller.profile,
-                      apiKey: controller.apiKey,
-                      langCode: controller.languageCode,
-                    ),
-                  ),
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text(controller.tr('prof_pdf') ?? 'PDF Raporu'),
+                      content: const Text('Raporun kapsayacağı zaman aralığını seçin:'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _openPdf(context, controller, 7);
+                          },
+                          child: const Text('7 Günlük'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _openPdf(context, controller, 30);
+                          },
+                          child: const Text('1 Aylık'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _openPdf(context, controller, 90);
+                          },
+                          child: const Text('3 Aylık'),
+                        ),
+                      ],
+                    );
+                  }
                 );
               },
               child: Padding(
@@ -404,6 +426,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
             label: Text(controller.tr('prof_logout'), style: const TextStyle(fontSize: 16)),
           ),
         ],
+      ),
+    );
+  }
+
+  void _openPdf(BuildContext context, AuraController controller, int days) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PdfPreviewScreen(
+          profile: controller.profile,
+          apiKey: controller.apiKey,
+          langCode: controller.languageCode,
+          days: days,
+        ),
       ),
     );
   }

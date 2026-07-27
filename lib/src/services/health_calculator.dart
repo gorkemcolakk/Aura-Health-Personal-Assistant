@@ -61,16 +61,20 @@ class HealthCalculator {
   }
 
   static List<DailyWater> getWeeklyWaterData(HealthProfile profile) {
+    return getHistoricalWaterData(profile, days: 7);
+  }
+
+  static List<DailyWater> getHistoricalWaterData(HealthProfile profile, {int days = 7}) {
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
-    final windowStart = todayStart.subtract(const Duration(days: 6));
+    final windowStart = todayStart.subtract(Duration(days: days - 1));
     
-    final Map<int, int> amounts = {for (var i = 0; i < 7; i++) i: 0};
+    final Map<int, int> amounts = {for (var i = 0; i < days; i++) i: 0};
     
     for (final log in profile.waterLogs) {
       final logDay = DateTime(log.timestamp.year, log.timestamp.month, log.timestamp.day);
       final difference = logDay.difference(windowStart).inDays;
-      if (difference >= 0 && difference < 7) {
+      if (difference >= 0 && difference < days) {
         amounts[difference] = (amounts[difference] ?? 0) + log.amountMl;
       }
     }
@@ -78,28 +82,32 @@ class HealthCalculator {
     final dayKeys = ['day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun'];
     final result = <DailyWater>[];
     
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < days; i++) {
       final date = windowStart.add(Duration(days: i));
       final isToday = date.isAtSameMomentAs(todayStart);
       final key = dayKeys[date.weekday - 1];
-      result.add(DailyWater(key, amounts[i]!, isToday: isToday));
+      result.add(DailyWater(key, amounts[i]!, date, isToday: isToday));
     }
     
     return result;
   }
 
   static List<DailySleep> getWeeklySleepData(HealthProfile profile) {
+    return getHistoricalSleepData(profile, days: 7);
+  }
+
+  static List<DailySleep> getHistoricalSleepData(HealthProfile profile, {int days = 7}) {
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
-    final windowStart = todayStart.subtract(const Duration(days: 6));
+    final windowStart = todayStart.subtract(Duration(days: days - 1));
     
-    final Map<int, double> hours = {for (var i = 0; i < 7; i++) i: 0.0};
-    final Map<int, String> feelings = {for (var i = 0; i < 7; i++) i: ''};
+    final Map<int, double> hours = {for (var i = 0; i < days; i++) i: 0.0};
+    final Map<int, String> feelings = {for (var i = 0; i < days; i++) i: ''};
 
     for (final log in profile.sleepLogs) {
       final logDay = DateTime(log.date.year, log.date.month, log.date.day);
       final difference = logDay.difference(windowStart).inDays;
-      if (difference >= 0 && difference < 7) {
+      if (difference >= 0 && difference < days) {
         hours[difference] = (hours[difference] ?? 0.0) + log.hours;
         feelings[difference] = log.feeling;
       }
@@ -108,11 +116,11 @@ class HealthCalculator {
     final dayKeys = ['day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun'];
     final result = <DailySleep>[];
     
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < days; i++) {
       final date = windowStart.add(Duration(days: i));
       final isToday = date.isAtSameMomentAs(todayStart);
       final key = dayKeys[date.weekday - 1];
-      result.add(DailySleep(key, hours[i]!, isToday: isToday, feeling: feelings[i]!));
+      result.add(DailySleep(key, hours[i]!, date, isToday: isToday, feeling: feelings[i]!));
     }
     
     return result;
@@ -123,8 +131,9 @@ class DailyWater {
   final String dayName;
   final int amountMl;
   final bool isToday;
+  final DateTime date;
 
-  const DailyWater(this.dayName, this.amountMl, {this.isToday = false});
+  const DailyWater(this.dayName, this.amountMl, this.date, {this.isToday = false});
 }
 
 class DailySleep {
@@ -132,6 +141,7 @@ class DailySleep {
   final double hours;
   final bool isToday;
   final String feeling;
+  final DateTime date;
 
-  const DailySleep(this.dayName, this.hours, {this.isToday = false, this.feeling = ''});
+  const DailySleep(this.dayName, this.hours, this.date, {this.isToday = false, this.feeling = ''});
 }

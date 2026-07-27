@@ -119,6 +119,7 @@ VKİ değerin yaklaşık ${bmi.toStringAsFixed(1)} ve kategori "$label". Günlü
     required HealthProfile profile,
     required String langCode,
     String? apiKey,
+    int days = 7,
   }) async {
     final key = (apiKey ?? '').trim();
     if (key.isEmpty) {
@@ -137,7 +138,10 @@ Hastanın bilgileri:
 - Sağlık Hedefi: ${profile.healthGoal}
 - Günlük Su Hedefi: $waterTarget ml
 
+Rapor Periyodu: Son $days Günlük Veriler
+
 Görevin: Bu verileri okuyan uzman doktor için kapsamlı ve detaylı (yaklaşık 5-7 cümlelik) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın cinsiyeti, yaş, VKİ, alerjileri, mevcut durumu ve sağlık hedeflerini dikkate alarak profesyonel bir tıbbi dille açıklama yap. Gerekli önerileri ve dikkat edilmesi gereken noktaları da belirt. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.
+IMPORTANT: You MUST reply in the language specified by the ISO code: "$langCode". If it's "en", reply entirely in English. If it's "tr", reply entirely in Turkish.''';
 
 IMPORTANT: You MUST write the report in the language specified by the ISO code: "$langCode". If it's "en", write entirely in English. If it's "tr", write entirely in Turkish.''';
 

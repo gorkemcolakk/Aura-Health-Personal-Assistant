@@ -179,7 +179,7 @@ class TranslationService {
     'dash_water_track': {'tr': 'Su takibi', 'en': 'Water tracking'},
     'dash_custom_water': {'tr': 'Özel', 'en': 'Custom'},
     'dash_sleep_track': {'tr': 'Uyku takibi', 'en': 'Sleep tracking'},
-    'dash_charts': {'tr': 'Haftalık Grafikler', 'en': 'Weekly Charts'},
+    'dash_charts': {'tr': 'Detaylı Analiz', 'en': 'Advanced Analytics'},
     'dash_no_meds': {'tr': 'Bugün planlı ilaç yok', 'en': 'No planned medication today'},
     'dash_no_meds_sub': {'tr': 'İlaç sekmesinden günlük alarm ekleyebilirsin.', 'en': 'You can add daily alarms from the medication tab.'},
     'dash_insight': {'tr': 'Aura içgörüsü', 'en': 'Aura insight'},

@@ -11,7 +11,7 @@ import 'translation_service.dart';
 
 class PdfService {
   static Future<Uint8List> buildPdf(
-      PdfPageFormat format, HealthProfile profile, String aiSummary, String langCode) async {
+      PdfPageFormat format, HealthProfile profile, String aiSummary, String langCode, int days) async {
     final pdf = pw.Document();
 
     final font = await PdfGoogleFonts.robotoRegular();
@@ -22,13 +22,11 @@ class PdfService {
 
     final bmi = HealthCalculator.bmi(profile);
 
-    final weeklySleep = HealthCalculator.getWeeklySleepData(profile);
-    final avgSleep =
-        weeklySleep.map((e) => e.hours).reduce((a, b) => a + b) / 7;
+    final dataSleep = HealthCalculator.getHistoricalSleepData(profile, days: days);
+    final avgSleep = dataSleep.isEmpty ? 0 : dataSleep.map((e) => e.hours).reduce((a, b) => a + b) / days;
 
-    final weeklyWater = HealthCalculator.getWeeklyWaterData(profile);
-    final avgWater =
-        weeklyWater.map((e) => e.amountMl).reduce((a, b) => a + b) / 7;
+    final dataWater = HealthCalculator.getHistoricalWaterData(profile, days: days);
+    final avgWater = dataWater.isEmpty ? 0 : dataWater.map((e) => e.amountMl).reduce((a, b) => a + b) / days;
 
     final clinicalText = [
       if (profile.conditions.isNotEmpty) '${TranslationService.get('pdf_condition', langCode)}: ${profile.conditions}',
@@ -189,10 +187,11 @@ class PdfService {
                 child: pw.Text(
                   aiSummary,
                   style: pw.TextStyle(
-                    fontSize: 17,
-                    lineSpacing: 5,
+                    fontSize: 18,
+                    lineSpacing: 6,
                     font: fontBold,
-                    color: PdfColors.blueGrey900,
+                    color: PdfColors.black,
+                    fontWeight: pw.FontWeight.bold,
                   ),
                 ),
               ),
