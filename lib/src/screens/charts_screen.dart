@@ -177,7 +177,16 @@ class _WaterWaveChart extends StatelessWidget {
                     },
                   ),
                 ),
-                gridData: const FlGridData(show: false),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  getDrawingHorizontalLine: (value) {
+                    return FlLine(
+                      color: colors.onSurfaceVariant.withValues(alpha: 0.05),
+                      strokeWidth: 1,
+                    );
+                  },
+                ),
                 titlesData: FlTitlesData(
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
@@ -200,7 +209,26 @@ class _WaterWaveChart extends StatelessWidget {
                       },
                     ),
                   ),
-                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 32,
+                      interval: 1000,
+                      getTitlesWidget: (value, meta) {
+                        return SideTitleWidget(
+                          meta: meta,
+                          child: Text(
+                            '${value.toInt()}',
+                            style: TextStyle(
+                              color: colors.onSurfaceVariant.withValues(alpha: 0.6),
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                   rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
@@ -237,11 +265,6 @@ class _WaterWaveChart extends StatelessWidget {
                 minY: 0,
                 maxY: max((target * 1.5).ceilToDouble(), data.fold<double>(0, (m, d) => max(m, d.amountMl.toDouble())) * 1.2),
               ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Center(
-            child: Text('${controller.tr('chart_target')} ${(target / 1000).toStringAsFixed(2)} L', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -301,7 +324,16 @@ class _SleepLineChart extends StatelessWidget {
                     },
                   ),
                 ),
-                gridData: const FlGridData(show: false),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  getDrawingHorizontalLine: (value) {
+                    return FlLine(
+                      color: colors.onSurfaceVariant.withValues(alpha: 0.05),
+                      strokeWidth: 1,
+                    );
+                  },
+                ),
                 titlesData: FlTitlesData(
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
@@ -322,7 +354,27 @@ class _SleepLineChart extends StatelessWidget {
                       },
                     ),
                   ),
-                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 24,
+                      interval: 2,
+                      getTitlesWidget: (value, meta) {
+                        if (value == 0) return const SizedBox.shrink();
+                        return SideTitleWidget(
+                          meta: meta,
+                          child: Text(
+                            '${value.toInt()}',
+                            style: TextStyle(
+                              color: colors.onSurfaceVariant.withValues(alpha: 0.6),
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                   rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
