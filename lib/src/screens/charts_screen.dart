@@ -184,6 +184,7 @@ class _WaterWaveChart extends StatelessWidget {
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
+                  horizontalInterval: 1000,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
                       color: colors.onSurfaceVariant.withValues(alpha: 0.3),
@@ -336,6 +337,7 @@ class _SleepLineChart extends StatelessWidget {
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
+                  horizontalInterval: 2,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
                       color: colors.onSurfaceVariant.withValues(alpha: 0.3),
