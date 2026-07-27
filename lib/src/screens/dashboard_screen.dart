@@ -819,27 +819,64 @@ class _ChartsButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return AuraCard(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.zero,
+      color: colors.primary.withValues(alpha: 0.05),
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(22),
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const ChartsScreen()));
         },
-        child: Row(
-          children: [
-            Container(
-              width: 40, height: 40,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [colors.primary, colors.primary.withValues(alpha: 0.8)],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colors.primary.withValues(alpha: 0.25),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.analytics_outlined, color: Colors.white, size: 24),
               ),
-              child: Icon(Icons.bar_chart, color: Theme.of(context).colorScheme.primary, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Expanded(child: Text(controller.tr('dash_charts'), style: Theme.of(context).textTheme.titleSmall)),
-            Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.primary),
-          ],
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      controller.tr('dash_charts'),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: colors.primary,
+                          ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Son 3 aya kadar su ve uyku gelişimini analiz et',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colors.onSurfaceVariant.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, color: colors.primary, size: 16),
+            ],
+          ),
         ),
       ),
     );
