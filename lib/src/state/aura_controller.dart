@@ -192,12 +192,7 @@ class AuraController extends ChangeNotifier {
     storage.saveCrashReportsEnabled(val);
     notifyListeners();
   }
-      await storage.saveBiometricEnabled(false);
-      await storage.saveBiometricUserTc(null);
-    }
-    notifyListeners();
-    return true;
-  }
+
 
   Future<bool> loginWithBiometrics() async {
     final isSupported = await biometric.isBiometricsSupported();
