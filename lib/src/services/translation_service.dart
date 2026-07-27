@@ -259,6 +259,7 @@ class TranslationService {
     'chart_liters_per_day': {'tr': 'L/gün', 'en': 'L/day'},
     'prof_age_suffix': {'tr': 'yaş', 'en': 'years old'},
     'dash_charts_sub': {'tr': 'Son 3 aya kadar su ve uyku gelişimini analiz et', 'en': 'Analyze water & sleep progress up to 3 months'},
+    'dash_no_sleep_logs': {'tr': 'Henüz uyku kaydı yok', 'en': 'No sleep records yet'},
     'act_low': {'tr': 'Düşük', 'en': 'Low'},
     'act_balanced': {'tr': 'Dengeli', 'en': 'Balanced'},
     'act_active': {'tr': 'Aktif', 'en': 'Active'},

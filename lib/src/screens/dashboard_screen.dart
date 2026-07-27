@@ -1080,7 +1080,7 @@ class _SleepCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '${isToday ? controller.tr('day_today') : controller.tr('day_yesterday')}: ${displaySleep.hours} saat',
+                  '${isToday ? controller.tr('day_today') : controller.tr('day_yesterday')}: ${displaySleep.hours} ${controller.tr('sleep_hours_unit')}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 8),
@@ -1089,12 +1089,12 @@ class _SleepCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              '${controller.tr('dash_target')}: ${target.toStringAsFixed(1)} saat',
+              '${controller.tr('dash_target')}: ${target.toStringAsFixed(1)} ${controller.tr('sleep_hours_unit')}',
               style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
             ),
           ] else ...[
             Text(
-              'Henüz uyku kaydı yok',
+              controller.tr('dash_no_sleep_logs'),
               style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
           ],
@@ -1472,7 +1472,7 @@ class _WeeklySleepChart extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Hedef: ${target.toStringAsFixed(1)} saat',
+                '${controller.tr('dash_target')}: ${target.toStringAsFixed(1)} ${controller.tr('sleep_hours_unit')}',
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
               ),
             ],

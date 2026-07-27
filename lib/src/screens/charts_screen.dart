@@ -294,7 +294,7 @@ class _SleepLineChart extends StatelessWidget {
                       return spots.map((s) {
                         final day = data[s.spotIndex];
                         return LineTooltipItem(
-                          '${DateFormat('dd MMM').format(day.date)}\n${s.y.toStringAsFixed(1)} saat',
+                          '${DateFormat('dd MMM').format(day.date)}\n${s.y.toStringAsFixed(1)} ${controller.tr('sleep_hours_unit')}',
                           const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
                         );
                       }).toList();

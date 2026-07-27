@@ -222,7 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           '${(HealthCalculator.dailyWaterTargetMl(profile) / 1000).toStringAsFixed(2)} L'),
                       const Divider(height: 20),
                       _targetRow(context, Icons.nights_stay, controller.tr('prof_sleep_target'),
-                          '${HealthCalculator.recommendedSleepHours(profile).toStringAsFixed(1)} saat'),
+                          '${HealthCalculator.recommendedSleepHours(profile).toStringAsFixed(1)} ${controller.tr('sleep_hours_unit')}'),
                     ],
                   ),
                 ),
