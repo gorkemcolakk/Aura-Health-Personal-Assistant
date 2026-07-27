@@ -106,6 +106,10 @@ class _WaterWaveChart extends StatelessWidget {
     final totalMl = data.fold<int>(0, (sum, item) => sum + item.amountMl);
     final avgMl = data.isEmpty ? 0 : totalMl / data.length;
 
+    final maxVal = data.fold<double>(0, (m, d) => max(m, d.amountMl.toDouble()));
+    final computedMax = max(5000.0, maxVal);
+    final maxY = ((computedMax / 1000).ceil() * 1000).toDouble();
+
     final colors = Theme.of(context).colorScheme;
 
     return AuraCard(
@@ -263,7 +267,7 @@ class _WaterWaveChart extends StatelessWidget {
                   ),
                 ],
                 minY: 0,
-                maxY: max((target * 1.5).ceilToDouble(), data.fold<double>(0, (m, d) => max(m, d.amountMl.toDouble())) * 1.2),
+                maxY: maxY,
               ),
             ),
           ),
@@ -287,6 +291,10 @@ class _SleepLineChart extends StatelessWidget {
 
     final totalHours = data.fold<double>(0, (sum, item) => sum + item.hours);
     final avgHours = data.isEmpty ? 0 : totalHours / data.length;
+
+    final maxVal = data.fold<double>(0, (m, d) => max(m, d.hours));
+    final computedMax = max(12.0, maxVal);
+    final maxY = ((computedMax / 2).ceil() * 2).toDouble();
 
     return AuraCard(
       child: Column(
@@ -399,7 +407,7 @@ class _SleepLineChart extends StatelessWidget {
                   ),
                 ],
                 minY: 0,
-                maxY: max((target * 1.5).ceilToDouble(), data.fold<double>(0, (m, d) => max(m, d.hours)) * 1.2),
+                maxY: maxY,
               ),
             ),
           ),
