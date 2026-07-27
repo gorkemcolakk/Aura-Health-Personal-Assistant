@@ -128,7 +128,16 @@ VKİ değerin yaklaşık ${bmi.toStringAsFixed(1)} ve kategori "$label". Günlü
 
     try {
       final waterTarget = HealthCalculator.dailyWaterTargetMl(profile);
+      final sleepTarget = HealthCalculator.recommendedSleepHours(profile);
       final bmi = HealthCalculator.bmi(profile);
+      
+      final dataSleep = HealthCalculator.getHistoricalSleepData(profile, days: days);
+      final avgSleep = dataSleep.isEmpty ? 0.0 : dataSleep.map((e) => e.hours).reduce((a, b) => a + b) / days;
+      final reachedSleepDays = dataSleep.where((d) => d.hours >= sleepTarget).length;
+
+      final dataWater = HealthCalculator.getHistoricalWaterData(profile, days: days);
+      final avgWater = dataWater.isEmpty ? 0.0 : dataWater.map((e) => e.amountMl).reduce((a, b) => a + b) / days;
+      final reachedWaterDays = dataWater.where((d) => d.amountMl >= waterTarget).length;
       
       final systemPrompt = '''Sen uzman bir doktora ön değerlendirme sunan tıbbi asistan "Aura"sın.
 Hastanın bilgileri:
@@ -136,14 +145,13 @@ Hastanın bilgileri:
 - Mevcut Durum/Hastalık: ${profile.conditions.isEmpty ? 'Yok' : profile.conditions}
 - Alerjiler: ${profile.allergies.isEmpty ? 'Yok' : profile.allergies}
 - Sağlık Hedefi: ${profile.healthGoal}
-- Günlük Su Hedefi: $waterTarget ml
 
 Rapor Periyodu: Son $days Günlük Veriler
+- Ortalama Uyku Süresi: ${avgSleep.toStringAsFixed(1)} saat/gün (Hedef: ${sleepTarget.toStringAsFixed(1)} saat, Hedefe ulaşılan gün sayısı: $reachedSleepDays/$days)
+- Ortalama Su Tüketimi: ${avgWater.round()} ml/gün (Hedef: $waterTarget ml, Hedefe ulaşılan gün sayısı: $reachedWaterDays/$days)
 
-Görevin: Bu verileri okuyan uzman doktor için kapsamlı ve detaylı (yaklaşık 5-7 cümlelik) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın cinsiyeti, yaş, VKİ, alerjileri, mevcut durumu ve sağlık hedeflerini dikkate alarak profesyonel bir tıbbi dille açıklama yap. Gerekli önerileri ve dikkat edilmesi gereken noktaları da belirt. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.
+Görevin: Bu verileri ve geçmiş performansları okuyan uzman doktor için kapsamlı ve detaylı (yaklaşık 5-7 cümlelik) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın cinsiyeti, yaş, VKİ, alerjileri, mevcut durumu, sağlık hedefleri ve bu süreçteki uyku/su karnesini dikkate alarak profesyonel bir tıbbi dille açıklama yap. Gerekli önerileri ve dikkat edilmesi gereken noktaları da belirt. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.
 IMPORTANT: You MUST reply in the language specified by the ISO code: "$langCode". If it's "en", reply entirely in English. If it's "tr", reply entirely in Turkish.''';
-
-IMPORTANT: You MUST write the report in the language specified by the ISO code: "$langCode". If it's "en", write entirely in English. If it's "tr", write entirely in Turkish.''';
 
       final userContent = langCode == 'en' 
           ? 'Please generate a comprehensive patient summary for the doctor report. Write approximately 5 to 7 sentences covering the patient condition, risks, and recommendations.' 
