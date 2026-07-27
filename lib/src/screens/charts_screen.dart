@@ -186,7 +186,7 @@ class _WaterWaveChart extends StatelessWidget {
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
-                      color: colors.onSurfaceVariant.withValues(alpha: 0.05),
+                      color: colors.onSurfaceVariant.withValues(alpha: 0.15),
                       strokeWidth: 1,
                     );
                   },
@@ -216,15 +216,15 @@ class _WaterWaveChart extends StatelessWidget {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 32,
+                      reservedSize: 48,
                       interval: 1000,
                       getTitlesWidget: (value, meta) {
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
-                            '${value.toInt()}',
+                            '${value.toInt()} ${controller.tr('chart_water_unit')}',
                             style: TextStyle(
-                              color: colors.onSurfaceVariant.withValues(alpha: 0.6),
+                              color: colors.onSurfaceVariant.withValues(alpha: 0.8),
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
                             ),
@@ -338,7 +338,7 @@ class _SleepLineChart extends StatelessWidget {
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
-                      color: colors.onSurfaceVariant.withValues(alpha: 0.05),
+                      color: colors.onSurfaceVariant.withValues(alpha: 0.15),
                       strokeWidth: 1,
                     );
                   },
@@ -366,16 +366,16 @@ class _SleepLineChart extends StatelessWidget {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 24,
+                      reservedSize: 32,
                       interval: 2,
                       getTitlesWidget: (value, meta) {
                         if (value == 0) return const SizedBox.shrink();
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
-                            '${value.toInt()}',
+                            '${value.toInt()} ${controller.tr('chart_sleep_unit')}',
                             style: TextStyle(
-                              color: colors.onSurfaceVariant.withValues(alpha: 0.6),
+                              color: colors.onSurfaceVariant.withValues(alpha: 0.8),
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
                             ),
