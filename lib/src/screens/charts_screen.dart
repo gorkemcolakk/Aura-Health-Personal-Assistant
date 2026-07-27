@@ -265,6 +265,7 @@ class _WaterWaveChart extends StatelessWidget {
                 minY: 0,
                 maxY: max((target * 1.5).ceilToDouble(), data.fold<double>(0, (m, d) => max(m, d.amountMl.toDouble())) * 1.2),
               ),
+            ),
           ),
         ],
       ),
