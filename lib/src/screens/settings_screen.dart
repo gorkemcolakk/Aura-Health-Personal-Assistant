@@ -15,6 +15,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    String maskTc(String? tc) {
+      if (tc == null || tc.length != 11) return '***';
+      return '${tc.substring(0,3)}*****${tc.substring(9,11)}';
+    }
+
     return Scaffold(
       backgroundColor: colors.surface,
       appBar: AppBar(
@@ -24,6 +29,65 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
+          // 1. Account Management
+          _SectionTitle(title: controller.tr('settings_account_mgmt')),
+          _SettingsCard(
+            child: Column(
+              children: [
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.person_outline),
+                  title: Text(controller.currentUserName ?? 'Kullanıcı'),
+                  subtitle: Text('T.C: ${maskTc(controller.currentUserTc)}'),
+                ),
+                const Divider(height: 24),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.password_outlined),
+                  title: Text(controller.tr('settings_change_password')),
+                  subtitle: Text(controller.tr('settings_change_password_sub')),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _showChangePasswordDialog(context, controller),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // 2. Notification Preferences
+          _SectionTitle(title: controller.tr('settings_notifications')),
+          _SettingsCard(
+            child: Column(
+              children: [
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  secondary: const Icon(Icons.water_drop_outlined),
+                  title: Text(controller.tr('settings_water_reminders')),
+                  value: controller.waterRemindersEnabled,
+                  onChanged: (val) => controller.setWaterRemindersEnabled(val),
+                ),
+                const Divider(height: 16),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  secondary: const Icon(Icons.medical_services_outlined),
+                  title: Text(controller.tr('settings_meds_alarms')),
+                  value: controller.medsAlarmsEnabled,
+                  onChanged: (val) => controller.setMedsAlarmsEnabled(val),
+                ),
+                const Divider(height: 16),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  secondary: const Icon(Icons.analytics_outlined),
+                  title: Text(controller.tr('settings_weekly_report')),
+                  value: controller.weeklyReportEnabled,
+                  onChanged: (val) => controller.setWeeklyReportEnabled(val),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // 3. Appearance & Language
           _SectionTitle(title: controller.tr('settings_appearance')),
           _SettingsCard(
             child: Column(
@@ -84,6 +148,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 24),
+
+          // 4. Data & Privacy
           _SectionTitle(title: controller.tr('settings_data_privacy')),
           _SettingsCard(
             child: Column(
@@ -116,6 +182,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 24),
+
+          // 5. Diagnostics & Support
+          _SectionTitle(title: controller.tr('settings_diagnostics')),
+          _SettingsCard(
+            child: Column(
+              children: [
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  secondary: const Icon(Icons.bug_report_outlined),
+                  title: Text(controller.tr('settings_crash_reports')),
+                  value: controller.crashReportsEnabled,
+                  onChanged: (val) => controller.setCrashReportsEnabled(val),
+                ),
+                const Divider(height: 16),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.help_outline),
+                  title: Text(controller.tr('settings_support_ticket')),
+                  subtitle: Text(controller.tr('settings_support_ticket_sub')),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _showSupportDialog(context, controller),
+                ),
+              ],
+            ),
+          ),
+
           const SizedBox(height: 32),
           Center(
             child: Column(
@@ -129,7 +222,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'v1.0.2',
+                  'v1.0.3',
                   style: textTheme.bodySmall?.copyWith(
                     color: colors.onSurfaceVariant,
                   ),
@@ -138,6 +231,99 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+
+  void _showChangePasswordDialog(BuildContext context, controller) {
+    final oldPasswordCtrl = TextEditingController();
+    final newPasswordCtrl = TextEditingController();
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: Text(controller.tr('dialog_change_password_title')),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: oldPasswordCtrl,
+                obscureText: true,
+                decoration: InputDecoration(labelText: controller.tr('old_password')),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: newPasswordCtrl,
+                obscureText: true,
+                decoration: InputDecoration(labelText: controller.tr('new_password')),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(controller.tr('btn_cancel')),
+            ),
+            FilledButton(
+              onPressed: isLoading ? null : () async {
+                setState(() => isLoading = true);
+                final success = await controller.changePassword(
+                  oldPasswordCtrl.text,
+                  newPasswordCtrl.text,
+                );
+                setState(() => isLoading = false);
+                
+                if (!mounted) return;
+                Navigator.pop(ctx);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      controller.tr(success ? 'msg_password_changed' : 'msg_password_error'),
+                    ),
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
+                );
+              },
+              child: isLoading 
+                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : Text(controller.tr('btn_save')),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSupportDialog(BuildContext context, controller) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(controller.tr('dialog_support_title')),
+        content: const TextField(
+          maxLines: 4,
+          decoration: InputDecoration(
+            hintText: 'Lütfen karşılaştığınız sorunu veya önerinizi buraya yazın...',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(controller.tr('btn_cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(controller.tr('msg_support_sent'))),
+              );
+            },
+            child: const Text('Gönder'),
+          ),
         ],
       ),
     );

@@ -85,6 +85,46 @@ class StorageService {
     await prefs.setString('aura.language_code', code);
   }
 
+  Future<bool> loadWaterRemindersEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('aura.water_reminders') ?? true;
+  }
+
+  Future<void> saveWaterRemindersEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('aura.water_reminders', enabled);
+  }
+
+  Future<bool> loadMedsAlarmsEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('aura.meds_alarms') ?? true;
+  }
+
+  Future<void> saveMedsAlarmsEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('aura.meds_alarms', enabled);
+  }
+
+  Future<bool> loadWeeklyReportEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('aura.weekly_report') ?? true;
+  }
+
+  Future<void> saveWeeklyReportEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('aura.weekly_report', enabled);
+  }
+
+  Future<bool> loadCrashReportsEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('aura.crash_reports') ?? true;
+  }
+
+  Future<void> saveCrashReportsEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('aura.crash_reports', enabled);
+  }
+
   Future<bool> loadBiometricEnabled() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('aura.biometric_enabled') ?? false;

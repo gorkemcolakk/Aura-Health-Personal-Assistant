@@ -89,6 +89,78 @@ class TranslationService {
       'tr': 'Biyometrik doğrulama kurulamadı.',
       'en': 'Biometric authentication could not be set up.',
     },
+    'settings_notifications': {
+      'tr': 'Bildirim Tercihleri',
+      'en': 'Notification Preferences',
+    },
+    'settings_water_reminders': {
+      'tr': 'Su Hatırlatıcıları',
+      'en': 'Water Reminders',
+    },
+    'settings_meds_alarms': {
+      'tr': 'İlaç Alarmları',
+      'en': 'Medication Alarms',
+    },
+    'settings_weekly_report': {
+      'tr': 'Haftalık Sağlık Raporu Bildirimi',
+      'en': 'Weekly Health Report Notification',
+    },
+    'settings_account_mgmt': {
+      'tr': 'Hesap Yönetimi',
+      'en': 'Account Management',
+    },
+    'settings_change_password': {
+      'tr': 'Şifre Değiştir',
+      'en': 'Change Password',
+    },
+    'settings_change_password_sub': {
+      'tr': 'Hesap şifrenizi güvenle güncelleyin',
+      'en': 'Update your account password securely',
+    },
+    'settings_diagnostics': {
+      'tr': 'Destek ve Tanılama',
+      'en': 'Diagnostics & Support',
+    },
+    'settings_crash_reports': {
+      'tr': 'Anonim kullanım ve çökme raporlarını paylaş',
+      'en': 'Share anonymous usage and crash reports',
+    },
+    'settings_support_ticket': {
+      'tr': 'Destek Talebi Oluştur',
+      'en': 'Create Support Ticket',
+    },
+    'settings_support_ticket_sub': {
+      'tr': 'Hata bildirimi yapın veya yardım isteyin',
+      'en': 'Report a bug or ask for help',
+    },
+    'dialog_change_password_title': {
+      'tr': 'Şifre Değiştir',
+      'en': 'Change Password',
+    },
+    'dialog_support_title': {
+      'tr': 'Destek Talebi',
+      'en': 'Support Ticket',
+    },
+    'old_password': {
+      'tr': 'Mevcut Şifre',
+      'en': 'Current Password',
+    },
+    'new_password': {
+      'tr': 'Yeni Şifre',
+      'en': 'New Password',
+    },
+    'msg_password_changed': {
+      'tr': 'Şifreniz başarıyla değiştirildi.',
+      'en': 'Your password has been changed successfully.',
+    },
+    'msg_password_error': {
+      'tr': 'Mevcut şifreniz hatalı. Lütfen tekrar deneyin.',
+      'en': 'Current password is incorrect. Please try again.',
+    },
+    'msg_support_sent': {
+      'tr': 'Destek talebiniz başarıyla gönderildi!',
+      'en': 'Your support ticket has been sent successfully!',
+    },
 
     // Bottom Nav
     'nav_today': {'tr': 'Bugün', 'en': 'Today'},

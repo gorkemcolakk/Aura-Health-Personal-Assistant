@@ -38,6 +38,11 @@ class AuraController extends ChangeNotifier {
   bool biometricEnabled = false;
   String? biometricUserTc;
 
+  bool waterRemindersEnabled = true;
+  bool medsAlarmsEnabled = true;
+  bool weeklyReportEnabled = true;
+  bool crashReportsEnabled = true;
+
   bool get isBiometricEnabledForCurrentUser => biometricEnabled && biometricUserTc == currentUserTc;
 
   String? currentUserTc;
@@ -71,6 +76,10 @@ class AuraController extends ChangeNotifier {
     languageCode = await storage.loadLanguageCode() ?? 'tr';
     biometricEnabled = await storage.loadBiometricEnabled();
     biometricUserTc = await storage.loadBiometricUserTc();
+    waterRemindersEnabled = await storage.loadWaterRemindersEnabled();
+    medsAlarmsEnabled = await storage.loadMedsAlarmsEnabled();
+    weeklyReportEnabled = await storage.loadWeeklyReportEnabled();
+    crashReportsEnabled = await storage.loadCrashReportsEnabled();
     // Do not load profile/medications until user logs in.
     
     _medicationTimer?.cancel();
@@ -111,6 +120,11 @@ class AuraController extends ChangeNotifier {
     return false;
   }
 
+  Future<bool> changePassword(String oldPassword, String newPassword) async {
+    if (currentUserTc == null) return false;
+    return await db.updatePassword(currentUserTc!, oldPassword, newPassword);
+  }
+
   Future<void> logout() async {
     currentUserTc = null;
     currentUserName = null;
@@ -148,6 +162,36 @@ class AuraController extends ChangeNotifier {
     } else {
       biometricEnabled = false;
       biometricUserTc = null;
+      await storage.saveBiometricEnabled(false);
+      await storage.saveBiometricUserTc(null);
+    }
+    notifyListeners();
+    return true;
+  }
+
+  void setWaterRemindersEnabled(bool val) {
+    waterRemindersEnabled = val;
+    storage.saveWaterRemindersEnabled(val);
+    notifyListeners();
+  }
+
+  void setMedsAlarmsEnabled(bool val) {
+    medsAlarmsEnabled = val;
+    storage.saveMedsAlarmsEnabled(val);
+    notifyListeners();
+  }
+
+  void setWeeklyReportEnabled(bool val) {
+    weeklyReportEnabled = val;
+    storage.saveWeeklyReportEnabled(val);
+    notifyListeners();
+  }
+
+  void setCrashReportsEnabled(bool val) {
+    crashReportsEnabled = val;
+    storage.saveCrashReportsEnabled(val);
+    notifyListeners();
+  }
       await storage.saveBiometricEnabled(false);
       await storage.saveBiometricUserTc(null);
     }

@@ -101,6 +101,31 @@ class DatabaseService {
     return null;
   }
 
+  Future<bool> updatePassword(String tc, String oldPassword, String newPassword) async {
+    final db = await database;
+    
+    // Verify old password
+    final results = await db.query(
+      'users',
+      where: 'tc = ? AND password_hash = ?',
+      whereArgs: [tc, _hashPassword(oldPassword)],
+    );
+    
+    if (results.isEmpty) {
+      return false;
+    }
+    
+    // Update to new password
+    await db.update(
+      'users',
+      {'password_hash': _hashPassword(newPassword)},
+      where: 'tc = ?',
+      whereArgs: [tc],
+    );
+    
+    return true;
+  }
+
   Future<Map<String, dynamic>?> getUser(String tc) async {
     final db = await database;
     final results = await db.query(

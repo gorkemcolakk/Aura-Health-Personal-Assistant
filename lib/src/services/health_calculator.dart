@@ -63,25 +63,26 @@ class HealthCalculator {
   static List<DailyWater> getWeeklyWaterData(HealthProfile profile) {
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
-    final mondayStart = todayStart.subtract(Duration(days: todayStart.weekday - 1));
+    final windowStart = todayStart.subtract(const Duration(days: 6));
     
     final Map<int, int> amounts = {for (var i = 0; i < 7; i++) i: 0};
     
     for (final log in profile.waterLogs) {
       final logDay = DateTime(log.timestamp.year, log.timestamp.month, log.timestamp.day);
-      final differenceFromMonday = logDay.difference(mondayStart).inDays;
-      if (differenceFromMonday >= 0 && differenceFromMonday < 7) {
-        amounts[differenceFromMonday] = (amounts[differenceFromMonday] ?? 0) + log.amountMl;
+      final difference = logDay.difference(windowStart).inDays;
+      if (difference >= 0 && difference < 7) {
+        amounts[difference] = (amounts[difference] ?? 0) + log.amountMl;
       }
     }
 
-    final weekdays = ['day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun'];
+    final dayKeys = ['day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun'];
     final result = <DailyWater>[];
     
     for (var i = 0; i < 7; i++) {
-      final date = mondayStart.add(Duration(days: i));
+      final date = windowStart.add(Duration(days: i));
       final isToday = date.isAtSameMomentAs(todayStart);
-      result.add(DailyWater(weekdays[i], amounts[i]!, isToday: isToday));
+      final key = dayKeys[date.weekday - 1];
+      result.add(DailyWater(key, amounts[i]!, isToday: isToday));
     }
     
     return result;
@@ -90,27 +91,28 @@ class HealthCalculator {
   static List<DailySleep> getWeeklySleepData(HealthProfile profile) {
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
-    final mondayStart = todayStart.subtract(Duration(days: todayStart.weekday - 1));
+    final windowStart = todayStart.subtract(const Duration(days: 6));
     
     final Map<int, double> hours = {for (var i = 0; i < 7; i++) i: 0.0};
     final Map<int, String> feelings = {for (var i = 0; i < 7; i++) i: ''};
 
     for (final log in profile.sleepLogs) {
       final logDay = DateTime(log.date.year, log.date.month, log.date.day);
-      final differenceFromMonday = logDay.difference(mondayStart).inDays;
-      if (differenceFromMonday >= 0 && differenceFromMonday < 7) {
-        hours[differenceFromMonday] = (hours[differenceFromMonday] ?? 0.0) + log.hours;
-        feelings[differenceFromMonday] = log.feeling;
+      final difference = logDay.difference(windowStart).inDays;
+      if (difference >= 0 && difference < 7) {
+        hours[difference] = (hours[difference] ?? 0.0) + log.hours;
+        feelings[difference] = log.feeling;
       }
     }
 
-    final weekdays = ['day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun'];
+    final dayKeys = ['day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun'];
     final result = <DailySleep>[];
     
     for (var i = 0; i < 7; i++) {
-      final date = mondayStart.add(Duration(days: i));
+      final date = windowStart.add(Duration(days: i));
       final isToday = date.isAtSameMomentAs(todayStart);
-      result.add(DailySleep(weekdays[i], hours[i]!, isToday: isToday, feeling: feelings[i]!));
+      final key = dayKeys[date.weekday - 1];
+      result.add(DailySleep(key, hours[i]!, isToday: isToday, feeling: feelings[i]!));
     }
     
     return result;
