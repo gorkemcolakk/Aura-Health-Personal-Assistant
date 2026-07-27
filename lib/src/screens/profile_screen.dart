@@ -375,7 +375,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const SizedBox(height: 4),
                           Text(
                             controller.tr('prof_pdf_sub'),
-                            style: const TextStyle(color: Colors.grey, fontSize: 12),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
                           ),
                         ],
                       ),
