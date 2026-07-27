@@ -186,7 +186,7 @@ class _WaterWaveChart extends StatelessWidget {
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
-                      color: colors.onSurfaceVariant.withValues(alpha: 0.15),
+                      color: colors.onSurfaceVariant.withValues(alpha: 0.3),
                       strokeWidth: 1,
                     );
                   },
@@ -338,7 +338,7 @@ class _SleepLineChart extends StatelessWidget {
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
-                      color: colors.onSurfaceVariant.withValues(alpha: 0.15),
+                      color: colors.onSurfaceVariant.withValues(alpha: 0.3),
                       strokeWidth: 1,
                     );
                   },
