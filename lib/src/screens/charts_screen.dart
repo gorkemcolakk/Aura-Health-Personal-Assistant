@@ -216,13 +216,13 @@ class _WaterWaveChart extends StatelessWidget {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 48,
+                      reservedSize: 24,
                       interval: 1000,
                       getTitlesWidget: (value, meta) {
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
-                            '${value.toInt()} ${controller.tr('chart_water_unit')}',
+                            '${(value / 1000).toInt()} ${controller.tr('chart_water_unit')}',
                             style: TextStyle(
                               color: colors.onSurfaceVariant.withValues(alpha: 0.8),
                               fontSize: 9,

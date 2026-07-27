@@ -260,7 +260,7 @@ class TranslationService {
     'prof_age_suffix': {'tr': 'yaş', 'en': 'years old'},
     'dash_charts_sub': {'tr': 'Son 3 aya kadar su ve uyku verilerini görüntüle', 'en': 'View water & sleep data up to 3 months'},
     'dash_no_sleep_logs': {'tr': 'Henüz uyku kaydı yok', 'en': 'No sleep records yet'},
-    'chart_water_unit': {'tr': 'ml', 'en': 'ml'},
+    'chart_water_unit': {'tr': 'L', 'en': 'L'},
     'chart_sleep_unit': {'tr': 'sa', 'en': 'h'},
     'act_low': {'tr': 'Düşük', 'en': 'Low'},
     'act_balanced': {'tr': 'Dengeli', 'en': 'Balanced'},
