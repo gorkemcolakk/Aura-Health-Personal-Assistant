@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/health_profile.dart';
 import '../services/health_calculator.dart';
 import '../state/aura_scope.dart';
+import '../state/aura_controller.dart';
 import '../widgets/aura_card.dart';
 import 'pdf_preview_screen.dart';
 
