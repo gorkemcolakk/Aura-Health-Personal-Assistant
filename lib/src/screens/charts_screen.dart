@@ -270,11 +270,11 @@ class _SleepLineChart extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.nights_stay, color: colors.secondary),
+              const Icon(Icons.nights_stay, color: Color(0xFFE76F51)),
               const SizedBox(width: 8),
               Text(controller.tr('chart_sleep_title'), style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
-              Text('${controller.tr('chart_target')} ${target.toStringAsFixed(1)} ${controller.tr('sleep_hours_unit')}', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
+              Text('${controller.tr('chart_target')} ${target.toStringAsFixed(1)} ${controller.tr('sleep_hours_unit')}', style: const TextStyle(color: Color(0xFFE76F51), fontSize: 13, fontWeight: FontWeight.w700)),
             ],
           ),
           const SizedBox(height: 12),
@@ -332,7 +332,7 @@ class _SleepLineChart extends StatelessWidget {
                     spots: data.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value.hours)).toList(),
                     isCurved: true,
                     curveSmoothness: 0.35,
-                    color: colors.secondary,
+                    color: const Color(0xFFE76F51),
                     barWidth: 3,
                     dotData: FlDotData(show: false),
                     belowBarData: BarAreaData(
@@ -340,7 +340,7 @@ class _SleepLineChart extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [colors.secondary.withValues(alpha: 0.2), colors.secondary.withValues(alpha: 0.02)],
+                        colors: [const Color(0xFFE76F51).withValues(alpha: 0.2), const Color(0xFFE76F51).withValues(alpha: 0.02)],
                       ),
                     ),
                   ),
@@ -386,11 +386,11 @@ class _SleepBars extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.nights_stay, color: colors.secondary),
+              const Icon(Icons.nights_stay, color: Color(0xFFE76F51)),
               const SizedBox(width: 8),
               Text(controller.tr('chart_sleep_title'), style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
-              Text('${controller.tr('chart_target')} ${target.toStringAsFixed(1)} ${controller.tr('sleep_hours_unit')}', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
+              Text('${controller.tr('chart_target')} ${target.toStringAsFixed(1)} ${controller.tr('sleep_hours_unit')}', style: const TextStyle(color: Color(0xFFE76F51), fontSize: 13, fontWeight: FontWeight.w700)),
             ],
           ),
           const SizedBox(height: 12),
@@ -438,7 +438,7 @@ class _SleepBars extends StatelessWidget {
                           top: 2,
                           child: Align(
                             alignment: Alignment(1.0.clamp(0.0, 1.0) * 2 - 1, 0),
-                            child: Container(width: 2, height: 20, color: colors.primary.withValues(alpha: 0.3)),
+                            child: Container(width: 2, height: 20, color: const Color(0xFFE76F51).withValues(alpha: 0.3)),
                           ),
                         ),
                       ],
@@ -469,9 +469,9 @@ class _SleepBars extends StatelessWidget {
             spacing: 16,
             runSpacing: 8,
             children: [
-              _legendDot(context, const Color(0xFFFFB300), controller.tr('chart_sleep_feeling_energetic')),
-              _legendDot(context, colors.primary, controller.tr('chart_sleep_feeling_normal')),
               _legendDot(context, const Color(0xFFE76F51), controller.tr('chart_sleep_feeling_tired')),
+              _legendDot(context, colors.primary, controller.tr('chart_sleep_feeling_normal')),
+              _legendDot(context, const Color(0xFFFFB300), controller.tr('chart_sleep_feeling_energetic')),
             ],
           ),
         ],
