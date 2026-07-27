@@ -11,20 +11,20 @@ class HealthCalculator {
     return profile.weightKg / (meters * meters);
   }
 
-  static String bmiLabel(double value) {
+  static String bmiLabel(double value, {String lang = 'tr'}) {
     if (value <= 0) {
-      return 'Eksik veri';
+      return lang == 'en' ? 'Missing data' : 'Eksik veri';
     }
     if (value < 18.5) {
-      return 'Düşük';
+      return lang == 'en' ? 'Underweight' : 'Düşük';
     }
     if (value < 25) {
-      return 'Dengeli';
+      return lang == 'en' ? 'Balanced' : 'Dengeli';
     }
     if (value < 30) {
-      return 'Yüksek';
+      return lang == 'en' ? 'Overweight' : 'Yüksek';
     }
-    return 'Çok yüksek';
+    return lang == 'en' ? 'Obese' : 'Çok yüksek';
   }
 
   static int dailyWaterTargetMl(HealthProfile profile) {

@@ -40,7 +40,7 @@ class _ChartsScreenState extends State<ChartsScreen> with TickerProviderStateMix
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('Detaylı Analiz', style: const TextStyle(fontWeight: FontWeight.w700)),
+        title: Text(controller.tr('dash_charts'), style: const TextStyle(fontWeight: FontWeight.w700)),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
       ),
@@ -49,10 +49,10 @@ class _ChartsScreenState extends State<ChartsScreen> with TickerProviderStateMix
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: SegmentedButton<int>(
-              segments: const [
-                ButtonSegment(value: 7, label: Text('7 Gün')),
-                ButtonSegment(value: 30, label: Text('1 Ay')),
-                ButtonSegment(value: 90, label: Text('3 Ay')),
+              segments: [
+                ButtonSegment(value: 7, label: Text(controller.tr('chart_7_days'))),
+                ButtonSegment(value: 30, label: Text(controller.tr('chart_1_month'))),
+                ButtonSegment(value: 90, label: Text(controller.tr('chart_3_months'))),
               ],
               selected: {_selectedDays},
               onSelectionChanged: (Set<int> newSelection) {
@@ -126,7 +126,7 @@ class _WaterWaveChart extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Ortalama: ${(avgMl / 1000).toStringAsFixed(2)} L/gün',
+            '${controller.tr('chart_average')}: ${(avgMl / 1000).toStringAsFixed(2)} ${controller.tr('chart_liters_per_day')}',
             style: TextStyle(color: colors.onSurfaceVariant, fontSize: 14),
           ),
           const SizedBox(height: 20),
@@ -274,12 +274,12 @@ class _SleepLineChart extends StatelessWidget {
               const SizedBox(width: 8),
               Text(controller.tr('chart_sleep_title'), style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
-              Text('${controller.tr('chart_target')} ${target.toStringAsFixed(1)} saat', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
+              Text('${controller.tr('chart_target')} ${target.toStringAsFixed(1)} ${controller.tr('sleep_hours_unit')}', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
             ],
           ),
           const SizedBox(height: 12),
           Text(
-            'Ortalama: ${avgHours.toStringAsFixed(1)} saat/gün',
+            '${controller.tr('chart_average')}: ${avgHours.toStringAsFixed(1)} ${controller.tr('chart_hours_per_day')}',
             style: TextStyle(color: colors.onSurfaceVariant, fontSize: 14),
           ),
           const SizedBox(height: 20),
@@ -390,12 +390,12 @@ class _SleepBars extends StatelessWidget {
               const SizedBox(width: 8),
               Text(controller.tr('chart_sleep_title'), style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
-              Text('${controller.tr('chart_target')} ${target.toStringAsFixed(1)} saat', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
+              Text('${controller.tr('chart_target')} ${target.toStringAsFixed(1)} ${controller.tr('sleep_hours_unit')}', style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700)),
             ],
           ),
           const SizedBox(height: 12),
           Text(
-            'Ortalama: ${avgHours.toStringAsFixed(1)} saat/gün',
+            '${controller.tr('chart_average')}: ${avgHours.toStringAsFixed(1)} ${controller.tr('chart_hours_per_day')}',
             style: TextStyle(color: colors.onSurfaceVariant, fontSize: 14),
           ),
           const SizedBox(height: 16),

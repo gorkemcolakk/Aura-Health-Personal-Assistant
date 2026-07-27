@@ -247,10 +247,22 @@ class TranslationService {
     'btn_delete': {'tr': 'Sil', 'en': 'Delete'},
 
     // Charts
-    'chart_title': {'tr': '📊 Haftalık Grafikler', 'en': '📊 Weekly Charts'},
-    'chart_water_title': {'tr': 'Haftalık Su Tüketimi', 'en': 'Weekly Water Consumption'},
+    'chart_title': {'tr': '📊 Grafiksel Sağlık Analizi', 'en': '📊 Graphical Health Analysis'},
+    'chart_water_title': {'tr': 'Su Tüketimi', 'en': 'Water Consumption'},
     'chart_target': {'tr': 'Hedef', 'en': 'Target'},
-    'chart_sleep_title': {'tr': 'Haftalık Uyku Düzeni', 'en': 'Weekly Sleep Pattern'},
+    'chart_sleep_title': {'tr': 'Uyku Düzeni', 'en': 'Sleep Pattern'},
+    'chart_7_days': {'tr': '7 Gün', 'en': '7 Days'},
+    'chart_1_month': {'tr': '1 Ay', 'en': '1 Month'},
+    'chart_3_months': {'tr': '3 Ay', 'en': '3 Months'},
+    'chart_average': {'tr': 'Ortalama', 'en': 'Average'},
+    'chart_hours_per_day': {'tr': 'saat/gün', 'en': 'hours/day'},
+    'chart_liters_per_day': {'tr': 'L/gün', 'en': 'L/day'},
+    'prof_age_suffix': {'tr': 'yaş', 'en': 'years old'},
+    'dash_charts_sub': {'tr': 'Son 3 aya kadar su ve uyku gelişimini analiz et', 'en': 'Analyze water & sleep progress up to 3 months'},
+    'act_low': {'tr': 'Düşük', 'en': 'Low'},
+    'act_balanced': {'tr': 'Dengeli', 'en': 'Balanced'},
+    'act_active': {'tr': 'Aktif', 'en': 'Active'},
+    'act_athletic': {'tr': 'Yoğun', 'en': 'Athletic'},
     
     // Weekdays
     'day_mon': {'tr': 'Pzt', 'en': 'Mon'},

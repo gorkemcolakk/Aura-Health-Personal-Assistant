@@ -58,7 +58,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               child: _Header(
                 initials: profile.initials,
                 name: profile.name,
-                subtitle: '${profile.activity.label} ${controller.tr('day_today').toLowerCase()} • ${profile.age} yaş',
+                subtitle: '${controller.tr('act_${profile.activity.name}')} ${controller.tr('day_today').toLowerCase()} • ${profile.age} ${controller.tr('prof_age_suffix')}',
               ),
             ),
           ),
@@ -69,7 +69,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 _HeroStatus(
                   firstName: profile.name.trim().split(' ').first,
                   bmi: bmi,
-                  bmiLabel: HealthCalculator.bmiLabel(bmi),
+                  bmiLabel: HealthCalculator.bmiLabel(bmi, lang: controller.languageCode),
                   waterTarget: waterTarget,
                   waterProgress: waterProgress,
                   consumed: HealthCalculator.todayWaterMl(profile),
@@ -397,7 +397,9 @@ class _HeroStatus extends StatelessWidget {
           Text(
             firstName.isEmpty
                 ? controller.tr('dash_health_panel')
-                : "$firstName'${_getPossessiveSuffix(firstName)} ${controller.tr('dash_health_panel')}",
+                : (controller.languageCode == 'en'
+                    ? "$firstName's ${controller.tr('dash_health_panel')}"
+                    : "$firstName'${_getPossessiveSuffix(firstName)} ${controller.tr('dash_health_panel')}"),
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 18),
@@ -407,7 +409,7 @@ class _HeroStatus extends StatelessWidget {
                 child: _WaveCircle(
                   progress: waterProgress,
                   center: '${(consumed / 1000).toStringAsFixed(2)} L',
-                  label: 'Su',
+                  label: controller.tr('dash_water'),
                   animation: animation,
                 ),
               ),
@@ -422,7 +424,7 @@ class _HeroStatus extends StatelessWidget {
                       children: [
                         Text(bmi.toStringAsFixed(1), style: Theme.of(context).textTheme.headlineLarge),
                         const SizedBox(width: 12),
-                        Text('VKİ • $bmiLabel', style: Theme.of(context).textTheme.bodyMedium),
+                        Text('${controller.tr('dash_bmi')} • $bmiLabel', style: Theme.of(context).textTheme.bodyMedium),
                       ],
                     ),
                     const SizedBox(height: 14),
@@ -434,7 +436,7 @@ class _HeroStatus extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Hedef ${(waterTarget / 1000).toStringAsFixed(2)} L',
+                      '${controller.tr('dash_target')} ${(waterTarget / 1000).toStringAsFixed(2)} L',
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 13, fontWeight: FontWeight.w500),
                     ),
                   ],
@@ -864,7 +866,7 @@ class _ChartsButton extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Son 3 aya kadar su ve uyku gelişimini analiz et',
+                      controller.tr('dash_charts_sub'),
                       style: TextStyle(
                         fontSize: 12,
                         color: colors.onSurfaceVariant.withValues(alpha: 0.8),
