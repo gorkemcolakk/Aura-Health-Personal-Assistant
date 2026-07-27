@@ -333,48 +333,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 18),
-          AuraCard(
-            child: FutureBuilder<bool>(
-              future: controller.biometric.isBiometricsSupported(),
-              builder: (context, snapshot) {
-                final isSupported = snapshot.data ?? false;
-                if (!isSupported) {
-                  return Text(
-                    controller.tr('prof_bio_not_supported'),
-                    style: const TextStyle(color: Colors.grey, fontSize: 13),
-                  );
-                }
 
-                return SwitchListTile(
-                  title: Text(controller.tr('settings_biometric')),
-                  subtitle: Text(controller.tr('settings_biometric_sub')),
-                  secondary: const Icon(Icons.fingerprint),
-                  contentPadding: EdgeInsets.zero,
-                  value: controller.isBiometricEnabledForCurrentUser,
-                  onChanged: (bool value) async {
-                    final success = await controller.setBiometricEnabled(value);
-                    if (!context.mounted) return;
-                    if (success) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(value
-                              ? controller.tr('prof_bio_on')
-                              : controller.tr('prof_bio_off')),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(controller.tr('prof_bio_fail')),
-                        ),
-                      );
-                    }
-                  },
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 18),
           AuraCard(
             child: InkWell(
               borderRadius: BorderRadius.circular(14),

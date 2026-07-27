@@ -199,29 +199,22 @@ class PdfService {
 
               pw.Spacer(),
 
-              // ── Uyarı Footer ─────────────────────────────────────────
               pw.Container(
-                padding: const pw.EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+                width: double.infinity,
+                padding: const pw.EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: pw.BoxDecoration(
-                  color: const PdfColor.fromInt(0xFFEBF5FB), // açık mavi arka plan
+                  color: const PdfColor.fromInt(0xFFEBF5FB),
                   borderRadius: const pw.BorderRadius.all(pw.Radius.circular(10)),
-                  border: pw.Border.all(color: const PdfColor.fromInt(0xFF2E86C1), width: 1.5),
+                  border: pw.Border.all(color: const PdfColor.fromInt(0xFF1B4F72), width: 1.5),
                 ),
-                child: pw.Row(
-                  children: [
-                    pw.Text('⚠  ', style: pw.TextStyle(fontSize: 16, font: fontBold, color: const PdfColor.fromInt(0xFF1A5276))),
-                    pw.Expanded(
-                      child: pw.Text(
-                        TranslationService.get('pdf_footer_warning', langCode),
-                        textAlign: pw.TextAlign.center,
-                        style: pw.TextStyle(
-                          fontSize: 14,
-                          font: fontBold,
-                          color: const PdfColor.fromInt(0xFF1A5276), // koyu mavi - okunabilir
-                        ),
-                      ),
-                    ),
-                  ],
+                child: pw.Text(
+                  TranslationService.get('pdf_footer_warning', langCode),
+                  textAlign: pw.TextAlign.center,
+                  style: pw.TextStyle(
+                    fontSize: 15,
+                    font: fontBold,
+                    color: const PdfColor.fromInt(0xFF0A223B), // Dark navy for maximum readability
+                  ),
                 ),
               ),
             ],
