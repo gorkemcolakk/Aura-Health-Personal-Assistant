@@ -384,6 +384,14 @@ class _NearbyScreenState extends State<NearbyScreen> {
                       onMapReady: () {
                         _isMapReady = true;
                       },
+                      onTap: (tapPosition, point) {
+                        setState(() {
+                          _currentLocation = point;
+                          _searchController.text = '${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)}';
+                          _loading = true;
+                        });
+                        _searchNearby(point);
+                      },
                     ),
                     children: [
                       TileLayer(
