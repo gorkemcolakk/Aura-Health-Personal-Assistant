@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../state/aura_scope.dart';
+import '../models/health_profile.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -11,6 +12,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _tcController = TextEditingController();
   final _nameController = TextEditingController();
+  final _birthDateController = TextEditingController();
   final _passwordController = TextEditingController();
   String _gender = 'Erkek';
   bool _isLoading = false;
@@ -20,6 +22,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void dispose() {
     _tcController.dispose();
     _nameController.dispose();
+    _birthDateController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -27,14 +30,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _register() async {
     final tc = _tcController.text.trim();
     final name = _nameController.text.trim();
+    final birthDate = HealthProfile.formatToIso(_birthDateController.text.trim());
     final password = _passwordController.text.trim();
 
     if (tc.length != 11 || int.tryParse(tc) == null) {
-      setState(() => _error = 'TC Kimlik numarası 11 haneli rakam olmalıdır.');
+      setState(() => _error = 'TC Kimlik numarası 11 haneli olmalıdır.');
       return;
     }
     if (name.isEmpty) {
       setState(() => _error = 'İsim boş bırakılamaz.');
+      return;
+    }
+    if (birthDate.isEmpty) {
+      setState(() => _error = 'Doğum tarihi seçmelisiniz.');
       return;
     }
     if (password.length < 4) {
@@ -48,7 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     final controller = AuraScope.of(context, listen: false);
-    final success = await controller.registerUser(tc, name, password, gender: _gender);
+    final success = await controller.registerUser(tc, name, password, gender: _gender, birthDate: birthDate);
 
     if (!mounted) return;
 
@@ -60,8 +68,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } else {
       setState(() {
         _isLoading = false;
-        _error = 'Bu TC Kimlik numarası ile zaten kayıtlı bir hesap var.';
       });
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Hesap Zaten Var'),
+          content: const Text('Bu TC Kimlik numarası ile zaten kayıtlı bir hesap var. Lütfen giriş yapmayı deneyin veya şifrenizi unuttuysanız sıfırlayın.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Anladım'),
+            ),
+          ],
+        ),
+      );
     }
   }
 
@@ -119,6 +139,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ],
                   onChanged: (val) {
                     if (val != null) setState(() => _gender = val);
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _birthDateController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Doğum Tarihi',
+                    prefixIcon: Icon(Icons.cake_outlined),
+                  ),
+                  onTap: () async {
+                    final now = DateTime.now();
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: _birthDateController.text.isNotEmpty 
+                          ? (DateTime.tryParse(HealthProfile.formatToIso(_birthDateController.text)) ?? DateTime(now.year - 20))
+                          : DateTime(now.year - 20),
+                      firstDate: DateTime(1900),
+                      lastDate: now,
+                    );
+                    if (date != null) {
+                      setState(() {
+                        _birthDateController.text = HealthProfile.formatToDisplay(date.toIso8601String().split('T').first);
+                      });
+                    }
                   },
                 ),
                 const SizedBox(height: 16),

@@ -18,7 +18,7 @@ enum ActivityLevel {
 class HealthProfile {
   const HealthProfile({
     required this.name,
-    required this.age,
+    required this.birthDate,
     required this.heightCm,
     required this.weightKg,
     required this.activity,
@@ -35,11 +35,11 @@ class HealthProfile {
     this.gender = 'Belirtilmedi',
   });
 
-  factory HealthProfile.initial({String name = '', String gender = 'Belirtilmedi'}) {
+  factory HealthProfile.initial({String name = '', String gender = 'Belirtilmedi', String birthDate = ''}) {
     return HealthProfile(
       name: name,
       gender: gender,
-      age: 0,
+      birthDate: birthDate,
       heightCm: 0,
       weightKg: 0,
       activity: ActivityLevel.balanced,
@@ -55,7 +55,7 @@ class HealthProfile {
     final json = jsonDecode(source) as Map<String, dynamic>;
     return HealthProfile(
       name: json['name'] as String? ?? '',
-      age: json['age'] as int? ?? 0,
+      birthDate: _parseOrCalculateBirthDate(json),
       heightCm: (json['heightCm'] as num? ?? 0).toDouble(),
       weightKg: (json['weightKg'] as num? ?? 0).toDouble(),
       activity: ActivityLevel.values.firstWhere(
@@ -86,7 +86,34 @@ class HealthProfile {
 
   final String name;
   final String gender;
-  final int age;
+  final String birthDate;
+
+  int get age {
+    if (birthDate.isEmpty) return 0;
+    try {
+      final bd = DateTime.parse(birthDate);
+      final today = DateTime.now();
+      int a = today.year - bd.year;
+      if (today.month < bd.month || (today.month == bd.month && today.day < bd.day)) {
+        a--;
+      }
+      return a > 0 ? a : 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  static String _parseOrCalculateBirthDate(Map<String, dynamic> json) {
+    final bdJson = json['birthDate'] as String?;
+    if (bdJson != null && bdJson.isNotEmpty) {
+      return bdJson;
+    }
+    final ageJson = json['age'] as int?;
+    if (ageJson != null && ageJson > 0) {
+      return DateTime(DateTime.now().year - ageJson, 1, 1).toIso8601String().split('T').first;
+    }
+    return '';
+  }
   final double heightCm;
   final double weightKg;
   final ActivityLevel activity;
@@ -101,6 +128,24 @@ class HealthProfile {
   final String emergencyPhone;
   final double sleepTargetHours;
 
+  static String formatToDisplay(String dateStr) {
+    if (dateStr.isEmpty) return '';
+    final parts = dateStr.split('-');
+    if (parts.length == 3) {
+      return '${parts[2]}/${parts[1]}/${parts[0]}';
+    }
+    return dateStr;
+  }
+
+  static String formatToIso(String dateStr) {
+    if (dateStr.isEmpty) return '';
+    final parts = dateStr.split('/');
+    if (parts.length == 3) {
+      return '${parts[2]}-${parts[1]}-${parts[0]}';
+    }
+    return dateStr;
+  }
+
   String get initials {
     final parts = name.trim().split(RegExp(r'\s+'));
     if (parts.isEmpty || parts.first.isEmpty) {
@@ -112,7 +157,7 @@ class HealthProfile {
   HealthProfile copyWith({
     String? name,
     String? gender,
-    int? age,
+    String? birthDate,
     double? heightCm,
     double? weightKg,
     ActivityLevel? activity,
@@ -130,7 +175,7 @@ class HealthProfile {
     return HealthProfile(
       name: name ?? this.name,
       gender: gender ?? this.gender,
-      age: age ?? this.age,
+      birthDate: birthDate ?? this.birthDate,
       heightCm: heightCm ?? this.heightCm,
       weightKg: weightKg ?? this.weightKg,
       activity: activity ?? this.activity,
@@ -151,7 +196,7 @@ class HealthProfile {
     return jsonEncode({
       'name': name,
       'gender': gender,
-      'age': age,
+      'birthDate': birthDate,
       'heightCm': heightCm,
       'weightKg': weightKg,
       'activity': activity.name,

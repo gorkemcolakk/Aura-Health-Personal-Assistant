@@ -9,7 +9,6 @@ import '../models/medication.dart';
 import '../models/sleep_log.dart';
 import '../models/water_log.dart';
 import '../services/ai_coach_service.dart';
-import '../services/health_calculator.dart';
 import '../services/notification_service.dart';
 import '../services/storage_service.dart';
 import '../services/database_service.dart';
@@ -89,15 +88,19 @@ class AuraController extends ChangeNotifier {
   }
 
   // --- Auth ---
-  Future<bool> registerUser(String tc, String name, String password, {String gender = 'Belirtilmedi'}) async {
+  Future<bool> registerUser(String tc, String name, String password, {String gender = 'Belirtilmedi', String birthDate = ''}) async {
     final success = await db.registerUser(tc, name, password);
     if (success) {
-      await db.saveProfile(tc, HealthProfile.initial(name: name, gender: gender));
+      await db.saveProfile(tc, HealthProfile.initial(name: name, gender: gender, birthDate: birthDate));
     }
     return success;
   }
 
-  Future<bool> login(String tc, String password) async {
+  Future<int> login(String tc, String password) async {
+    final userExists = await db.getUser(tc);
+    if (userExists == null) {
+      return -1; // Account not found
+    }
     final user = await db.loginUser(tc, password);
     if (user != null) {
       currentUserTc = user['tc'] as String;
@@ -115,14 +118,28 @@ class AuraController extends ChangeNotifier {
       // Login'de her zaman yeni sohbetle başla
       _activeSessionId = null;
       notifyListeners();
-      return true;
+      return 1; // Success
     }
-    return false;
+    return -2; // Incorrect password
   }
 
   Future<bool> changePassword(String oldPassword, String newPassword) async {
     if (currentUserTc == null) return false;
     return await db.updatePassword(currentUserTc!, oldPassword, newPassword);
+  }
+
+  Future<int> resetPasswordWithBirthDate(String tc, String birthDate, String newPassword) async {
+    return await db.resetPasswordWithBirthDate(tc, birthDate, newPassword);
+  }
+
+  Future<void> deleteAccount() async {
+    if (currentUserTc == null) return;
+    final tc = currentUserTc!;
+    try {
+      await notifications.cancelAll();
+    } catch (_) {}
+    await db.deleteUser(tc);
+    await logout();
   }
 
   Future<void> logout() async {

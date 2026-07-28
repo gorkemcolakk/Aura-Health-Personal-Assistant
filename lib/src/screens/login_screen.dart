@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../state/aura_scope.dart';
 import 'register_screen.dart';
+import '../models/health_profile.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -60,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text.trim();
 
     if (tc.length != 11 || int.tryParse(tc) == null) {
-      setState(() => _error = 'TC Kimlik numarası 11 haneli rakam olmalıdır.');
+      setState(() => _error = 'TC Kimlik numarası 11 haneli olmalıdır.');
       return;
     }
     if (password.isEmpty) {
@@ -74,18 +75,125 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     final controller = AuraScope.of(context, listen: false);
-    final success = await controller.login(tc, password);
+    final result = await controller.login(tc, password);
 
     if (!mounted) return;
 
-    if (success) {
+    if (result == 1) {
       // AuraApp will rebuild and automatically show AuraShell
     } else {
       setState(() {
         _isLoading = false;
-        _error = 'TC Kimlik numarası veya şifre hatalı.';
+        if (result == -1) {
+          _error = 'Hesap bulunamadı.';
+        } else {
+          _error = 'Şifre hatalı.';
+        }
       });
     }
+  }
+
+  void _showForgotPasswordSheet() {
+    final tcCtrl = TextEditingController(text: _tcController.text);
+    final birthDateCtrl = TextEditingController();
+    final newPasswordCtrl = TextEditingController();
+    String? localError;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(ctx).viewInsets.bottom,
+                left: 24,
+                right: 24,
+                top: 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Şifremi Unuttum', style: Theme.of(ctx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  const Text('Lütfen hesabınızı doğrulamak için TC kimlik numaranızı ve doğum tarihinizi girin.'),
+                  const SizedBox(height: 16),
+                  if (localError != null) ...[
+                    Text(localError!, style: TextStyle(color: Theme.of(ctx).colorScheme.error, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 12),
+                  ],
+                  TextField(
+                    controller: tcCtrl,
+                    keyboardType: TextInputType.number,
+                    maxLength: 11,
+                    decoration: const InputDecoration(labelText: 'TC Kimlik No', prefixIcon: Icon(Icons.badge_outlined), counterText: ''),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: birthDateCtrl,
+                    readOnly: true,
+                    decoration: const InputDecoration(labelText: 'Doğum Tarihi', prefixIcon: Icon(Icons.cake_outlined)),
+                    onTap: () async {
+                      final now = DateTime.now();
+                      final date = await showDatePicker(
+                        context: ctx,
+                        initialDate: birthDateCtrl.text.isNotEmpty 
+                            ? (DateTime.tryParse(HealthProfile.formatToIso(birthDateCtrl.text)) ?? DateTime(now.year - 20))
+                            : DateTime(now.year - 20),
+                        firstDate: DateTime(1900),
+                        lastDate: now,
+                      );
+                      if (date != null) {
+                        setModalState(() {
+                          birthDateCtrl.text = HealthProfile.formatToDisplay(date.toIso8601String().split('T').first);
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: newPasswordCtrl,
+                    obscureText: true,
+                    decoration: const InputDecoration(labelText: 'Yeni Şifre', prefixIcon: Icon(Icons.lock_outline)),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: FilledButton(
+                      onPressed: () async {
+                        if (tcCtrl.text.isEmpty || birthDateCtrl.text.isEmpty || newPasswordCtrl.text.length < 4) {
+                          setModalState(() => localError = 'Lütfen tüm alanları geçerli şekilde doldurun (Şifre en az 4 karakter).');
+                          return;
+                        }
+                        final controller = AuraScope.of(context, listen: false);
+                        final isoBirthDate = HealthProfile.formatToIso(birthDateCtrl.text.trim());
+                        final result = await controller.resetPasswordWithBirthDate(tcCtrl.text, isoBirthDate, newPasswordCtrl.text);
+                        if (result == 1) {
+                          if (ctx.mounted) {
+                            Navigator.pop(ctx);
+                            ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Şifreniz başarıyla güncellendi. Yeni şifrenizle giriş yapabilirsiniz.')));
+                          }
+                        } else if (result == -1) {
+                          setModalState(() => localError = 'Böyle bir TC Kimlik Numarası bulunamadı.');
+                        } else {
+                          setModalState(() => localError = 'Doğum Tarihi hatalı.');
+                        }
+                      },
+                      child: const Text('Şifreyi Sıfırla'),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -197,6 +305,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                   },
                   child: const Text('Hesabın yok mu? Kayıt Ol'),
+                ),
+                TextButton(
+                  onPressed: _showForgotPasswordSheet,
+                  child: const Text('Şifremi Unuttum'),
                 ),
               ],
             ),

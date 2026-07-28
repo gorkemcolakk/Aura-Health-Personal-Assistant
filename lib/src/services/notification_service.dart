@@ -90,4 +90,8 @@ class NotificationService {
   Future<void> cancelMedication(Medication medication) {
     return _plugin.cancel(id: medication.notificationId);
   }
+
+  Future<void> cancelAll() {
+    return _plugin.cancelAll();
+  }
 }

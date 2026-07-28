@@ -126,6 +126,47 @@ class DatabaseService {
     return true;
   }
 
+  Future<int> resetPasswordWithBirthDate(String tc, String birthDate, String newPassword) async {
+    final db = await database;
+    
+    // Check if user exists
+    final userResults = await db.query('users', where: 'tc = ?', whereArgs: [tc]);
+    if (userResults.isEmpty) return -1; // User not found
+
+    // Check if profile exists and has matching birthDate
+    final profileResults = await db.query('profiles', where: 'tc = ?', whereArgs: [tc]);
+    if (profileResults.isEmpty) return -2; // Profile not found / birthdate mismatch
+    
+    try {
+      final profileStr = profileResults.first['data'] as String;
+      final profile = HealthProfile.fromJson(profileStr);
+      if (profile.birthDate != birthDate) {
+        return -2; // Birthdate mismatch
+      }
+      
+      // Update password
+      await db.update(
+        'users',
+        {'password_hash': _hashPassword(newPassword)},
+        where: 'tc = ?',
+        whereArgs: [tc],
+      );
+      return 1; // Success
+    } catch (_) {
+      return -2;
+    }
+  }
+
+  Future<void> deleteUser(String tc) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      await txn.delete('users', where: 'tc = ?', whereArgs: [tc]);
+      await txn.delete('profiles', where: 'tc = ?', whereArgs: [tc]);
+      await txn.delete('medications', where: 'tc = ?', whereArgs: [tc]);
+      await txn.delete('chat_sessions', where: 'tc = ?', whereArgs: [tc]);
+    });
+  }
+
   Future<Map<String, dynamic>?> getUser(String tc) async {
     final db = await database;
     final results = await db.query(

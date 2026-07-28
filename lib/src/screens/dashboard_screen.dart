@@ -58,7 +58,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               child: _Header(
                 initials: profile.initials,
                 name: profile.name,
-                subtitle: '${controller.tr('act_${profile.activity.name}')} ${controller.tr('day_today').toLowerCase()} • ${profile.age} ${controller.tr('prof_age_suffix')}',
+                subtitle: '${profile.age} ${controller.tr('prof_age_suffix')} • ${profile.gender}',
               ),
             ),
           ),
@@ -66,18 +66,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
             sliver: SliverList.list(
               children: [
-                _HeroStatus(
-                  firstName: profile.name.trim().split(' ').first,
-                  bmi: bmi,
-                  bmiLabel: HealthCalculator.bmiLabel(bmi, lang: controller.languageCode),
-                  waterTarget: waterTarget,
-                  waterProgress: waterProgress,
-                  consumed: HealthCalculator.todayWaterMl(profile),
-                  animation: _waveCtrl,
-                ),
-                const SizedBox(height: 16),
-                _EmergencyRow(profile: profile),
-                const SizedBox(height: 16),
+                // 4. Fiziksel Durum
+                _sectionTitle('Fiziksel Durum', Theme.of(context)),
                 Row(
                   children: [
                     Expanded(
@@ -95,15 +85,40 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         value: '${profile.weightKg.toStringAsFixed(1)} kg',
                       ),
                     ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _MetricTile(
+                        icon: Icons.monitor_weight_outlined,
+                        label: 'VKİ',
+                        value: bmi.toStringAsFixed(1),
+                      ),
+                    ),
                   ],
                 ),
+                const SizedBox(height: 24),
+
+                // 1. Acil Durum Kartı
+                _EmergencyRow(profile: profile),
+                const SizedBox(height: 24),
+                
+                // 2. Günlük Takip
+                _sectionTitle('Günlük Takip', Theme.of(context)),
+                _HeroStatus(
+                  waterTarget: waterTarget,
+                  waterProgress: waterProgress,
+                  consumed: HealthCalculator.todayWaterMl(profile),
+                  animation: _waveCtrl,
+                ),
                 if (controller.profile.waterLogs.isNotEmpty) ...[
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   _WaterTimelineCard(controller: controller),
                 ],
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 _SleepCard(controller: controller),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
+
+                // 3. Bugünkü İlaçlarım
+                _sectionTitle('Bugünkü İlaçlarım', Theme.of(context)),
                 if (nextMedication.isEmpty)
                   AuraCard(
                     child: Row(
@@ -189,39 +204,29 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       ),
                     ),
                     if (i < nextMedication.length - 1)
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                   ],
-                const SizedBox(height: 16),
-                AuraCard(
-                  color: const Color(0xFF172026),
-                  child: DefaultTextStyle.merge(
-                    style: const TextStyle(color: Colors.white),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.auto_awesome,
-                          color: Color(0xFFFFC857),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          controller.tr('dash_insight'),
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(color: Colors.white),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Hedefin: ${profile.healthGoal}. Su, VKİ ve ilaç düzenini birlikte izleyen asistan hazır.',
-                          style: const TextStyle(color: Color(0xFFEAF2EF)),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                const SizedBox(height: 24),
+
+                const SizedBox(height: 12),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _sectionTitle(String title, ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 12, top: 8),
+      child: Text(
+        title,
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.onSurface,
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }
@@ -296,49 +301,16 @@ class _Header extends StatelessWidget {
 
 class _HeroStatus extends StatelessWidget {
   const _HeroStatus({
-    required this.firstName,
-    required this.bmi,
-    required this.bmiLabel,
     required this.waterTarget,
     required this.waterProgress,
     required this.consumed,
     required this.animation,
   });
 
-  final String firstName;
-  final double bmi;
-  final String bmiLabel;
   final int waterTarget;
   final double waterProgress;
   final int consumed;
   final Animation<double> animation;
-
-  String _getPossessiveSuffix(String name) {
-    if (name.isEmpty) return 'in';
-    
-    final vowels = 'aeıioöuü';
-    String lastVowel = 'e';
-    for (int i = name.length - 1; i >= 0; i--) {
-      if (vowels.contains(name[i].toLowerCase())) {
-        lastVowel = name[i].toLowerCase();
-        break;
-      }
-    }
-    
-    final lastChar = name.toLowerCase()[name.length - 1];
-    final endsWithVowel = vowels.contains(lastChar);
-    
-    if (lastVowel == 'a' || lastVowel == 'ı') {
-      return endsWithVowel ? 'nın' : 'ın';
-    } else if (lastVowel == 'e' || lastVowel == 'i') {
-      return endsWithVowel ? 'nin' : 'in';
-    } else if (lastVowel == 'o' || lastVowel == 'u') {
-      return endsWithVowel ? 'nun' : 'un';
-    } else if (lastVowel == 'ö' || lastVowel == 'ü') {
-      return endsWithVowel ? 'nün' : 'ün';
-    }
-    return 'in';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -349,11 +321,7 @@ class _HeroStatus extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            firstName.isEmpty
-                ? controller.tr('dash_health_panel')
-                : (controller.languageCode == 'en'
-                    ? "$firstName's ${controller.tr('dash_health_panel')}"
-                    : "$firstName'${_getPossessiveSuffix(firstName)} ${controller.tr('dash_health_panel')}"),
+            'Su Tüketimi',
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 18),
@@ -372,23 +340,14 @@ class _HeroStatus extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(bmi.toStringAsFixed(1), style: Theme.of(context).textTheme.headlineLarge),
-                        const SizedBox(width: 12),
-                        Text('${controller.tr('dash_bmi')} • $bmiLabel', style: Theme.of(context).textTheme.bodyMedium),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
                     Text(
                       '%${(waterProgress * 100).toStringAsFixed(0)}',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
+                    const SizedBox(height: 4),
                     Text(
                       '${controller.tr('dash_target')} ${(waterTarget / 1000).toStringAsFixed(2)} L',
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 13, fontWeight: FontWeight.w500),
@@ -418,13 +377,15 @@ class _MetricTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AuraCard(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon),
-          const SizedBox(height: 14),
-          Text(label),
-          Text(value, style: Theme.of(context).textTheme.titleLarge),
+          Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(height: 8),
+          Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          const SizedBox(height: 2),
+          Text(value, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
         ],
       ),
     );

@@ -15,7 +15,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final _name = TextEditingController();
-  final _age = TextEditingController();
+  final _birthDate = TextEditingController();
   final _height = TextEditingController();
   final _weight = TextEditingController();
   final _goal = TextEditingController();
@@ -40,7 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _fillFromProfile(HealthProfile profile) {
     _name.text = profile.name;
-    _age.text = profile.age.toString();
+    _birthDate.text = HealthProfile.formatToDisplay(profile.birthDate);
     _height.text = profile.heightCm.toStringAsFixed(0);
     _weight.text = profile.weightKg.toStringAsFixed(1);
     _goal.text = profile.healthGoal;
@@ -56,7 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     _name.dispose();
-    _age.dispose();
+    _birthDate.dispose();
     _height.dispose();
     _weight.dispose();
     _goal.dispose();
@@ -73,7 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await controller.saveProfile(
       profile.copyWith(
         name: _name.text.trim().isEmpty ? profile.name : _name.text.trim(),
-        age: int.tryParse(_age.text.trim()) ?? profile.age,
+        birthDate: HealthProfile.formatToIso(_birthDate.text.trim()),
         heightCm: double.tryParse(_height.text.replaceAll(',', '.')) ?? profile.heightCm,
         weightKg: double.tryParse(_weight.text.replaceAll(',', '.')) ?? profile.weightKg,
         activity: _activity,
@@ -136,6 +136,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             icon: const Icon(Icons.logout, size: 18),
             label: Text(controller.tr('prof_logout'), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+          ),
+          const SizedBox(height: 12),
+          TextButton.icon(
+            onPressed: () => _confirmDeleteAccount(context, controller),
+            style: TextButton.styleFrom(
+              foregroundColor: colors.error,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+            icon: const Icon(Icons.delete_forever, size: 18),
+            label: Text(
+              controller.languageCode == 'tr' ? 'Hesabımı Kalıcı Olarak Sil' : 'Permanently Delete My Account',
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, decoration: TextDecoration.underline),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteAccount(BuildContext context, AuraController controller) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(controller.languageCode == 'tr' ? 'Hesabını Sil' : 'Delete Account'),
+        content: Text(controller.languageCode == 'tr'
+            ? 'Hesabınız ve tüm sağlık verileriniz (ilaçlar, su takibi, sohbet geçmişi) kalıcı olarak silinecektir. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?'
+            : 'Your account and all health data (medications, water logs, chat history) will be permanently deleted. This action cannot be undone. Do you want to continue?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(controller.languageCode == 'tr' ? 'Vazgeç' : 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await controller.deleteAccount();
+            },
+            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
+            child: Text(controller.languageCode == 'tr' ? 'Sil' : 'Delete'),
           ),
         ],
       ),
@@ -315,7 +354,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             rows: [
               _InfoRow(controller.tr('prof_name'), profile.name.isEmpty ? '—' : profile.name),
               _InfoRow(controller.tr('prof_gender'), _genderLabel(profile.gender, controller)),
-              _InfoRow(controller.tr('prof_age'), '${profile.age} ${controller.tr('prof_age_suffix')}'),
+              _InfoRow(controller.languageCode == 'tr' ? 'Doğum Tarihi' : 'Birth Date', '${HealthProfile.formatToDisplay(profile.birthDate)} (${profile.age} ${controller.tr('prof_age_suffix')})'),
             ],
             isFirst: true,
           ),
@@ -392,7 +431,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: ['Erkek', 'Kadın', 'Belirtilmedi'].contains(_gender) ? _gender : 'Belirtilmedi',
+                      initialValue: ['Erkek', 'Kadın', 'Belirtilmedi'].contains(_gender) ? _gender : 'Belirtilmedi',
                       decoration: InputDecoration(labelText: controller.tr('prof_gender'), prefixIcon: const Icon(Icons.wc)),
                       items: [
                         DropdownMenuItem(value: 'Erkek', child: Text(controller.tr('prof_gender_m'))),
@@ -405,9 +444,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
-                      controller: _age,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(labelText: controller.tr('prof_age'), prefixIcon: const Icon(Icons.cake_outlined)),
+                      controller: _birthDate,
+                      readOnly: true,
+                      onTap: () async {
+                        final now = DateTime.now();
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: _birthDate.text.isNotEmpty 
+                              ? (DateTime.tryParse(HealthProfile.formatToIso(_birthDate.text)) ?? DateTime(now.year - 20))
+                              : DateTime(now.year - 20),
+                          firstDate: DateTime(1900),
+                          lastDate: now,
+                        );
+                        if (date != null) {
+                          setState(() {
+                            _birthDate.text = HealthProfile.formatToDisplay(date.toIso8601String().split('T').first);
+                          });
+                        }
+                      },
+                      decoration: InputDecoration(
+                        labelText: controller.languageCode == 'tr' ? 'Doğum Tarihi' : 'Birth Date', 
+                        prefixIcon: const Icon(Icons.cake_outlined)
+                      ),
                     ),
                   ),
                 ],
@@ -426,7 +484,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 14),
               DropdownButtonFormField<ActivityLevel>(
-                value: _activity,
+                initialValue: _activity,
                 decoration: InputDecoration(labelText: controller.tr('prof_activity'), prefixIcon: const Icon(Icons.directions_run)),
                 items: ActivityLevel.values.map((a) => DropdownMenuItem(value: a, child: Text(a.label))).toList(),
                 onChanged: (v) { if (v != null) setState(() => _activity = v); },
