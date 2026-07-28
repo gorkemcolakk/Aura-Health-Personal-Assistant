@@ -30,7 +30,7 @@ class TranslationService {
       'en': 'System',
     },
     'settings_lang': {
-      'tr': 'Dil / Language',
+      'tr': 'Dil',
       'en': 'Language',
     },
     'settings_lang_sub': {

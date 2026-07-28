@@ -124,7 +124,7 @@ class _WaterWaveChart extends StatelessWidget {
               Text(controller.tr('chart_water_title'), style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
               Text(
-                '${controller.tr('chart_target')} ${(target / 1000).toStringAsFixed(2)} L',
+                '${controller.tr('chart_target')} ${(target / 1000).toStringAsFixed(2)} ${controller.languageCode == 'tr' ? 'Litre' : 'Liters'}',
                 style: TextStyle(color: colors.primary, fontSize: 13, fontWeight: FontWeight.w700),
               ),
             ],
@@ -150,7 +150,7 @@ class _WaterWaveChart extends StatelessWidget {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('${(todayMl / 1000).toStringAsFixed(2)} L', style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: colors.primary, fontWeight: FontWeight.w900)),
+                            Text('${(todayMl / 1000).toStringAsFixed(2)} ${controller.languageCode == 'tr' ? 'Litre' : 'Liters'}', style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: colors.primary, fontWeight: FontWeight.w900)),
                             Text(controller.tr('day_today'), style: TextStyle(color: colors.onSurfaceVariant, fontSize: 13)),
                           ],
                         ),
@@ -175,7 +175,7 @@ class _WaterWaveChart extends StatelessWidget {
                       return spots.map((s) {
                         final day = data[s.spotIndex];
                         return LineTooltipItem(
-                          '${DateFormat('dd MMM').format(day.date)}\n${(s.y / 1000).toStringAsFixed(2)} L',
+                          '${DateFormat('dd MMM').format(day.date)}\n${(s.y / 1000).toStringAsFixed(2)} ${controller.languageCode == 'tr' ? 'Litre' : 'Liters'}',
                           const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
                         );
                       }).toList();

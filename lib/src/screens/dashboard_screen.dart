@@ -330,7 +330,7 @@ class _HeroStatus extends StatelessWidget {
               Expanded(
                 child: _WaveCircle(
                   progress: waterProgress,
-                  center: '${(consumed / 1000).toStringAsFixed(2)} L',
+                  center: '${(consumed / 1000).toStringAsFixed(2)} ${controller.languageCode == 'tr' ? 'Litre' : 'Liters'}',
                   label: controller.tr('dash_water'),
                   animation: animation,
                 ),
@@ -349,7 +349,7 @@ class _HeroStatus extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${controller.tr('dash_target')} ${(waterTarget / 1000).toStringAsFixed(2)} L',
+                      '${controller.tr('dash_target')} ${(waterTarget / 1000).toStringAsFixed(2)} ${controller.languageCode == 'tr' ? 'Litre' : 'Liters'}',
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 13, fontWeight: FontWeight.w500),
                     ),
                   ],
@@ -695,7 +695,7 @@ class _WaterTimelineCard extends StatelessWidget {
               const SizedBox(width: 10),
               Text(controller.tr('dash_water_history'), style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
-              Text('${(todayTotal / 1000).toStringAsFixed(2)} L', style: TextStyle(color: colors.primary, fontWeight: FontWeight.w700)),
+              Text('${(todayTotal / 1000).toStringAsFixed(2)} ${controller.languageCode == 'tr' ? 'Litre' : 'Liters'}', style: TextStyle(color: colors.primary, fontWeight: FontWeight.w700)),
             ],
           ),
           const SizedBox(height: 12),

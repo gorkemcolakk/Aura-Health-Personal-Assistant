@@ -10,6 +10,7 @@ import 'screens/medication_screen.dart';
 import 'screens/nearby_screen.dart';
 import 'screens/pdf_preview_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/settings_screen.dart';
 import 'state/aura_scope.dart';
 import 'state/aura_controller.dart';
 import 'theme/aura_theme.dart';
@@ -72,7 +73,7 @@ class _AuraShellState extends State<AuraShell> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => const _QuickActionsSheet(),
+      builder: (ctx) => _QuickActionsSheet(parentContext: context),
     );
   }
 
@@ -254,47 +255,41 @@ class _QuickActionDockItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final foreground = colors.onSurfaceVariant;
+
     return Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: onTap,
-        child: SizedBox(
-          height: 54,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [colors.primary, colors.secondary],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+      child: Tooltip(
+        message: label,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: onTap,
+          child: Container(
+            height: 54,
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.add_circle_outline_rounded,
+                  color: foreground,
+                  size: 22,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: foreground,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
                   ),
-                  borderRadius: BorderRadius.circular(13),
-                  boxShadow: [
-                    BoxShadow(
-                      color: colors.primary.withValues(alpha: .35),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
                 ),
-                child: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colors.primary,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -304,7 +299,9 @@ class _QuickActionDockItem extends StatelessWidget {
 
 // ─── Quick Actions Bottom Sheet ──────────────────────────────
 class _QuickActionsSheet extends StatelessWidget {
-  const _QuickActionsSheet();
+  const _QuickActionsSheet({required this.parentContext});
+
+  final BuildContext parentContext;
 
   @override
   Widget build(BuildContext context) {
@@ -392,7 +389,7 @@ class _QuickActionsSheet extends StatelessWidget {
             subtitle: controller.tr('quick_nearby_sub'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const NearbyScreen()));
+              Navigator.push(parentContext, MaterialPageRoute(builder: (_) => const NearbyScreen()));
             },
           ),
           _ActionItem(
@@ -402,7 +399,17 @@ class _QuickActionsSheet extends StatelessWidget {
             subtitle: controller.tr('quick_pdf_sub'),
             onTap: () {
               Navigator.pop(context);
-              _showPdfPeriodDialog(context, controller);
+              _showPdfPeriodDialog(parentContext, controller);
+            },
+          ),
+          _ActionItem(
+            color: const Color(0xFF607D8B),
+            icon: Icons.settings_rounded,
+            title: controller.tr('settings_title'),
+            subtitle: controller.languageCode == 'tr' ? 'Uygulama ayarlarını yönetin' : 'Manage app settings',
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(parentContext, MaterialPageRoute(builder: (_) => const SettingsScreen()));
             },
           ),
         ],
@@ -494,25 +501,54 @@ void _showPdfPeriodDialog(BuildContext context, AuraController controller) {
           Text(controller.tr('quick_pdf')),
         ],
       ),
-      content: Text(
-        controller.languageCode == 'tr'
-            ? 'Raporun kapsayacağı zaman aralığını seçin:'
-            : 'Select the time range for the report:',
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            controller.languageCode == 'tr'
+                ? 'Raporun kapsayacağı zaman aralığını seçin:'
+                : 'Select the time range for the report:',
+          ),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton(
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () { Navigator.pop(ctx); _openPdf(context, controller, 7); },
+                  child: Text(controller.languageCode == 'tr' ? '7 Günlük' : '7 Days', style: const TextStyle(fontSize: 12, color: Colors.white)),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton(
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () { Navigator.pop(ctx); _openPdf(context, controller, 30); },
+                  child: Text(controller.languageCode == 'tr' ? '1 Aylık' : '1 Month', style: const TextStyle(fontSize: 12, color: Colors.white)),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton(
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () { Navigator.pop(ctx); _openPdf(context, controller, 90); },
+                  child: Text(controller.languageCode == 'tr' ? '3 Aylık' : '3 Months', style: const TextStyle(fontSize: 12, color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () { Navigator.pop(ctx); _openPdf(context, controller, 7); },
-          child: Text(controller.languageCode == 'tr' ? '7 Günlük' : '7 Days'),
-        ),
-        TextButton(
-          onPressed: () { Navigator.pop(ctx); _openPdf(context, controller, 30); },
-          child: Text(controller.languageCode == 'tr' ? '1 Aylık' : '1 Month'),
-        ),
-        FilledButton(
-          onPressed: () { Navigator.pop(ctx); _openPdf(context, controller, 90); },
-          child: Text(controller.languageCode == 'tr' ? '3 Aylık' : '3 Months'),
-        ),
-      ],
     ),
   );
 }
