@@ -108,14 +108,17 @@ class PlacesService {
       }
     }
     
-    final query = '[out:json];(${tagQueries.toString()});out body 30;';
+    final query = '[out:json];(${tagQueries.toString()});out body;';
 
     try {
       final response = await http.post(
         Uri.parse(_overpassUrl),
         body: query,
-        headers: {'Content-Type': 'text/plain'},
-      ).timeout(const Duration(seconds: 5));
+        headers: {
+          'Content-Type': 'text/plain',
+          'User-Agent': 'AuraHealthApp/1.0 (contact@aurahealth.app)',
+        },
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -210,7 +213,7 @@ class PlacesService {
             'User-Agent': 'AuraHealthApp/1.0 (contact@aurahealth.app)',
             'Accept-Language': 'tr',
           },
-        ).timeout(const Duration(seconds: 5));
+        ).timeout(const Duration(seconds: 10));
 
         if (response.statusCode == 200) {
           final results = jsonDecode(response.body) as List<dynamic>;
