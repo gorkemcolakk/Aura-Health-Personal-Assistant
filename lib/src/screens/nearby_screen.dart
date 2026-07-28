@@ -286,13 +286,21 @@ class _NearbyScreenState extends State<NearbyScreen> {
     final controller = AuraScope.of(context);
     final colors = Theme.of(context).colorScheme;
 
-    return SafeArea(
-      child: Column(
-        children: [
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
             child: Row(
               children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.arrow_back),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                const SizedBox(width: 12),
                 Icon(Icons.local_hospital, color: colors.primary, size: 28),
                 const SizedBox(width: 10),
                 Text(controller.tr('nearby_title'), style: Theme.of(context).textTheme.titleLarge),
@@ -485,7 +493,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _filterChip(String label, String? type) {
