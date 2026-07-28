@@ -34,6 +34,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
     'Eczane': Colors.green,
     'Klinik': Colors.blue,
     'Sağlık Ocağı': Colors.orange,
+    'Diş Hekimi': Colors.teal,
+    'Veteriner': Colors.brown,
   };
 
   @override
@@ -276,6 +278,10 @@ class _NearbyScreenState extends State<NearbyScreen> {
         return '🩺';
       case 'Sağlık Ocağı':
         return '🏚️';
+      case 'Diş Hekimi':
+        return '🦷';
+      case 'Veteriner':
+        return '🐾';
       default:
         return '🏥';
     }
@@ -366,6 +372,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
                 _filterChip('💊 ${controller.tr('nearby_type_pharmacy')}', 'Eczane'),
                 _filterChip('🩺 ${controller.tr('nearby_type_clinic')}', 'Klinik'),
                 _filterChip('🏚️ ${controller.tr('nearby_type_health_center')}', 'Sağlık Ocağı'),
+                _filterChip('🦷 ${controller.tr('nearby_type_dentist')}', 'Diş Hekimi'),
+                _filterChip('🐾 ${controller.tr('nearby_type_vet')}', 'Veteriner'),
               ],
             ),
           ),
@@ -420,6 +428,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
                           _legendItem(Colors.green, controller.tr('nearby_type_pharmacy')),
                           _legendItem(Colors.blue, controller.tr('nearby_type_clinic')),
                           _legendItem(Colors.orange, controller.tr('nearby_type_health_center')),
+                          _legendItem(Colors.teal, controller.tr('nearby_type_dentist')),
+                          _legendItem(Colors.brown, controller.tr('nearby_type_vet')),
                         ],
                       ),
                     ),

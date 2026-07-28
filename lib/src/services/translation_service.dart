@@ -325,6 +325,8 @@ class TranslationService {
     'nearby_type_pharmacy': {'tr': 'Eczane', 'en': 'Pharmacy'},
     'nearby_type_clinic': {'tr': 'Klinik', 'en': 'Clinic'},
     'nearby_type_health_center': {'tr': 'Sağlık Ocağı', 'en': 'Health Center'},
+    'nearby_type_dentist': {'tr': 'Diş Hekimi', 'en': 'Dentist'},
+    'nearby_type_vet': {'tr': 'Veteriner', 'en': 'Veterinary'},
     'nearby_filter_all': {'tr': 'Tümü', 'en': 'All'},
     'nearby_no_facilities': {'tr': 'Yakında sağlık kuruluşu bulunamadı', 'en': 'No health facilities found nearby'},
     'nearby_no_results': {'tr': 'Bu kategoride sonuç bulunamadı', 'en': 'No results found in this category'},

@@ -16,11 +16,11 @@ void main() async {
   final tagQueries = StringBuffer();
   for (final entry in _osmTags.entries) {
     for (final t in entry.value) {
-      tagQueries.write('node[$t](around:${maxDistanceKm * 1000},$lat,$lng);');
+      tagQueries.write('nwr[$t](around:${maxDistanceKm * 1000},$lat,$lng);');
     }
   }
   
-  final query = '[out:json];(${tagQueries.toString()});out body;';
+  final query = '[out:json];(${tagQueries.toString()});out center;';
   print('Executing query: $query');
 
   try {

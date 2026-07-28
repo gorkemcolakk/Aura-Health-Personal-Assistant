@@ -27,14 +27,21 @@ class HealthFacility {
 
 class PlacesService {
   static const _nominatimUrl = 'https://nominatim.openstreetmap.org';
-  static const _overpassUrl = 'https://overpass-api.de/api/interpreter';
+  
+  static const _overpassUrls = [
+    'https://overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter',
+    'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+  ];
 
-  // Türkçe arama terimleri + OSM tag'leri
+  // Türkçe arama terimleri
   static const _queries = {
-    'Hastane': 'hospital',
+    'Hastane': 'hastane',
     'Eczane': 'eczane',
-    'Klinik': 'clinic',
-    'Sağlık Ocağı': 'aile sağlığı merkezi',
+    'Klinik': 'klinik',
+    'Sağlık Ocağı': 'sağlık ocağı',
+    'Diş Hekimi': 'diş hekimi',
+    'Veteriner': 'veteriner',
   };
 
   /// Adresi koordinata çevir
@@ -53,7 +60,7 @@ class PlacesService {
           'User-Agent': 'AuraHealthApp/1.0 (contact@aurahealth.app)',
           'Accept-Language': 'tr',
         },
-      ).timeout(const Duration(seconds: 60));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final results = jsonDecode(response.body) as List<dynamic>;
@@ -72,7 +79,9 @@ class PlacesService {
     'Hastane': ['"amenity"="hospital"'],
     'Eczane': ['"amenity"="pharmacy"', '"shop"="chemist"'],
     'Klinik': ['"amenity"="clinic"', '"amenity"="doctors"'],
-    'Sağlık Ocağı': ['"amenity"="clinic"', '"healthcare"="centre"'],
+    'Sağlık Ocağı': ['"healthcare"="centre"'],
+    'Diş Hekimi': ['"amenity"="dentist"'],
+    'Veteriner': ['"amenity"="veterinary"'],
   };
 
   String? lastDebugError;
@@ -83,11 +92,18 @@ class PlacesService {
     int maxDistanceKm = 3,
   }) async {
     lastDebugError = null;
-    try {
-      final overpassResults = await _searchOverpass(lat, lng, maxDistanceKm);
-      if (overpassResults.isNotEmpty) return overpassResults;
-    } catch (_) {}
+    
+    // 1. Try Overpass API with multiple fallbacks
+    for (final url in _overpassUrls) {
+      try {
+        final overpassResults = await _searchOverpass(url, lat, lng, maxDistanceKm);
+        if (overpassResults.isNotEmpty) return overpassResults;
+      } catch (_) {
+        // Fallback to the next URL
+      }
+    }
 
+    // 2. If all Overpass servers fail, use Nominatim as absolute fallback
     try {
       return await _searchNominatim(lat, lng, maxDistanceKm);
     } catch (_) {
@@ -96,104 +112,95 @@ class PlacesService {
   }
 
   Future<List<HealthFacility>> _searchOverpass(
-    double lat, double lng, int maxDistanceKm,
+    String overpassUrl, double lat, double lng, int maxDistanceKm,
   ) async {
     final allResults = <HealthFacility>[];
 
-    // Combine all tag queries into a single Overpass QL block
+    // Combine all tag queries into a single Overpass QL block using nwr
     final tagQueries = StringBuffer();
     for (final entry in _osmTags.entries) {
       for (final t in entry.value) {
-        tagQueries.write('node[$t](around:${maxDistanceKm * 1000},$lat,$lng);');
+        tagQueries.write('nwr[$t](around:${maxDistanceKm * 1000},$lat,$lng);');
       }
     }
     
-    final query = '[out:json];(${tagQueries.toString()});out body;';
+    final query = '[out:json];(${tagQueries.toString()});out center;';
 
-    try {
-      final response = await http.post(
-        Uri.parse(_overpassUrl),
-        body: query,
-        headers: {
-          'Content-Type': 'text/plain',
-          'User-Agent': 'AuraHealthApp/1.0 (contact@aurahealth.app)',
-        },
-      ).timeout(const Duration(seconds: 60));
+    final response = await http.post(
+      Uri.parse(overpassUrl),
+      body: query,
+      headers: {
+        'Content-Type': 'text/plain',
+        'User-Agent': 'AuraHealthApp/1.0 (contact@aurahealth.app)',
+      },
+    ).timeout(const Duration(seconds: 15));
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final elements = data['elements'] as List<dynamic>?;
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final elements = data['elements'] as List<dynamic>?;
 
-        if (elements != null) {
-          for (final el in elements) {
-            final tags = el['tags'] as Map<String, dynamic>?;
-            if (tags == null) continue;
+      if (elements != null) {
+        for (final el in elements) {
+          final tags = el['tags'] as Map<String, dynamic>?;
+          if (tags == null) continue;
 
-            final rLat = (el['lat'] as num?)?.toDouble() ?? 0.0;
-            final rLng = (el['lon'] as num?)?.toDouble() ?? 0.0;
-            final dist = _haversineKm(lat, lng, rLat, rLng);
-            if (dist > maxDistanceKm) continue;
+          // For 'nwr' with 'out center', nodes have lat/lon directly, 
+          // ways/relations have center properties
+          final center = el['center'];
+          final rLat = (el['lat'] ?? center?['lat'] as num?)?.toDouble() ?? 0.0;
+          final rLng = (el['lon'] ?? center?['lon'] as num?)?.toDouble() ?? 0.0;
+          
+          if (rLat == 0.0 || rLng == 0.0) continue;
 
-            // Determine type by checking tags against _osmTags
-            String type = 'Sağlık Kuruluşu';
-            for (final entry in _osmTags.entries) {
-              bool matched = false;
-              for (final t in entry.value) {
-                final parts = t.replaceAll('"', '').split('=');
-                if (parts.length == 2 && tags[parts[0]] == parts[1]) {
-                  matched = true;
-                  break;
-                }
-              }
-              if (matched) {
-                type = entry.key;
+          final dist = _haversineKm(lat, lng, rLat, rLng);
+          if (dist > maxDistanceKm) continue;
+
+          // Determine base type by checking tags against _osmTags
+          String baseType = 'Sağlık Kuruluşu';
+          for (final entry in _osmTags.entries) {
+            bool matched = false;
+            for (final t in entry.value) {
+              final parts = t.replaceAll('"', '').split('=');
+              if (parts.length == 2 && tags[parts[0]] == parts[1]) {
+                matched = true;
                 break;
               }
             }
-
-            final name = tags['name']?.toString() ??
-                tags['name:tr']?.toString() ??
-                type;
-            final street = tags['addr:street']?.toString() ?? '';
-            final city = tags['addr:city']?.toString() ?? '';
-
-            allResults.add(HealthFacility(
-              name: name,
-              address: [name, street, city].where((e) => e.isNotEmpty).join(', '),
-              type: type,
-              lat: rLat,
-              lng: rLng,
-              distanceKm: dist,
-            ));
+            if (matched) {
+              baseType = entry.key;
+              break;
+            }
           }
+
+          final rawName = tags['name']?.toString() ??
+              tags['name:tr']?.toString() ??
+              baseType;
+              
+          final type = _postProcessType(rawName, baseType);
+          final street = tags['addr:street']?.toString() ?? '';
+          final city = tags['addr:city']?.toString() ?? '';
+
+          allResults.add(HealthFacility(
+            name: rawName,
+            address: [rawName, street, city].where((e) => e.isNotEmpty).join(', '),
+            type: type,
+            lat: rLat,
+            lng: rLng,
+            distanceKm: dist,
+          ));
         }
       }
-    } catch (_) {}
+    } else {
+      throw Exception('Overpass returned non-200');
+    }
 
-    // Duplicate temizle, mesafeye göre sırala
-    final seen = <String>{};
-    final filtered = allResults.where((f) {
-      final key = '${f.name}_${f.lat}_${f.lng}';
-      if (seen.contains(key)) return false;
-      seen.add(key);
-      return true;
-    }).toList();
-
-    filtered.sort((a, b) {
-      final dA = a.distanceKm ?? 0.0;
-      final dB = b.distanceKm ?? 0.0;
-      return dA.compareTo(dB);
-    });
-
-    return filtered;
+    return _filterAndSort(allResults, lat, lng);
   }
 
   Future<List<HealthFacility>> _searchNominatim(
     double lat, double lng, int maxDistanceKm,
   ) async {
     final allResults = <HealthFacility>[];
-
-    // 5km için yaklaşık 0.05 derece
     final delta = maxDistanceKm / 111.0;
 
     for (final entry in _queries.entries) {
@@ -213,7 +220,7 @@ class PlacesService {
             'User-Agent': 'AuraHealthApp/1.0 (contact@aurahealth.app)',
             'Accept-Language': 'tr',
           },
-        ).timeout(const Duration(seconds: 60));
+        ).timeout(const Duration(seconds: 10));
 
         if (response.statusCode == 200) {
           final results = jsonDecode(response.body) as List<dynamic>;
@@ -222,14 +229,16 @@ class PlacesService {
             final rLat = double.tryParse(r['lat']?.toString() ?? '0') ?? 0;
             final rLng = double.tryParse(r['lon']?.toString() ?? '0') ?? 0;
 
-            // Kesin mesafe filtresi (Haversine)
             final dist = _haversineKm(lat, lng, rLat, rLng);
             if (dist > maxDistanceKm) continue;
 
+            final rawName = r['display_name']?.toString().split(',').first.trim() ?? 'Bilinmiyor';
+            final type = _postProcessType(rawName, entry.key);
+
             allResults.add(HealthFacility(
-              name: r['display_name']?.toString().split(',').first.trim() ?? 'Bilinmiyor',
+              name: rawName,
               address: r['display_name']?.toString() ?? '',
-              type: entry.key,
+              type: type,
               lat: rLat,
               lng: rLng,
               distanceKm: dist,
@@ -238,13 +247,41 @@ class PlacesService {
         }
       } catch (_) {}
       
-      // Nominatim strict rate limit: maximum 1 request per second
       await Future.delayed(const Duration(seconds: 1));
     }
 
-    // Duplicate temizle ve mesafeye göre sırala
+    return _filterAndSort(allResults, lat, lng);
+  }
+
+  /// Akıllı Kategori Ayrıştırması (İsme Göre Düzeltme)
+  String _postProcessType(String name, String baseType) {
+    final lowerName = name.toLowerCase();
+    if (lowerName.contains('sağlık ocağı') || 
+        lowerName.contains('aile sağlığı') || 
+        lowerName.contains('asm')) {
+      return 'Sağlık Ocağı';
+    }
+    if (lowerName.contains('hastane') || 
+        lowerName.contains('hospital') ||
+        lowerName.contains('tıp merkezi') ||
+        lowerName.contains('poliklinik')) {
+      return 'Hastane';
+    }
+    if (lowerName.contains('eczane') || lowerName.contains('pharmacy')) {
+      return 'Eczane';
+    }
+    if (lowerName.contains('diş') || lowerName.contains('dentist')) {
+      return 'Diş Hekimi';
+    }
+    if (lowerName.contains('veteriner') || lowerName.contains('vet')) {
+      return 'Veteriner';
+    }
+    return baseType;
+  }
+
+  List<HealthFacility> _filterAndSort(List<HealthFacility> results, double lat, double lng) {
     final seen = <String>{};
-    final filtered = allResults.where((f) {
+    final filtered = results.where((f) {
       final key = '${f.name}_${f.lat}_${f.lng}';
       if (seen.contains(key)) return false;
       seen.add(key);
@@ -252,8 +289,8 @@ class PlacesService {
     }).toList();
 
     filtered.sort((a, b) {
-      final dA = _haversineKm(lat, lng, a.lat, a.lng);
-      final dB = _haversineKm(lat, lng, b.lat, b.lng);
+      final dA = a.distanceKm ?? 0.0;
+      final dB = b.distanceKm ?? 0.0;
       return dA.compareTo(dB);
     });
 
