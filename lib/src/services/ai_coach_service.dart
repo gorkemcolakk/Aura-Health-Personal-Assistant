@@ -72,7 +72,7 @@ class AiCoachService {
   String _buildPrompt(HealthProfile profile, List<Medication> medications, String langCode) {
     final waterTarget = HealthCalculator.dailyWaterTargetMl(profile);
     final sleepLogs = profile.sleepLogs;
-    final lastSleep = sleepLogs.isNotEmpty ? sleepLogs.last : null;
+    final lastSleep = sleepLogs.isNotEmpty ? sleepLogs.first : null;
     final sleepText = lastSleep != null
         ? "\n- Son Uykusu: ${lastSleep.hours} saat (${lastSleep.feeling})"
         : "";
