@@ -221,10 +221,12 @@ class _WaterWaveChart extends StatelessWidget {
                       reservedSize: 24,
                       interval: 1000,
                       getTitlesWidget: (value, meta) {
+                        final intVal = value.round();
+                        if (intVal % 1000 != 0) return const SizedBox.shrink();
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
-                            '${(value / 1000).toInt()} ${controller.tr('chart_water_unit')}',
+                            '${intVal ~/ 1000} ${controller.tr('chart_water_unit')}',
                             style: TextStyle(
                               color: colors.onSurfaceVariant.withValues(alpha: 0.8),
                               fontSize: 9,
@@ -373,11 +375,12 @@ class _SleepLineChart extends StatelessWidget {
                       reservedSize: 32,
                       interval: 2,
                       getTitlesWidget: (value, meta) {
-                        if (value == 0) return const SizedBox.shrink();
+                        final intVal = value.round();
+                        if (intVal == 0 || intVal % 2 != 0) return const SizedBox.shrink();
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
-                            '${value.toInt()} ${controller.tr('chart_sleep_unit')}',
+                            '$intVal ${controller.tr('chart_sleep_unit')}',
                             style: TextStyle(
                               color: colors.onSurfaceVariant.withValues(alpha: 0.8),
                               fontSize: 9,
