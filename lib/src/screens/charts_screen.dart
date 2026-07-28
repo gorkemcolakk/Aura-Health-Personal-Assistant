@@ -222,7 +222,9 @@ class _WaterWaveChart extends StatelessWidget {
                       interval: 1000,
                       getTitlesWidget: (value, meta) {
                         final intVal = value.round();
-                        if (intVal % 1000 != 0) return const SizedBox.shrink();
+                        if ((value - intVal).abs() > 0.01 || intVal % 1000 != 0) {
+                          return const SizedBox.shrink();
+                        }
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
@@ -376,7 +378,9 @@ class _SleepLineChart extends StatelessWidget {
                       interval: 2,
                       getTitlesWidget: (value, meta) {
                         final intVal = value.round();
-                        if (intVal == 0 || intVal % 2 != 0) return const SizedBox.shrink();
+                        if (intVal == 0 || (value - intVal).abs() > 0.01 || intVal % 2 != 0) {
+                          return const SizedBox.shrink();
+                        }
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
