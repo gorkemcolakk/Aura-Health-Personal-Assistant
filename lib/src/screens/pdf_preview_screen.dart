@@ -37,6 +37,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
         profile: widget.profile,
         apiKey: widget.apiKey,
         langCode: widget.langCode,
+        days: widget.days,
       );
       if (mounted) {
         setState(() {

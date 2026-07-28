@@ -135,7 +135,7 @@ class PdfService {
               pw.SizedBox(height: 18),
 
               // ── Sağlık Verileri ──────────────────────────────────────
-              pw.Text(TranslationService.get('pdf_health_data', langCode),
+              pw.Text('${TranslationService.get('pdf_health_data', langCode)} ${TranslationService.get('pdf_health_data_days', langCode).replaceAll('@', days.toString())}',
                   style: pw.TextStyle(
                       fontSize: 20,
                       font: fontBold,
