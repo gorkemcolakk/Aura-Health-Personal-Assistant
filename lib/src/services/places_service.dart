@@ -216,12 +216,13 @@ class PlacesService {
               lng: rLng,
               distanceKm: dist,
             ));
-          } else {
-            throw Exception('Nominatim API error: ${response.statusCode}');
           }
-        } catch (e) {
-          throw Exception('Network or API Error: $e');
+        } else {
+          throw Exception('Nominatim API error: ${response.statusCode}');
         }
+      } catch (e) {
+        throw Exception('Network or API Error: $e');
+      }
 
       await Future.delayed(const Duration(seconds: 1));
     }
