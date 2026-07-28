@@ -177,12 +177,31 @@ class PlacesService {
               baseType;
               
           final type = _postProcessType(rawName, baseType);
+          
           final street = tags['addr:street']?.toString() ?? '';
+          final housenumber = tags['addr:housenumber']?.toString() ?? '';
+          final suburb = tags['addr:suburb']?.toString() ?? '';
+          final district = tags['addr:district']?.toString() ?? '';
           final city = tags['addr:city']?.toString() ?? '';
+
+          String streetWithNumber = street;
+          if (street.isNotEmpty && housenumber.isNotEmpty) {
+            streetWithNumber = '$street No:$housenumber';
+          }
+
+          final addressParts = <String>[];
+          if (streetWithNumber.isNotEmpty) addressParts.add(streetWithNumber);
+          if (suburb.isNotEmpty) addressParts.add(suburb);
+          if (district.isNotEmpty) addressParts.add(district);
+          if (city.isNotEmpty) addressParts.add(city);
+
+          final address = addressParts.isEmpty 
+              ? 'Adres detayı haritada bulunmuyor.' 
+              : '$rawName, ${addressParts.join(', ')}';
 
           allResults.add(HealthFacility(
             name: rawName,
-            address: [rawName, street, city].where((e) => e.isNotEmpty).join(', '),
+            address: address,
             type: type,
             lat: rLat,
             lng: rLng,
