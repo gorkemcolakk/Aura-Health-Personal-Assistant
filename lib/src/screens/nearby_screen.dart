@@ -416,6 +416,31 @@ class _NearbyScreenState extends State<NearbyScreen> {
                       ),
                     ),
                   ),
+                  // Zoom kontrolleri
+                  Positioned(
+                    bottom: 12,
+                    right: 12,
+                    child: Column(
+                      children: [
+                        _zoomButton(
+                          icon: Icons.add,
+                          onTap: () {
+                            final current = _mapController.camera.zoom;
+                            if (_isMapReady) _mapController.move(_mapController.camera.center, current + 1);
+                          },
+                        ),
+                        const SizedBox(height: 4),
+                        _zoomButton(
+                          icon: Icons.remove,
+                          onTap: () {
+                            final current = _mapController.camera.zoom;
+                            if (_isMapReady) _mapController.move(_mapController.camera.center, current - 1);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
                 ],
               ),
             ),
@@ -527,6 +552,24 @@ class _NearbyScreenState extends State<NearbyScreen> {
           const SizedBox(width: 4),
           Text(label, style: const TextStyle(fontSize: 11)),
         ],
+      ),
+    );
+  }
+
+  Widget _zoomButton({required IconData icon, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: const [
+            BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 2)),
+          ],
+        ),
+        child: Icon(icon, size: 22, color: Colors.black87),
       ),
     );
   }
