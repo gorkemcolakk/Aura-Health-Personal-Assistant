@@ -23,6 +23,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
   LatLng? _currentLocation;
   List<HealthFacility> _facilities = [];
   bool _loading = true;
+  bool _isMapReady = false;
   String? _error;
   String? _activeFilter; // null = hepsi
 
@@ -62,16 +63,15 @@ class _NearbyScreenState extends State<NearbyScreen> {
 
       final location = LatLng(position.latitude, position.longitude);
 
-      // Emülatör Mountain View sahte konumunu yakala, İstanbul'a düş
       if (_isEmulatorLocation(location)) {
         setState(() => _currentLocation = _defaultLocation);
-        _mapController.move(_defaultLocation, 12);
+        if (_isMapReady) _mapController.move(_defaultLocation, 12);
         await _searchNearby(_defaultLocation);
         return;
       }
 
       setState(() => _currentLocation = location);
-      _mapController.move(location, 14);
+      if (_isMapReady) _mapController.move(location, 14);
       await _searchNearby(location);
     } catch (e) {
       setState(() => _loading = false);
@@ -108,7 +108,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
       _error = null;
     });
 
-    _mapController.move(location, 14);
+    if (_isMapReady) _mapController.move(location, 14);
     await _searchNearby(location);
   }
 
@@ -138,7 +138,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
       });
 
       // Arama noktasına odaklan, tüm sonuçlara zoom out yapma
-      _mapController.move(location, 14);
+      if (_isMapReady) _mapController.move(location, 14);
     } catch (e) {
       setState(() {
         _loading = false;
@@ -381,11 +381,14 @@ class _NearbyScreenState extends State<NearbyScreen> {
                     options: MapOptions(
                       initialCenter: _currentLocation ?? _defaultLocation,
                       initialZoom: 14,
+                      onMapReady: () {
+                        _isMapReady = true;
+                      },
                     ),
                     children: [
                       TileLayer(
                         urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        userAgentPackageName: 'com.aurahealth.app',
+                        userAgentPackageName: 'com.aurahealth.v2',
                       ),
                       MarkerLayer(markers: _buildMarkers()),
                     ],
