@@ -50,7 +50,7 @@ class PlacesService {
       final response = await http.get(
         url,
         headers: {
-          'User-Agent': 'AuraHealthApp/1.0',
+          'User-Agent': 'AuraHealthApp/1.0 (contact@aurahealth.app)',
           'Accept-Language': 'tr',
         },
       );
@@ -174,13 +174,13 @@ class PlacesService {
           '&format=json'
           '&limit=20'
           '&bounded=1'
-          '&viewbox=${lng - delta},${lat - delta},${lng + delta},${lat + delta}',
+          '&viewbox=${lng - delta},${lat + delta},${lng + delta},${lat - delta}',
         );
 
         final response = await http.get(
           url,
           headers: {
-            'User-Agent': 'AuraHealthApp/1.0',
+            'User-Agent': 'AuraHealthApp/1.0 (contact@aurahealth.app)',
             'Accept-Language': 'tr',
           },
         );
