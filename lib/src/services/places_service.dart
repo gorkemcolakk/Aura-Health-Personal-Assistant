@@ -86,15 +86,12 @@ class PlacesService {
     try {
       final overpassResults = await _searchOverpass(lat, lng, maxDistanceKm);
       if (overpassResults.isNotEmpty) return overpassResults;
-    } catch (e) {
-      lastDebugError = e.toString();
-    }
+    } catch (_) {}
 
     try {
       return await _searchNominatim(lat, lng, maxDistanceKm);
-    } catch (e) {
-      lastDebugError = lastDebugError != null ? '$lastDebugError | $e' : e.toString();
-      return []; // fallback to empty
+    } catch (_) {
+      return [];
     }
   }
 
@@ -145,9 +142,7 @@ class PlacesService {
             }
           }
         }
-      } catch (e) {
-        throw Exception('Overpass Error: $e');
-      }
+      } catch (_) {}
 
       await Future.delayed(const Duration(milliseconds: 500));
     }
@@ -217,12 +212,8 @@ class PlacesService {
               distanceKm: dist,
             ));
           }
-        } else {
-          throw Exception('Nominatim API error: ${response.statusCode}');
-        }
-      } catch (e) {
-        throw Exception('Network or API Error: $e');
-      }
+        } else {}
+      } catch (_) {}
 
       await Future.delayed(const Duration(seconds: 1));
     }
