@@ -172,11 +172,26 @@ class PlacesService {
             }
           }
 
-          final rawName = tags['name']?.toString() ??
+          String rawName = tags['name']?.toString() ??
               tags['name:tr']?.toString() ??
               baseType;
               
           final type = _postProcessType(rawName, baseType);
+          
+          if (rawName != type && rawName != 'Sağlık Kuruluşu') {
+            final lowerName = rawName.toLowerCase();
+            if (type == 'Eczane' && !lowerName.contains('eczane')) {
+              rawName = '$rawName Eczanesi';
+            } else if (type == 'Diş Hekimi' && !lowerName.contains('diş') && !lowerName.contains('dentist')) {
+              rawName = '$rawName Diş Hekimi';
+            } else if (type == 'Veteriner' && !lowerName.contains('veteriner') && !lowerName.contains('vet')) {
+              rawName = '$rawName Veteriner Kliniği';
+            } else if (type == 'Klinik' && !lowerName.contains('klinik') && !lowerName.contains('poliklinik') && !lowerName.contains('clinic')) {
+              rawName = '$rawName Kliniği';
+            } else if (type == 'Hastane' && !lowerName.contains('hastane') && !lowerName.contains('hospital') && !lowerName.contains('tıp')) {
+              rawName = '$rawName Hastanesi';
+            }
+          }
           
           final street = tags['addr:street']?.toString() ?? '';
           final housenumber = tags['addr:housenumber']?.toString() ?? '';

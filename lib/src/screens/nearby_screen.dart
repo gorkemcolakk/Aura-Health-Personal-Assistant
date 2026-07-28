@@ -232,7 +232,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
             children: [
               Row(
                 children: [
-                  Text(_typeIcon(facility.type), style: const TextStyle(fontSize: 28)),
+                  _typeIconWidget(facility.type, size: 28),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(facility.name, style: Theme.of(context).textTheme.titleMedium),
@@ -285,6 +285,20 @@ class _NearbyScreenState extends State<NearbyScreen> {
       default:
         return '🏥';
     }
+  }
+
+  Widget _typeIconWidget(String type, {double size = 24}) {
+    final emoji = _typeIcon(type);
+    return Container(
+      width: size + 16,
+      height: size + 16,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: (_typeColors[type] ?? Colors.grey).withValues(alpha: 0.15),
+        shape: BoxShape.circle,
+      ),
+      child: Text(emoji, style: TextStyle(fontSize: size * 0.8)),
+    );
   }
 
   @override
@@ -504,7 +518,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                               padding: const EdgeInsets.all(4),
                               child: Row(
                                 children: [
-                                  Text(_typeIcon(facility.type), style: const TextStyle(fontSize: 24)),
+                                  _typeIconWidget(facility.type, size: 24),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
