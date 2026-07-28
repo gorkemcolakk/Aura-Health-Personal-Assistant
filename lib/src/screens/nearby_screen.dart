@@ -424,9 +424,13 @@ class _NearbyScreenState extends State<NearbyScreen> {
             flex: 2,
             child: _facilities.isEmpty && !_loading
                 ? Center(
-                    child: Text(
-                      _error ?? controller.tr('nearby_no_facilities'),
-                      style: Theme.of(context).textTheme.bodyLarge,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        _error ?? _placesService.lastDebugError ?? controller.tr('nearby_no_facilities'),
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   )
                 : Builder(
