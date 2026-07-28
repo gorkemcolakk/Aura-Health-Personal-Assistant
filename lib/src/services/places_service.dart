@@ -100,52 +100,72 @@ class PlacesService {
   ) async {
     final allResults = <HealthFacility>[];
 
+    // Combine all tag queries into a single Overpass QL block
+    final tagQueries = StringBuffer();
     for (final entry in _osmTags.entries) {
-      final tagQueries = entry.value.map((t) => 'node[$t](around:${maxDistanceKm * 1000},$lat,$lng);').join();
-      final query = '[out:json];($tagQueries);out body 30;';
+      for (final t in entry.value) {
+        tagQueries.write('node[$t](around:${maxDistanceKm * 1000},$lat,$lng);');
+      }
+    }
+    
+    final query = '[out:json];(${tagQueries.toString()});out body 30;';
 
-      try {
-        final response = await http.post(
-          Uri.parse(_overpassUrl),
-          body: query,
-          headers: {'Content-Type': 'text/plain'},
-        );
+    try {
+      final response = await http.post(
+        Uri.parse(_overpassUrl),
+        body: query,
+        headers: {'Content-Type': 'text/plain'},
+      );
 
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final elements = data['elements'] as List<dynamic>?;
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final elements = data['elements'] as List<dynamic>?;
 
-          if (elements != null) {
-            for (final el in elements) {
-              final tags = el['tags'] as Map<String, dynamic>?;
-              if (tags == null) continue;
+        if (elements != null) {
+          for (final el in elements) {
+            final tags = el['tags'] as Map<String, dynamic>?;
+            if (tags == null) continue;
 
-              final rLat = (el['lat'] as num?)?.toDouble() ?? 0.0;
-              final rLng = (el['lon'] as num?)?.toDouble() ?? 0.0;
-              final dist = _haversineKm(lat, lng, rLat, rLng);
-              if (dist > maxDistanceKm) continue;
+            final rLat = (el['lat'] as num?)?.toDouble() ?? 0.0;
+            final rLng = (el['lon'] as num?)?.toDouble() ?? 0.0;
+            final dist = _haversineKm(lat, lng, rLat, rLng);
+            if (dist > maxDistanceKm) continue;
 
-              final name = tags['name']?.toString() ??
-                  tags['name:tr']?.toString() ??
-                  entry.key;
-              final street = tags['addr:street']?.toString() ?? '';
-              final city = tags['addr:city']?.toString() ?? '';
-
-              allResults.add(HealthFacility(
-                name: name,
-                address: '$name, $street, $city'.trim(),
-                type: entry.key,
-                lat: rLat,
-                lng: rLng,
-                distanceKm: dist,
-              ));
+            // Determine type by checking tags against _osmTags
+            String type = 'Sağlık Kuruluşu';
+            for (final entry in _osmTags.entries) {
+              bool matched = false;
+              for (final t in entry.value) {
+                final parts = t.replaceAll('"', '').split('=');
+                if (parts.length == 2 && tags[parts[0]] == parts[1]) {
+                  matched = true;
+                  break;
+                }
+              }
+              if (matched) {
+                type = entry.key;
+                break;
+              }
             }
+
+            final name = tags['name']?.toString() ??
+                tags['name:tr']?.toString() ??
+                type;
+            final street = tags['addr:street']?.toString() ?? '';
+            final city = tags['addr:city']?.toString() ?? '';
+
+            allResults.add(HealthFacility(
+              name: name,
+              address: [name, street, city].where((e) => e.isNotEmpty).join(', '),
+              type: type,
+              lat: rLat,
+              lng: rLng,
+              distanceKm: dist,
+            ));
           }
         }
-      } catch (_) {}
-
-      await Future.delayed(const Duration(milliseconds: 500));
-    }
+      }
+    } catch (_) {}
 
     // Duplicate temizle, mesafeye göre sırala
     final seen = <String>{};
@@ -157,8 +177,8 @@ class PlacesService {
     }).toList();
 
     filtered.sort((a, b) {
-      final dA = _haversineKm(lat, lng, a.lat, a.lng);
-      final dB = _haversineKm(lat, lng, b.lat, b.lng);
+      final dA = a.distanceKm ?? 0.0;
+      final dB = b.distanceKm ?? 0.0;
       return dA.compareTo(dB);
     });
 
@@ -173,13 +193,13 @@ class PlacesService {
     // 5km için yaklaşık 0.05 derece
     final delta = maxDistanceKm / 111.0;
 
-    for (final entry in _queries.entries) {
+    final futures = _queries.entries.map((entry) async {
       try {
         final url = Uri.parse(
           '$_nominatimUrl/search'
           '?q=${Uri.encodeComponent(entry.value)}'
           '&format=json'
-          '&limit=20'
+          '&limit=10'
           '&bounded=1'
           '&viewbox=${lng - delta},${lat + delta},${lng + delta},${lat - delta}',
         );
@@ -194,6 +214,7 @@ class PlacesService {
 
         if (response.statusCode == 200) {
           final results = jsonDecode(response.body) as List<dynamic>;
+          final localResults = <HealthFacility>[];
 
           for (final r in results) {
             final rLat = double.tryParse(r['lat']?.toString() ?? '0') ?? 0;
@@ -203,7 +224,7 @@ class PlacesService {
             final dist = _haversineKm(lat, lng, rLat, rLng);
             if (dist > maxDistanceKm) continue;
 
-            allResults.add(HealthFacility(
+            localResults.add(HealthFacility(
               name: r['display_name']?.toString().split(',').first.trim() ?? 'Bilinmiyor',
               address: r['display_name']?.toString() ?? '',
               type: entry.key,
@@ -212,10 +233,15 @@ class PlacesService {
               distanceKm: dist,
             ));
           }
-        } else {}
+          return localResults;
+        }
       } catch (_) {}
+      return <HealthFacility>[];
+    });
 
-      await Future.delayed(const Duration(seconds: 1));
+    final resultsList = await Future.wait(futures);
+    for (final list in resultsList) {
+      allResults.addAll(list);
     }
 
     // Duplicate temizle ve mesafeye göre sırala
