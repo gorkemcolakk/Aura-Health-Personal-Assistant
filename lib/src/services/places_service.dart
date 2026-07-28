@@ -53,7 +53,7 @@ class PlacesService {
           'User-Agent': 'AuraHealthApp/1.0 (contact@aurahealth.app)',
           'Accept-Language': 'tr',
         },
-      );
+      ).timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         final results = jsonDecode(response.body) as List<dynamic>;
@@ -115,7 +115,7 @@ class PlacesService {
         Uri.parse(_overpassUrl),
         body: query,
         headers: {'Content-Type': 'text/plain'},
-      );
+      ).timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -210,7 +210,7 @@ class PlacesService {
             'User-Agent': 'AuraHealthApp/1.0 (contact@aurahealth.app)',
             'Accept-Language': 'tr',
           },
-        );
+        ).timeout(const Duration(seconds: 5));
 
         if (response.statusCode == 200) {
           final results = jsonDecode(response.body) as List<dynamic>;
