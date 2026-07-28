@@ -57,6 +57,10 @@ class TranslationService {
       'tr': 'Su, uyku ve ilaç kayıtlarınızı siler',
       'en': 'Deletes water, sleep and medication logs',
     },
+    'prof_birth': {
+      'tr': 'Doğum Tarihi',
+      'en': 'Birth Date',
+    },
     'dialog_reset_title': {
       'tr': 'Verileri Sıfırla',
       'en': 'Reset Data',

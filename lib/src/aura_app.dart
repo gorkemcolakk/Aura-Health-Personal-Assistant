@@ -11,6 +11,7 @@ import 'screens/nearby_screen.dart';
 import 'screens/pdf_preview_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'state/aura_scope.dart';
 import 'state/aura_controller.dart';
 import 'theme/aura_theme.dart';
@@ -28,6 +29,7 @@ class AuraApp extends StatelessWidget {
         animation: controller,
         builder: (context, _) {
           return MaterialApp(
+            key: ValueKey(controller.currentUserTc),
             title: 'Aura Health',
             debugShowCheckedModeBanner: false,
             theme: AuraTheme.light(),
@@ -35,7 +37,7 @@ class AuraApp extends StatelessWidget {
             themeMode: controller.themeMode,
             home: controller.currentUserTc == null
                 ? const LoginScreen()
-                : const AuraShell(),
+                : (controller.profile.heightCm == 0 ? const OnboardingScreen() : const AuraShell()),
           );
         },
       ),

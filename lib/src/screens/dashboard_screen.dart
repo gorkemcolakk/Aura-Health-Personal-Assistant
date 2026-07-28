@@ -192,7 +192,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${nextMedication[i].dosage} • ${nextMedication[i].mealTiming}',
+                                  '${nextMedication[i].dosage} • ${nextMedication[i].mealTiming == 'Aç' ? controller.tr('med_meal_before') : nextMedication[i].mealTiming == 'Tok' ? controller.tr('med_meal_after') : controller.tr('med_meal_any')}',
                                   style: TextStyle(
                                     color: nextMedication[i].isTakenToday ? Colors.grey : null,
                                   ),
@@ -999,7 +999,7 @@ class _SleepCard extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 8),
-                Text(displaySleep.feeling, style: const TextStyle(fontSize: 18)),
+                Text(displaySleep.feeling.contains('Yorgun') ? '😴 ${controller.tr('feeling_tired')}' : displaySleep.feeling.contains('Normal') ? '😐 ${controller.tr('feeling_normal')}' : '🤩 ${controller.tr('feeling_energetic')}', style: const TextStyle(fontSize: 18)),
               ],
             ),
             const SizedBox(height: 4),

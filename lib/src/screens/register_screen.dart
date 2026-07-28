@@ -12,37 +12,35 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _tcController = TextEditingController();
   final _nameController = TextEditingController();
-  final _birthDateController = TextEditingController();
+  final _surnameController = TextEditingController();
   final _passwordController = TextEditingController();
-  String _gender = 'Erkek';
   bool _isLoading = false;
+  bool _obscuringPassword = true;
   String? _error;
 
   @override
   void dispose() {
     _tcController.dispose();
     _nameController.dispose();
-    _birthDateController.dispose();
+    _surnameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   void _register() async {
     final tc = _tcController.text.trim();
-    final name = _nameController.text.trim();
-    final birthDate = HealthProfile.formatToIso(_birthDateController.text.trim());
+    final firstName = _nameController.text.trim();
+    final lastName = _surnameController.text.trim();
     final password = _passwordController.text.trim();
+    
+    final name = '$firstName $lastName'.trim();
 
     if (tc.length != 11 || int.tryParse(tc) == null) {
       setState(() => _error = 'TC Kimlik numarası 11 haneli olmalıdır.');
       return;
     }
-    if (name.isEmpty) {
-      setState(() => _error = 'İsim boş bırakılamaz.');
-      return;
-    }
-    if (birthDate.isEmpty) {
-      setState(() => _error = 'Doğum tarihi seçmelisiniz.');
+    if (firstName.isEmpty || lastName.isEmpty) {
+      setState(() => _error = 'İsim ve soyisim boş bırakılamaz.');
       return;
     }
     if (password.length < 4) {
@@ -56,7 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     final controller = AuraScope.of(context, listen: false);
-    final success = await controller.registerUser(tc, name, password, gender: _gender, birthDate: birthDate);
+    final success = await controller.registerUser(tc, name, password);
 
     if (!mounted) return;
 
@@ -87,110 +85,181 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = AuraScope.of(context);
+    final isTr = controller.languageCode == 'tr';
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Kayıt Ol')),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (_error != null) ...[
-                  Text(
-                    _error!,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                      fontWeight: FontWeight.bold,
+        child: Stack(
+          children: [
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 72.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      isTr ? 'Kayıt Ol' : 'Sign Up',
+                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-                TextField(
-                  controller: _tcController,
-                  keyboardType: TextInputType.number,
-                  maxLength: 11,
-                  decoration: const InputDecoration(
-                    labelText: 'TC Kimlik No',
-                    prefixIcon: Icon(Icons.badge_outlined),
-                    counterText: '',
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _nameController,
-                  textCapitalization: TextCapitalization.words,
-                  decoration: const InputDecoration(
-                    labelText: 'Ad Soyad',
-                    prefixIcon: Icon(Icons.person_outline),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  initialValue: _gender,
-                  decoration: const InputDecoration(
-                    labelText: 'Cinsiyet',
-                    prefixIcon: Icon(Icons.wc),
-                  ),
-                  items: const [
-                    DropdownMenuItem(value: 'Erkek', child: Text('Erkek')),
-                    DropdownMenuItem(value: 'Kadın', child: Text('Kadın')),
-                    DropdownMenuItem(value: 'Belirtilmedi', child: Text('Belirtilmedi')),
+                    const SizedBox(height: 32),
+                    if (_error != null) ...[
+                      Text(
+                        _getTranslatedError(isTr, _error)!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    TextField(
+                      controller: _tcController,
+                      keyboardType: TextInputType.number,
+                      maxLength: 11,
+                      decoration: InputDecoration(
+                        labelText: isTr ? 'TC Kimlik No' : 'ID Number',
+                        prefixIcon: const Icon(Icons.badge_outlined),
+                        counterText: '',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _nameController,
+                            textCapitalization: TextCapitalization.words,
+                            decoration: InputDecoration(
+                              labelText: isTr ? 'Ad' : 'Name',
+                              prefixIcon: const Icon(Icons.person_outline),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: TextField(
+                            controller: _surnameController,
+                            textCapitalization: TextCapitalization.words,
+                            decoration: InputDecoration(
+                              labelText: isTr ? 'Soyad' : 'Surname',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: _obscuringPassword,
+                      decoration: InputDecoration(
+                        labelText: isTr ? 'Şifre' : 'Password',
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscuringPassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscuringPassword = !_obscuringPassword;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: FilledButton(
+                        onPressed: _isLoading ? null : _register,
+                        child: _isLoading
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : Text(isTr ? 'Kayıt Ol' : 'Sign Up', style: const TextStyle(fontSize: 16)),
+                      ),
+                    ),
                   ],
-                  onChanged: (val) {
-                    if (val != null) setState(() => _gender = val);
-                  },
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _birthDateController,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Doğum Tarihi',
-                    prefixIcon: Icon(Icons.cake_outlined),
-                  ),
-                  onTap: () async {
-                    final now = DateTime.now();
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: _birthDateController.text.isNotEmpty 
-                          ? (DateTime.tryParse(HealthProfile.formatToIso(_birthDateController.text)) ?? DateTime(now.year - 20))
-                          : DateTime(now.year - 20),
-                      firstDate: DateTime(1900),
-                      lastDate: now,
-                    );
-                    if (date != null) {
-                      setState(() {
-                        _birthDateController.text = HealthProfile.formatToDisplay(date.toIso8601String().split('T').first);
-                      });
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Şifre',
-                    prefixIcon: Icon(Icons.lock_outline),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: FilledButton(
-                    onPressed: _isLoading ? null : _register,
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Kayıt Ol', style: TextStyle(fontSize: 16)),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+            Positioned(
+              top: 8,
+              left: 8,
+              right: 16,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Back button + Theme switch
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        controller.themeMode == ThemeMode.dark
+                            ? Icons.dark_mode_outlined
+                            : Icons.light_mode_outlined,
+                        size: 20,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Switch(
+                        value: controller.themeMode == ThemeMode.dark ||
+                            (controller.themeMode == ThemeMode.system &&
+                                MediaQuery.of(context).platformBrightness == Brightness.dark),
+                        onChanged: (isDark) {
+                          controller.setThemeMode(isDark ? ThemeMode.dark : ThemeMode.light);
+                        },
+                      ),
+                    ],
+                  ),
+                  // Language Switch
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.language_outlined, size: 20),
+                      const SizedBox(width: 4),
+                      Text(
+                        controller.languageCode.toUpperCase(),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 4),
+                      Switch(
+                        value: controller.languageCode == 'en',
+                        onChanged: (isEn) {
+                          controller.setLanguageCode(isEn ? 'en' : 'tr');
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  String? _getTranslatedError(bool isTr, String? error) {
+    if (error == null) return null;
+    switch (error) {
+      case 'TC Kimlik numarası 11 haneli olmalıdır.':
+        return isTr ? 'TC Kimlik numarası 11 haneli olmalıdır.' : 'ID Number must be 11 digits.';
+      case 'İsim ve soyisim boş bırakılamaz.':
+        return isTr ? 'İsim ve soyisim boş bırakılamaz.' : 'Name and surname cannot be empty.';
+      case 'Şifre en az 4 karakter olmalıdır.':
+        return isTr ? 'Şifre en az 4 karakter olmalıdır.' : 'Password must be at least 4 characters.';
+      default:
+        return error;
+    }
   }
 }

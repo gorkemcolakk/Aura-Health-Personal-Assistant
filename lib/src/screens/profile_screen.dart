@@ -431,6 +431,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
+                      isExpanded: true,
                       initialValue: ['Erkek', 'Kadın', 'Belirtilmedi'].contains(_gender) ? _gender : 'Belirtilmedi',
                       decoration: InputDecoration(labelText: controller.tr('prof_gender'), prefixIcon: const Icon(Icons.wc)),
                       items: [
@@ -484,9 +485,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 14),
               DropdownButtonFormField<ActivityLevel>(
+                isExpanded: true,
                 initialValue: _activity,
                 decoration: InputDecoration(labelText: controller.tr('prof_activity'), prefixIcon: const Icon(Icons.directions_run)),
-                items: ActivityLevel.values.map((a) => DropdownMenuItem(value: a, child: Text(a.label))).toList(),
+                items: ActivityLevel.values.map((a) {
+                  String label = a.label;
+                  if (a == ActivityLevel.low) label = controller.tr('act_low');
+                  if (a == ActivityLevel.balanced) label = controller.tr('act_balanced');
+                  if (a == ActivityLevel.active) label = controller.tr('act_active');
+                  if (a == ActivityLevel.athletic) label = controller.tr('act_athletic');
+                  return DropdownMenuItem(value: a, child: Text(label));
+                }).toList(),
                 onChanged: (v) { if (v != null) setState(() => _activity = v); },
               ),
               const SizedBox(height: 12),

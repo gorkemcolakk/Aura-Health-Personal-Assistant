@@ -303,11 +303,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(controller.tr('dialog_support_title')),
-        content: const TextField(
+        content: TextField(
           maxLines: 4,
           decoration: InputDecoration(
-            hintText: 'Lütfen karşılaştığınız sorunu veya önerinizi buraya yazın...',
-            border: OutlineInputBorder(),
+            hintText: controller.languageCode == 'tr' 
+                ? 'Lütfen karşılaştığınız sorunu veya önerinizi buraya yazın...' 
+                : 'Please describe the issue or suggestion here...',
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
@@ -319,10 +321,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () {
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(controller.tr('msg_support_sent'))),
+                SnackBar(content: Text(controller.languageCode == 'tr' ? 'Talep gönderildi.' : 'Ticket sent.')),
               );
             },
-            child: const Text('Gönder'),
+            child: Text(controller.languageCode == 'tr' ? 'Gönder' : 'Send'),
           ),
         ],
       ),
