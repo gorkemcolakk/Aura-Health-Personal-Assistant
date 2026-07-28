@@ -288,16 +288,27 @@ class _NearbyScreenState extends State<NearbyScreen> {
   }
 
   Widget _typeIconWidget(String type, {double size = 24}) {
-    final emoji = _typeIcon(type);
+    IconData iconData;
+    switch (type) {
+      case 'Hastane': iconData = Icons.local_hospital; break;
+      case 'Eczane': iconData = Icons.local_pharmacy; break;
+      case 'Klinik': iconData = Icons.medical_services; break;
+      case 'Sağlık Ocağı': iconData = Icons.health_and_safety; break;
+      case 'Diş Hekimi': iconData = Icons.healing; break;
+      case 'Veteriner': iconData = Icons.pets; break;
+      default: iconData = Icons.local_hospital; break;
+    }
+    
+    final color = _typeColors[type] ?? Colors.grey;
     return Container(
       width: size + 16,
       height: size + 16,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: (_typeColors[type] ?? Colors.grey).withValues(alpha: 0.15),
+        color: color.withValues(alpha: 0.15),
         shape: BoxShape.circle,
       ),
-      child: Text(emoji, style: TextStyle(fontSize: size * 0.8)),
+      child: Icon(iconData, size: size * 0.8, color: color),
     );
   }
 
