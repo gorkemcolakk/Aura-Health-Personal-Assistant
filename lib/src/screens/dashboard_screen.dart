@@ -97,51 +97,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                AuraCard(
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary.withValues(alpha: .10),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Icon(Icons.water_drop_rounded, color: Theme.of(context).colorScheme.primary, size: 22),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              controller.tr('dash_water_track'),
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${(HealthCalculator.todayWaterMl(profile) / 1000).toStringAsFixed(2)} L / ${(waterTarget / 1000).toStringAsFixed(2)} L',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        '%${(waterProgress * 100).toStringAsFixed(0)}',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 if (controller.profile.waterLogs.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   _WaterTimelineCard(controller: controller),
