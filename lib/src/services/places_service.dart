@@ -53,7 +53,7 @@ class PlacesService {
           'User-Agent': 'AuraHealthApp/1.0 (contact@aurahealth.app)',
           'Accept-Language': 'tr',
         },
-      ).timeout(const Duration(seconds: 5));
+      ).timeout(const Duration(seconds: 60));
 
       if (response.statusCode == 200) {
         final results = jsonDecode(response.body) as List<dynamic>;
@@ -118,7 +118,7 @@ class PlacesService {
           'Content-Type': 'text/plain',
           'User-Agent': 'AuraHealthApp/1.0 (contact@aurahealth.app)',
         },
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 60));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -196,7 +196,7 @@ class PlacesService {
     // 5km için yaklaşık 0.05 derece
     final delta = maxDistanceKm / 111.0;
 
-    final futures = _queries.entries.map((entry) async {
+    for (final entry in _queries.entries) {
       try {
         final url = Uri.parse(
           '$_nominatimUrl/search'
@@ -213,11 +213,10 @@ class PlacesService {
             'User-Agent': 'AuraHealthApp/1.0 (contact@aurahealth.app)',
             'Accept-Language': 'tr',
           },
-        ).timeout(const Duration(seconds: 10));
+        ).timeout(const Duration(seconds: 60));
 
         if (response.statusCode == 200) {
           final results = jsonDecode(response.body) as List<dynamic>;
-          final localResults = <HealthFacility>[];
 
           for (final r in results) {
             final rLat = double.tryParse(r['lat']?.toString() ?? '0') ?? 0;
@@ -227,7 +226,7 @@ class PlacesService {
             final dist = _haversineKm(lat, lng, rLat, rLng);
             if (dist > maxDistanceKm) continue;
 
-            localResults.add(HealthFacility(
+            allResults.add(HealthFacility(
               name: r['display_name']?.toString().split(',').first.trim() ?? 'Bilinmiyor',
               address: r['display_name']?.toString() ?? '',
               type: entry.key,
@@ -236,15 +235,11 @@ class PlacesService {
               distanceKm: dist,
             ));
           }
-          return localResults;
         }
       } catch (_) {}
-      return <HealthFacility>[];
-    });
-
-    final resultsList = await Future.wait(futures);
-    for (final list in resultsList) {
-      allResults.addAll(list);
+      
+      // Nominatim strict rate limit: maximum 1 request per second
+      await Future.delayed(const Duration(seconds: 1));
     }
 
     // Duplicate temizle ve mesafeye göre sırala
