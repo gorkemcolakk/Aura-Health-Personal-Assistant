@@ -30,14 +30,16 @@ class _MedicationScreenState extends State<MedicationScreen> {
   Widget build(BuildContext context) {
     final controller = AuraScope.of(context);
 
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 22, 20, 120),
-        children: [
-          Text(controller.tr('med_title'), style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: 8),
-          Text(controller.tr('med_subtitle')),
-          const SizedBox(height: 18),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(controller.tr('med_title')),
+      ),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 22, 20, 120),
+          children: [
+            Text(controller.tr('med_subtitle')),
+            const SizedBox(height: 18),
           AuraCard(
             child: Column(
               children: [
@@ -207,7 +209,8 @@ class _MedicationScreenState extends State<MedicationScreen> {
               ),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
