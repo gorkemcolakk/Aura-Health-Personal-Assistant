@@ -99,43 +99,45 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 ),
                 const SizedBox(height: 16),
                 AuraCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.water_drop_outlined),
-                          const SizedBox(width: 10),
-                          Text(
-                            controller.tr('dash_water_track'),
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const Spacer(),
-                        ],
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withValues(alpha: .10),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(Icons.water_drop_rounded, color: Theme.of(context).colorScheme.primary, size: 22),
                       ),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: [
-                          _WaterButton(
-                            label: '+250 ml',
-                            onTap: () => controller.addWater(250),
-                          ),
-                          _WaterButton(
-                            label: '+500 ml',
-                            onTap: () => controller.addWater(500),
-                          ),
-                          _WaterButton(
-                            label: '+750 ml',
-                            onTap: () => controller.addWater(750),
-                          ),
-                          _WaterButton(
-                            label: '+ ${controller.tr('dash_custom_water')}',
-                            icon: Icons.tune,
-                            onTap: () => _showCustomWaterDialog(context, controller),
-                          ),
-                        ],
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              controller.tr('dash_water_track'),
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${(HealthCalculator.todayWaterMl(profile) / 1000).toStringAsFixed(2)} L / ${(waterTarget / 1000).toStringAsFixed(2)} L',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        '%${(waterProgress * 100).toStringAsFixed(0)}',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 18,
+                        ),
                       ),
                     ],
                   ),
@@ -146,9 +148,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 ],
                 const SizedBox(height: 16),
                 _SleepCard(controller: controller),
-                const SizedBox(height: 16),
-                // Haftalık Grafikler butonu
-                _ChartsButton(controller: controller),
                 const SizedBox(height: 16),
                 if (nextMedication.isEmpty)
                   AuraCard(
@@ -498,7 +497,7 @@ class _WaterButton extends StatelessWidget {
   }
 }
 
-void _showCustomWaterDialog(BuildContext context, AuraController controller) {
+void showCustomWaterDialog(BuildContext context, AuraController controller) {
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -1098,15 +1097,6 @@ class _SleepCard extends StatelessWidget {
               style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
           ],
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () => _showSleepDialog(context, controller),
-              icon: const Icon(Icons.add),
-              label: Text('+ ${controller.tr('sleep_add')}'),
-            ),
-          ),
         ],
       ),
     );
@@ -1123,7 +1113,7 @@ bool _isYesterday(DateTime d) {
   return d.year == yesterday.year && d.month == yesterday.month && d.day == yesterday.day;
 }
 
-void _showSleepDialog(BuildContext context, AuraController controller) {
+void showSleepDialog(BuildContext context, AuraController controller) {
   double hours = 7.5;
   String selectedFeeling = '😐 Normal';
   DateTime selectedDate = DateTime.now();

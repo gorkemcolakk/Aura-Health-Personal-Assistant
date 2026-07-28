@@ -164,10 +164,22 @@ class TranslationService {
 
     // Bottom Nav
     'nav_today': {'tr': 'Bugün', 'en': 'Today'},
+    'nav_charts': {'tr': 'Grafikler', 'en': 'Charts'},
     'nav_profile': {'tr': 'Profil', 'en': 'Profile'},
     'nav_meds': {'tr': 'İlaç', 'en': 'Meds'},
     'nav_ai': {'tr': 'AI', 'en': 'AI'},
-    'nav_nearby': {'tr': 'Yakınlar', 'en': 'Nearby'},
+    'nav_nearby': {'tr': 'Yakın Sağlık', 'en': 'Nearby'},
+    'nav_quick': {'tr': 'Hızlı İşlemler', 'en': 'Quick Actions'},
+    'quick_water': {'tr': 'Su Ekle', 'en': 'Add Water'},
+    'quick_water_sub': {'tr': 'Günlük su tüketimine ekle', 'en': 'Add to daily water intake'},
+    'quick_sleep': {'tr': 'Uyku Ekle', 'en': 'Add Sleep'},
+    'quick_sleep_sub': {'tr': 'Bugünkü uyku kaydını ekle', 'en': 'Log today\'s sleep'},
+    'quick_med': {'tr': 'İlaç Yönetimi', 'en': 'Medication'},
+    'quick_med_sub': {'tr': 'İlaç ekle veya yönet', 'en': 'Add or manage medications'},
+    'quick_nearby': {'tr': 'Yakın Sağlık Kuruluşları', 'en': 'Nearby Health Facilities'},
+    'quick_nearby_sub': {'tr': 'Çevrendeki sağlık tesislerini bul', 'en': 'Find health facilities near you'},
+    'quick_pdf': {'tr': 'Doktor Raporu', 'en': 'Doctor Report'},
+    'quick_pdf_sub': {'tr': 'AI destekli PDF raporu oluştur', 'en': 'Generate AI-powered PDF report'},
 
     // Dashboard
     'dash_health_panel': {'tr': 'Sağlık Paneli', 'en': 'Health Panel'},
