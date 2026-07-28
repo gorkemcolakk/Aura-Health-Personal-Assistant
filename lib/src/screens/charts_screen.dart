@@ -108,7 +108,8 @@ class _WaterWaveChart extends StatelessWidget {
 
     final maxVal = data.fold<double>(0, (m, d) => max(m, d.amountMl.toDouble()));
     final computedMax = max(5000.0, maxVal);
-    final maxY = ((computedMax / 1000).ceil() * 1000).toDouble();
+    final baseMaxY = ((computedMax / 1000).ceil() * 1000).toDouble();
+    final maxY = baseMaxY + 150;
 
     final colors = Theme.of(context).colorScheme;
 
@@ -295,7 +296,8 @@ class _SleepLineChart extends StatelessWidget {
 
     final maxVal = data.fold<double>(0, (m, d) => max(m, d.hours));
     final computedMax = max(12.0, maxVal);
-    final maxY = ((computedMax / 2).ceil() * 2).toDouble();
+    final baseMaxY = ((computedMax / 2).ceil() * 2).toDouble();
+    final maxY = baseMaxY + 0.3;
 
     return AuraCard(
       child: Column(
