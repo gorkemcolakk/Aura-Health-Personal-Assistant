@@ -6,9 +6,11 @@ mixin AuraMedicationMixin on AuraControllerBase {
     
     final now = DateTime.now();
     final todayStr = now.toIso8601String().split('T').first;
+    final todayWeekday = now.weekday;
 
     for (final med in medications) {
       if (!med.enabled || med.isTakenToday) continue;
+      if (!med.daysOfWeek.contains(todayWeekday)) continue;
       
       if (med.hour == now.hour && med.minute == now.minute) {
         final alarmId = '${med.id}_$todayStr';
