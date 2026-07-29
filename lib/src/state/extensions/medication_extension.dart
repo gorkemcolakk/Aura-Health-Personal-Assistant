@@ -39,7 +39,17 @@ mixin AuraMedicationMixin on AuraControllerBase {
     if (index >= 0) {
       final med = medications[index];
       final todayStr = DateTime.now().toIso8601String().split('T').first;
-      final updatedMed = med.copyWith(lastTakenDate: todayStr);
+      
+      int? newStock = med.stock;
+      if (!med.isTakenToday && newStock != null && newStock > 0) {
+        newStock -= 1;
+      }
+      
+      final updatedMed = med.copyWith(
+        lastTakenDate: todayStr,
+        stock: newStock,
+      );
+      
       final newList = List<Medication>.from(medications)..[index] = updatedMed;
       medications = newList;
       if (currentUserTc != null) {
@@ -86,18 +96,26 @@ mixin AuraMedicationMixin on AuraControllerBase {
 
   Future<void> toggleMedicationTaken(Medication medication, bool taken) async {
     final today = DateTime.now().toIso8601String().split('T').first;
-    final updated = Medication(
-      id: medication.id,
-      name: medication.name,
-      dosage: medication.dosage,
-      hour: medication.hour,
-      minute: medication.minute,
-      notes: medication.notes,
-      enabled: medication.enabled,
-      mealTiming: medication.mealTiming,
-      daysOfWeek: medication.daysOfWeek,
+    int? newStock = medication.stock;
+    
+    if (taken && !medication.isTakenToday) {
+      if (newStock != null && newStock > 0) newStock -= 1;
+    } else if (!taken && medication.isTakenToday) {
+      // Revert the stock deduction
+      if (newStock != null) newStock += 1;
+    }
+
+    final updated = medication.copyWith(
       lastTakenDate: taken ? today : null,
+      stock: newStock,
+      clearStock: taken ? false : (newStock == null), // Avoid accidentally setting stock to null in copyWith if it wasn't null
     );
+    // Actually wait, if clearStock is false, copyWith(stock: null) will just keep original stock, which is what we want?
+    // Let me check copyWith: `stock: clearStock ? null : (stock ?? this.stock)`. 
+    // If I want to update stock to 0, I pass stock: 0. clearStock will be false. It sets stock: 0.
+    // So the above `clearStock` logic is not strictly needed here unless I want to explicitly remove stock, which I don't.
+    // Let's just pass `stock: newStock`.
+
     await upsertMedication(updated);
   }
 }

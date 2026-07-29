@@ -12,6 +12,7 @@ class Medication {
     this.lastTakenDate,
     this.mealTiming = 'Farketmez',
     this.daysOfWeek = const [1, 2, 3, 4, 5, 6, 7],
+    this.stock,
   });
 
   factory Medication.fromMap(Map<String, dynamic> json) {
@@ -27,6 +28,7 @@ class Medication {
       mealTiming: json['mealTiming'] as String? ?? 'Farketmez',
       daysOfWeek: (json['daysOfWeek'] as List<dynamic>?)?.cast<int>() ??
           const [1, 2, 3, 4, 5, 6, 7],
+      stock: json['stock'] as int?,
     );
   }
 
@@ -40,6 +42,7 @@ class Medication {
   final String? lastTakenDate;
   final String mealTiming;
   final List<int> daysOfWeek;
+  final int? stock;
 
   int get notificationId => id.hashCode & 0x7fffffff;
 
@@ -65,6 +68,8 @@ class Medication {
     String? lastTakenDate,
     String? mealTiming,
     List<int>? daysOfWeek,
+    int? stock,
+    bool clearStock = false,
   }) {
     return Medication(
       id: id,
@@ -77,6 +82,7 @@ class Medication {
       lastTakenDate: lastTakenDate ?? this.lastTakenDate,
       mealTiming: mealTiming ?? this.mealTiming,
       daysOfWeek: daysOfWeek ?? this.daysOfWeek,
+      stock: clearStock ? null : (stock ?? this.stock),
     );
   }
 
@@ -92,6 +98,7 @@ class Medication {
       'lastTakenDate': lastTakenDate,
       'mealTiming': mealTiming,
       'daysOfWeek': daysOfWeek,
+      'stock': stock,
     };
   }
 

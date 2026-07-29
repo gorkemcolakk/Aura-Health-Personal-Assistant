@@ -42,9 +42,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     final bmi = HealthCalculator.bmi(profile);
     final waterTarget = HealthCalculator.dailyWaterTargetMl(profile);
     final waterProgress = HealthCalculator.waterProgress(profile);
+    final todayWeekday = DateTime.now().weekday;
     final nextMedication =
         controller.medications
-            .where((item) => item.enabled)
+            .where((item) => item.enabled && item.daysOfWeek.contains(todayWeekday))
             .cast<dynamic>()
             .toList()
           ..sort((a, b) => a.timeLabel.compareTo(b.timeLabel));
@@ -192,11 +193,24 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${nextMedication[i].dosage} • ${nextMedication[i].mealTiming == 'Aç' ? controller.tr('med_meal_before') : nextMedication[i].mealTiming == 'Tok' ? controller.tr('med_meal_after') : controller.tr('med_meal_any')}',
+                                  '${nextMedication[i].dosage} • ${nextMedication[i].mealTiming == 'Aç' ? controller.tr('med_meal_before') : nextMedication[i].mealTiming == 'Tok' ? controller.tr('med_meal_after') : nextMedication[i].mealTiming == 'Yemekle Beraber' ? (controller.languageCode == 'tr' ? 'Yemekle Beraber' : 'With Meal') : controller.tr('med_meal_any')}',
                                   style: TextStyle(
                                     color: nextMedication[i].isTakenToday ? Colors.grey : null,
                                   ),
                                 ),
+                                if (nextMedication[i].stock != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    child: Text(
+                                      controller.languageCode == 'tr' ? 'Kalan Stok: ${nextMedication[i].stock}' : 'Remaining Stock: ${nextMedication[i].stock}',
+                                      style: TextStyle(
+                                        color: nextMedication[i].isTakenToday ? Colors.grey : (nextMedication[i].stock! <= 5 ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                        decoration: nextMedication[i].isTakenToday ? TextDecoration.lineThrough : null,
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                           ),
