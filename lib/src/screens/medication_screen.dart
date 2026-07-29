@@ -640,7 +640,7 @@ class _ContributionGrid extends StatelessWidget {
 
   static const double _box = 16.0;
   static const double _gap = 3.0;
-  static const double _labelW = 34.0;
+  static const double _labelW = 38.0;
   static const double _colPad = 6.0;
 
   String _monthShort(DateTime d, String lang) {
@@ -692,8 +692,9 @@ class _ContributionGrid extends StatelessWidget {
                     child: Text(
                       '${w.day}\n${_monthShort(w, lang)}',
                       style: TextStyle(
-                        fontSize: 9, 
-                        color: colors.onSurfaceVariant,
+                        fontSize: 11, 
+                        fontWeight: FontWeight.w600,
+                        color: colors.onSurface.withValues(alpha: 0.7),
                         height: 1.1,
                       ),
                       textAlign: TextAlign.center,
@@ -713,10 +714,11 @@ class _ContributionGrid extends StatelessWidget {
                     child: Text(
                       _dayShort(dow, lang),
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
                         color: scheduledDays.contains(dow)
                             ? colors.onSurface
-                            : colors.onSurface.withValues(alpha: 0.2),
+                            : colors.onSurfaceVariant.withValues(alpha: 0.4),
                       ),
                     ),
                   ),
@@ -845,7 +847,7 @@ class _ContributionGrid extends StatelessWidget {
         const SizedBox(width: 4),
         Text(label,
             style:
-                TextStyle(fontSize: 10, color: colors.onSurfaceVariant)),
+                TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: colors.onSurfaceVariant)),
       ],
     );
   }
