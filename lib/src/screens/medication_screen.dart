@@ -470,22 +470,42 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: List.generate(7, (index) {
-                final day = index + 1;
-                final isSelected = _selectedDays.contains(day);
-                final label = _dayNameShort(day, widget.controller.languageCode);
-                return FilterChip(
-                  label: Text(label),
-                  selected: isSelected,
-                  onSelected: (_) => _toggleDay(day),
+              children: [
+                FilterChip(
+                  label: Text(isTr ? 'Her gün' : 'Everyday'),
+                  selected: _selectedDays.length == 7,
+                  onSelected: (val) {
+                    setState(() {
+                      _selectedDays.clear();
+                      if (val) {
+                        _selectedDays.addAll([1, 2, 3, 4, 5, 6, 7]);
+                      }
+                    });
+                  },
                   selectedColor: colors.primaryContainer,
                   checkmarkColor: colors.primary,
                   labelStyle: TextStyle(
-                    color: isSelected ? colors.primary : colors.onSurface,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    color: _selectedDays.length == 7 ? colors.primary : colors.onSurface,
+                    fontWeight: _selectedDays.length == 7 ? FontWeight.bold : FontWeight.normal,
                   ),
-                );
-              }),
+                ),
+                ...List.generate(7, (index) {
+                  final day = index + 1;
+                  final isSelected = _selectedDays.contains(day);
+                  final label = _dayNameShort(day, widget.controller.languageCode);
+                  return FilterChip(
+                    label: Text(label),
+                    selected: isSelected,
+                    onSelected: (_) => _toggleDay(day),
+                    selectedColor: colors.primaryContainer,
+                    checkmarkColor: colors.primary,
+                    labelStyle: TextStyle(
+                      color: isSelected ? colors.primary : colors.onSurface,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  );
+                }),
+              ],
             ),
             const SizedBox(height: 16),
             Wrap(
