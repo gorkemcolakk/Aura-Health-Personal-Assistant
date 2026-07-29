@@ -3,14 +3,15 @@ import '../models/mood_log.dart';
 import '../state/aura_scope.dart';
 
 class MoodEntrySheet extends StatefulWidget {
-  const MoodEntrySheet({super.key});
+  final MoodLog? initialLog;
+  const MoodEntrySheet({super.key, this.initialLog});
 
-  static Future<void> show(BuildContext context) {
+  static Future<void> show(BuildContext context, {MoodLog? initialLog}) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const MoodEntrySheet(),
+      builder: (_) => MoodEntrySheet(initialLog: initialLog),
     );
   }
 
@@ -19,11 +20,20 @@ class MoodEntrySheet extends StatefulWidget {
 }
 
 class _MoodEntrySheetState extends State<MoodEntrySheet> {
-  // 1.0 (Very Bad) to 5.0 (Excellent)
   double _moodValue = 3.0;
 
   final Set<String> _selectedSymptoms = {};
   final TextEditingController _noteController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialLog != null) {
+      _moodValue = widget.initialLog!.moodLevel.toDouble();
+      _selectedSymptoms.addAll(widget.initialLog!.symptoms);
+      _noteController.text = widget.initialLog!.note;
+    }
+  }
 
   final List<String> _symptomsTr = [
     'Baş Ağrısı',

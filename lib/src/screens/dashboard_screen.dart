@@ -1611,7 +1611,7 @@ class _MoodCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
         onTap: () {
-          MoodEntrySheet.show(context);
+          MoodEntrySheet.show(context, initialLog: log);
         },
         child: Container(
           padding: const EdgeInsets.all(16),
