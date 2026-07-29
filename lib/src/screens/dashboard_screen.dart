@@ -68,7 +68,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             sliver: SliverList.list(
               children: [
                 // 4. Fiziksel Durum
-                _sectionTitle('Fiziksel Durum', Theme.of(context)),
+                _sectionTitle(controller.languageCode == 'tr' ? 'Fiziksel Durum' : 'Physical Status', Theme.of(context)),
                 Row(
                   children: [
                     Expanded(
@@ -119,7 +119,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 const SizedBox(height: 24),
 
                 // 3. Bugünkü İlaçlarım
-                _sectionTitle('Bugünkü İlaçlarım', Theme.of(context)),
+                _sectionTitle(controller.languageCode == 'tr' ? 'Bugünkü İlaçlarım' : 'Today\'s Medications', Theme.of(context)),
                 if (nextMedication.isEmpty)
                   AuraCard(
                     child: Row(
@@ -184,7 +184,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${nextMedication[i].period ?? ''} • ${nextMedication[i].mealTiming == 'Aç' ? controller.tr('med_meal_before') : nextMedication[i].mealTiming == 'Tok' ? controller.tr('med_meal_after') : nextMedication[i].mealTiming == 'Yemekle Beraber' ? (controller.languageCode == 'tr' ? 'Yemekle Beraber' : 'With Meal') : controller.tr('med_meal_any')}',
+                                  '${_periodName(nextMedication[i].period, controller.languageCode)} • ${nextMedication[i].mealTiming == 'Aç' ? controller.tr('med_meal_before') : nextMedication[i].mealTiming == 'Tok' ? controller.tr('med_meal_after') : nextMedication[i].mealTiming == 'Yemekle Beraber' ? (controller.languageCode == 'tr' ? 'Yemekle Beraber' : 'With Meal') : controller.tr('med_meal_any')}',
                                   style: TextStyle(
                                     color: nextMedication[i].isTakenToday ? Colors.grey : null,
                                   ),
@@ -239,6 +239,18 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         ),
       ),
     );
+  }
+
+  String _periodName(String? period, String lang) {
+    if (period == null) return '';
+    if (lang == 'tr') return period;
+    switch (period) {
+      case 'Sabah': return 'Morning';
+      case 'Öğle': return 'Noon';
+      case 'Akşam': return 'Evening';
+      case 'Gece': return 'Night';
+      default: return period;
+    }
   }
 }
 
