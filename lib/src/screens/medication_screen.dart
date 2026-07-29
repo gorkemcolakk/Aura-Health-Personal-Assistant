@@ -175,7 +175,8 @@ class _MedicationCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(24),
           onTap: () {
-             // Sadece görsel tıklama efekti için bırakıldı, ilaç içme işlemi Dashboard'dan yapılıyor.
+            final group = controller.medications.where((m) => m.groupId == medication.groupId).toList();
+            _showAddMedicationSheet(context, controller, existingGroup: group.isEmpty ? [medication] : group);
           },
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -278,18 +279,19 @@ class _MedicationCard extends StatelessWidget {
   }
 }
 
-void _showAddMedicationSheet(BuildContext context, AuraController controller) {
+void _showAddMedicationSheet(BuildContext context, AuraController controller, {List<Medication>? existingGroup}) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (ctx) => _AddMedicationSheet(controller: controller),
+    builder: (ctx) => _AddMedicationSheet(controller: controller, existingGroup: existingGroup),
   );
 }
 
 class _AddMedicationSheet extends StatefulWidget {
-  const _AddMedicationSheet({required this.controller});
+  const _AddMedicationSheet({required this.controller, this.existingGroup});
   final AuraController controller;
+  final List<Medication>? existingGroup;
 
   @override
   State<_AddMedicationSheet> createState() => _AddMedicationSheetState();
@@ -300,8 +302,25 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
   final _stock = TextEditingController();
   final Map<String, TimeOfDay> _selectedPeriods = {};
   String _mealTiming = 'Farketmez';
-  final List<int> _selectedDays = []; // Default to empty list as requested
+  final List<int> _selectedDays = []; 
   final List<String> _availablePeriods = ['Sabah', 'Öğle', 'Akşam', 'Gece'];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existingGroup != null && widget.existingGroup!.isNotEmpty) {
+      final first = widget.existingGroup!.first;
+      _name.text = first.name;
+      _stock.text = first.stock?.toString() ?? '';
+      _mealTiming = first.mealTiming;
+      _selectedDays.addAll(first.daysOfWeek);
+      for (final med in widget.existingGroup!) {
+        if (med.period != null) {
+          _selectedPeriods[med.period!] = TimeOfDay(hour: med.hour, minute: med.minute);
+        }
+      }
+    }
+  }
 
   void _togglePeriod(String period) {
     setState(() {
@@ -380,7 +399,9 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                 ),
                 const SizedBox(width: 16),
                 Text(
-                  isTr ? 'Yeni İlaç Ekle' : 'Add New Medication',
+                  widget.existingGroup != null 
+                    ? (isTr ? 'İlacı Düzenle' : 'Edit Medication') 
+                    : (isTr ? 'Yeni İlaç Ekle' : 'Add New Medication'),
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
                 ),
               ],
@@ -550,7 +571,16 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                   stockVal = int.tryParse(_stock.text.trim());
                 }
 
-                final groupId = DateTime.now().microsecondsSinceEpoch.toString();
+                final groupId = widget.existingGroup != null && widget.existingGroup!.isNotEmpty
+                    ? widget.existingGroup!.first.groupId ?? DateTime.now().microsecondsSinceEpoch.toString()
+                    : DateTime.now().microsecondsSinceEpoch.toString();
+
+                // If editing, remove the old ones first
+                if (widget.existingGroup != null) {
+                  for (final med in widget.existingGroup!) {
+                    await widget.controller.removeMedication(med);
+                  }
+                }
 
                 for (final entry in _selectedPeriods.entries) {
                   await widget.controller.upsertMedication(
@@ -573,11 +603,11 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                 if (context.mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(tr('med_add_success'))),
+                    SnackBar(content: Text(widget.existingGroup != null ? (isTr ? 'İlaç güncellendi' : 'Medication updated') : tr('med_add_success'))),
                   );
                 }
               },
-              child: Text(tr('med_btn_add'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              child: Text(widget.existingGroup != null ? (isTr ? 'Kaydet' : 'Save') : tr('med_btn_add'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
