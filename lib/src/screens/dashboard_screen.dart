@@ -962,9 +962,8 @@ class _SleepCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
 
-    // Bugünün uykusunu bul, yoksa dünün, o da yoksa null
+    // Bugünün uykusunu bul, yoksa null
     final todaySleep = controller.profile.sleepLogs
         .where((l) => l.date.year == today.year && l.date.month == today.month && l.date.day == today.day)
         .toList()
