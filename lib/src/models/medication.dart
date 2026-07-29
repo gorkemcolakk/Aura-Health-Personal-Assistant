@@ -15,6 +15,7 @@ class Medication {
     this.stock,
     this.period,
     this.groupId,
+    this.takenHistory = const [],
   });
 
   factory Medication.fromMap(Map<String, dynamic> json) {
@@ -33,6 +34,7 @@ class Medication {
       stock: json['stock'] as int?,
       period: json['period'] as String?,
       groupId: json['groupId'] as String?,
+      takenHistory: (json['takenHistory'] as List<dynamic>?)?.cast<String>() ?? const [],
     );
   }
 
@@ -50,13 +52,18 @@ class Medication {
   final String? period;
   final String? groupId;
 
+  /// Tüm alınan dozların tarihleri: ["YYYY-MM-DD", ...]
+  final List<String> takenHistory;
+
   int get notificationId => id.hashCode & 0x7fffffff;
 
   bool get isTakenToday {
-    if (lastTakenDate == null) return false;
     final today = DateTime.now().toIso8601String().split('T').first;
-    return lastTakenDate == today;
+    return takenHistory.contains(today) || lastTakenDate == today;
   }
+
+  /// Belirtilen tarihte bu dozun alınıp alınmadığını kontrol eder.
+  bool isDoseTaken(String date) => takenHistory.contains(date);
 
   String get timeLabel {
     final hourText = hour.toString().padLeft(2, '0');
@@ -77,6 +84,7 @@ class Medication {
     int? stock,
     String? period,
     String? groupId,
+    List<String>? takenHistory,
     bool clearStock = false,
     bool clearDate = false,
   }) {
@@ -94,6 +102,7 @@ class Medication {
       stock: clearStock ? null : (stock ?? this.stock),
       period: period ?? this.period,
       groupId: groupId ?? this.groupId,
+      takenHistory: takenHistory ?? this.takenHistory,
     );
   }
 
@@ -112,6 +121,7 @@ class Medication {
       'stock': stock,
       'period': period,
       'groupId': groupId,
+      'takenHistory': takenHistory,
     };
   }
 
