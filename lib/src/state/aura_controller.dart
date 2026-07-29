@@ -6,6 +6,7 @@ import '../models/chat_message.dart';
 import '../models/chat_session.dart';
 import '../models/health_profile.dart';
 import '../models/medication.dart';
+import '../models/mood_log.dart';
 import '../models/sleep_log.dart';
 import '../models/water_log.dart';
 import '../services/ai_coach_service.dart';

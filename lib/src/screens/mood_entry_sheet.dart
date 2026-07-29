@@ -120,7 +120,7 @@ class _MoodEntrySheetState extends State<MoodEntrySheet> {
             child: Container(
               width: 40,
               height: 4,
-              margin: const EdgeInsets.bottom(24),
+              margin: const EdgeInsets.only(bottom: 24),
               decoration: BoxDecoration(
                 color: sysColors.onSurfaceVariant.withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(2),

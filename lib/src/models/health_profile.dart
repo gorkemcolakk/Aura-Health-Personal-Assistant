@@ -130,6 +130,7 @@ class HealthProfile {
   final int waterConsumedMl;
   final List<WaterLog> waterLogs;
   final List<SleepLog> sleepLogs;
+  final List<MoodLog> moodLogs;
   final String bloodType;
   final String allergies;
   final String emergencyContact;
