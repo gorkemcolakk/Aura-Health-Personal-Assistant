@@ -211,7 +211,7 @@ class _MedicationCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${medication.period ?? ''} • ${medication.timeLabel}',
+                        '${_periodName(medication.period, controller.languageCode)} • ${medication.timeLabel}',
                         style: TextStyle(
                           color: colors.onSurfaceVariant,
                           fontSize: 13,
@@ -277,6 +277,18 @@ class _MedicationCard extends StatelessWidget {
       }
     }
   }
+
+  String _periodName(String? period, String lang) {
+    if (period == null) return '';
+    if (lang == 'tr') return period;
+    switch (period) {
+      case 'Sabah': return 'Morning';
+      case 'Öğle': return 'Noon';
+      case 'Akşam': return 'Evening';
+      case 'Gece': return 'Night';
+      default: return period;
+    }
+  }
 }
 
 void _showAddMedicationSheet(BuildContext context, AuraController controller, {List<Medication>? existingGroup}) {
@@ -338,6 +350,17 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
         _selectedPeriods[period] = defaultTime;
       }
     });
+  }
+
+  String _periodName(String period, String lang) {
+    if (lang == 'tr') return period;
+    switch (period) {
+      case 'Sabah': return 'Morning';
+      case 'Öğle': return 'Noon';
+      case 'Akşam': return 'Evening';
+      case 'Gece': return 'Night';
+      default: return period;
+    }
   }
 
   @override
@@ -438,7 +461,7 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
               children: _availablePeriods.map((period) {
                 final isSelected = _selectedPeriods.containsKey(period);
                 return FilterChip(
-                  label: Text(period),
+                  label: Text(_periodName(period, widget.controller.languageCode)),
                   selected: isSelected,
                   onSelected: (_) => _togglePeriod(period),
                   selectedColor: colors.primaryContainer,
@@ -474,7 +497,7 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                             }
                           },
                           icon: const Icon(Icons.schedule),
-                          label: Text('${isTr ? "${entry.key} Saati:" : "${entry.key} Time:"} ${entry.value.format(context)}'),
+                          label: Text('${isTr ? "${_periodName(entry.key, widget.controller.languageCode)} Saati:" : "${_periodName(entry.key, widget.controller.languageCode)} Time:"} ${entry.value.format(context)}'),
                         ),
                       ),
                     ],
