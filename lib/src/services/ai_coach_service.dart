@@ -78,6 +78,12 @@ class AiCoachService {
         : "";
     final medList = medications.map((m) => "- ${m.name} (${m.dosage})").join('\n');
 
+    final moodLogs = profile.moodLogs;
+    final lastMood = moodLogs.isNotEmpty ? moodLogs.last : null;
+    final moodText = lastMood != null 
+        ? "\n- Bugün Hissedilen Duygu (1-5): ${lastMood.moodLevel}/5 (Belirtiler: ${lastMood.symptoms.isEmpty ? 'Yok' : lastMood.symptoms.join(', ')})"
+        : "";
+
     return '''
 Sen uzman bir sağlık koçu ve doktor, diyetisyen, spor eğitmeni "Aura Health AI"sın.
 Hastanın profili:
@@ -90,7 +96,7 @@ Hastanın profili:
 - Sağlık hedefi: ${profile.healthGoal}
 - Hastalıklar/Durum: ${profile.conditions.isEmpty ? 'Belirtilmedi' : profile.conditions}
 - Alerjiler: ${profile.allergies.isEmpty ? 'Belirtilmedi' : profile.allergies}
-- Bugün İçilen Su: ${HealthCalculator.todayWaterMl(profile)} / $waterTarget ml$sleepText
+- Bugün İçilen Su: ${HealthCalculator.todayWaterMl(profile)} / $waterTarget ml$sleepText$moodText
 - Vücut Kitle İndeksi (VKİ): ${HealthCalculator.bmi(profile).toStringAsFixed(1)}
 
 Şu anki ilaçları:
@@ -117,6 +123,7 @@ VKİ değerin yaklaşık ${bmi.toStringAsFixed(1)} ve kategori "$label". Günlü
 
   Future<String> generateDoctorSummary({
     required HealthProfile profile,
+    required List<Medication> medications,
     required String langCode,
     String? apiKey,
     int days = 7,
@@ -139,6 +146,12 @@ VKİ değerin yaklaşık ${bmi.toStringAsFixed(1)} ve kategori "$label". Günlü
       final avgWater = dataWater.isEmpty ? 0.0 : dataWater.map((e) => e.amountMl).reduce((a, b) => a + b) / days;
       final reachedWaterDays = dataWater.where((d) => d.amountMl >= waterTarget).length;
       
+      final dataMood = profile.moodLogs.where((log) => DateTime.now().difference(log.timestamp).inDays <= days).toList();
+      final avgMood = dataMood.isEmpty ? 0.0 : dataMood.map((e) => e.moodLevel).reduce((a, b) => a + b) / dataMood.length;
+      final recentSymptoms = dataMood.expand((e) => e.symptoms).toSet().join(', ');
+
+      final medList = medications.isEmpty ? 'Yok' : medications.map((m) => "- ${m.name} (${m.dosage})").join('\n');
+      
       final systemPrompt = '''Sen uzman bir doktora ön değerlendirme sunan tıbbi asistan "Aura"sın.
 Hastanın bilgileri:
 - Cinsiyet: ${profile.gender}, Yaş: ${profile.age}, Boy: ${profile.heightCm} cm, Kilo: ${profile.weightKg} kg, VKİ: ${bmi.toStringAsFixed(1)}
@@ -149,6 +162,10 @@ Hastanın bilgileri:
 Rapor Periyodu: Son $days Günlük Veriler
 - Ortalama Uyku Süresi: ${avgSleep.toStringAsFixed(1)} saat/gün (Hedef: ${sleepTarget.toStringAsFixed(1)} saat, Hedefe ulaşılan gün sayısı: $reachedSleepDays/$days)
 - Ortalama Su Tüketimi: ${avgWater.round()} ml/gün (Hedef: $waterTarget ml, Hedefe ulaşılan gün sayısı: $reachedWaterDays/$days)
+- Duygu Durumu Ortalaması (1-5): ${avgMood > 0 ? avgMood.toStringAsFixed(1) : 'Veri Yok'} (Sık Görülen Belirtiler: ${recentSymptoms.isEmpty ? 'Yok' : recentSymptoms})
+
+Kullandığı İlaçlar ve Programı:
+$medList
 
 Görevin: Bu verileri ve geçmiş performansları okuyan uzman doktor için kapsamlı ve detaylı (yaklaşık 5-7 cümlelik) bir tıbbi ön değerlendirme ve özet yazmak. Hastanın cinsiyeti, yaş, VKİ, alerjileri, mevcut durumu, sağlık hedefleri ve bu süreçteki uyku/su karnesini dikkate alarak profesyonel bir tıbbi dille açıklama yap. Gerekli önerileri ve dikkat edilmesi gereken noktaları da belirt. Sadece doktorun okuyacağı bir rapor notu olarak hazırla. Selamlama veya kapanış yapma.
 IMPORTANT: You MUST reply in the language specified by the ISO code: "$langCode". If it's "en", reply entirely in English. If it's "tr", reply entirely in Turkish.''';

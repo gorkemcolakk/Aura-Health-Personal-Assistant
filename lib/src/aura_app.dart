@@ -561,6 +561,7 @@ void _openPdf(BuildContext context, AuraController controller, int days) {
     MaterialPageRoute(
       builder: (_) => PdfPreviewScreen(
         profile: controller.profile,
+        medications: controller.medications,
         apiKey: controller.apiKey,
         langCode: controller.languageCode,
         days: days,

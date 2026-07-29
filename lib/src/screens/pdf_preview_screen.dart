@@ -3,17 +3,19 @@ import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 
 import '../models/health_profile.dart';
+import '../models/medication.dart';
 import '../services/ai_coach_service.dart';
 import '../services/pdf_service.dart';
 import '../services/translation_service.dart';
 
 class PdfPreviewScreen extends StatefulWidget {
   final HealthProfile profile;
+  final List<Medication> medications;
   final String? apiKey;
   final String langCode;
   final int days;
 
-  const PdfPreviewScreen({super.key, required this.profile, this.apiKey, required this.langCode, this.days = 7});
+  const PdfPreviewScreen({super.key, required this.profile, required this.medications, this.apiKey, required this.langCode, this.days = 7});
 
   @override
   State<PdfPreviewScreen> createState() => _PdfPreviewScreenState();
@@ -35,6 +37,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
       final aiService = AiCoachService();
       final summary = await aiService.generateDoctorSummary(
         profile: widget.profile,
+        medications: widget.medications,
         apiKey: widget.apiKey,
         langCode: widget.langCode,
         days: widget.days,
