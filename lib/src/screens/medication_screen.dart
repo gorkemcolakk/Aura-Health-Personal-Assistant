@@ -48,19 +48,71 @@ class MedicationScreen extends StatelessWidget {
                 runSpacing: 8,
                 children: stockItems.entries.map((entry) {
                   final isLow = entry.value <= 5;
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isLow ? colors.errorContainer : colors.primaryContainer.withValues(alpha: 0.3),
+                  return Material(
+                    color: Colors.transparent,
+                    child: InkWell(
                       borderRadius: BorderRadius.circular(12),
-                      border: isLow ? Border.all(color: colors.error.withValues(alpha: 0.5)) : null,
-                    ),
-                    child: Text(
-                      '${entry.key}: ${entry.value} ${controller.languageCode == 'tr' ? 'adet' : 'pcs'}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: isLow ? colors.onErrorContainer : colors.onSurface,
+                      onTap: () {
+                        final stockController = TextEditingController(text: entry.value.toString());
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text(controller.languageCode == 'tr' ? 'Stok Güncelle: ${entry.key}' : 'Update Stock: ${entry.key}'),
+                            content: TextField(
+                              controller: stockController,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              decoration: InputDecoration(
+                                labelText: controller.languageCode == 'tr' ? 'Yeni Stok' : 'New Stock',
+                                border: const OutlineInputBorder(),
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(controller.tr('btn_cancel')),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  final newStock = int.tryParse(stockController.text);
+                                  if (newStock != null) {
+                                    final firstMed = controller.medications.firstWhere((m) => m.name == entry.key);
+                                    controller.upsertMedication(firstMed.copyWith(stock: newStock, clearStock: false));
+                                    Navigator.pop(context);
+                                  }
+                                },
+                                child: Text(controller.languageCode == 'tr' ? 'Kaydet' : 'Save'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isLow ? colors.errorContainer : colors.primaryContainer.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(12),
+                          border: isLow ? Border.all(color: colors.error.withValues(alpha: 0.5)) : null,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${entry.key}: ${entry.value} ${controller.languageCode == 'tr' ? 'adet' : 'pcs'}',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: isLow ? colors.onErrorContainer : colors.onSurface,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.edit,
+                              size: 14,
+                              color: isLow ? colors.onErrorContainer : colors.onSurface.withValues(alpha: 0.7),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -123,7 +175,7 @@ class _MedicationCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(24),
           onTap: () {
-             controller.toggleMedicationTaken(medication, !medication.isTakenToday);
+             // Sadece görsel tıklama efekti için bırakıldı, ilaç içme işlemi Dashboard'dan yapılıyor.
           },
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -153,15 +205,14 @@ class _MedicationCard extends StatelessWidget {
                         medication.name,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
-                          decoration: medication.isTakenToday ? TextDecoration.lineThrough : null,
-                          color: medication.isTakenToday ? Colors.grey : colors.onSurface,
+                          color: colors.onSurface,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${medication.period ?? ''} • ${medication.timeLabel}',
                         style: TextStyle(
-                          color: medication.isTakenToday ? Colors.grey : colors.onSurfaceVariant,
+                          color: colors.onSurfaceVariant,
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
                         ),
@@ -170,7 +221,7 @@ class _MedicationCard extends StatelessWidget {
                       Text(
                         '${medication.mealTiming == 'Aç' ? controller.tr('med_meal_before') : medication.mealTiming == 'Tok' ? controller.tr('med_meal_after') : medication.mealTiming == 'Yemekle Beraber' ? (controller.languageCode == 'tr' ? 'Yemekle Beraber' : 'With Meal') : controller.tr('med_meal_any')} • $daysStr',
                         style: TextStyle(
-                          color: medication.isTakenToday ? Colors.grey : colors.onSurfaceVariant,
+                          color: colors.onSurfaceVariant,
                           fontSize: 12,
                         ),
                       ),
