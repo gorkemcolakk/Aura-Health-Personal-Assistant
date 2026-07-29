@@ -544,9 +544,7 @@ class _ContributionCardState extends State<_ContributionCard>
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            widget.group
-                                .map((m) => _localPeriod(m.period, lang))
-                                .join(' & '),
+                            '${rep.daysOfWeek.length == 7 ? (isTr ? 'Her gün' : 'Everyday') : rep.daysOfWeek.map((d) => _dayShort(d, lang)).join(', ')} • ${widget.group.map((m) => _localPeriod(m.period, lang)).join(' & ')}',
                             style: TextStyle(
                                 color: colors.onSurfaceVariant, fontSize: 12),
                           ),
@@ -625,7 +623,7 @@ class _ContributionGrid extends StatelessWidget {
   static const double _labelW = 34.0;
   static const double _colPad = 6.0;
 
-  String _monthLabel(DateTime d, String lang) {
+  String _monthShort(DateTime d, String lang) {
     const tr = [
       '', 'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
       'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
@@ -634,7 +632,7 @@ class _ContributionGrid extends StatelessWidget {
       '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
-    return '${(lang == 'tr' ? tr : en)[d.month]} ${d.day}';
+    return (lang == 'tr' ? tr : en)[d.month];
   }
 
   @override
@@ -672,10 +670,13 @@ class _ContributionGrid extends StatelessWidget {
               ...weeks.map((w) => SizedBox(
                     width: colW,
                     child: Text(
-                      _monthLabel(w, lang),
+                      '${w.day}\n${_monthShort(w, lang)}',
                       style: TextStyle(
-                          fontSize: 9, color: colors.onSurfaceVariant),
-                      overflow: TextOverflow.ellipsis,
+                        fontSize: 9, 
+                        color: colors.onSurfaceVariant,
+                        height: 1.1,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   )),
             ],
@@ -758,19 +759,22 @@ class _ContributionGrid extends StatelessWidget {
                                   ),
                                 );
                               }).toList()
-                            : List.generate(
-                                numPeriods,
-                                (_) => Container(
-                                  width: _box,
+                            : [
+                                SizedBox(
+                                  width: colW - _colPad,
                                   height: _box,
-                                  margin: EdgeInsets.only(right: _gap),
-                                  decoration: BoxDecoration(
-                                    color: colors.surfaceContainerHighest
-                                        .withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(4),
+                                  child: Center(
+                                    child: Container(
+                                      width: 4,
+                                      height: 4,
+                                      decoration: BoxDecoration(
+                                        color: colors.onSurfaceVariant.withValues(alpha: 0.3),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+                              ],
                       ),
                     );
                   }),
