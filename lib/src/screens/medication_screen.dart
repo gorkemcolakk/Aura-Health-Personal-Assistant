@@ -719,16 +719,28 @@ class _ContributionGrid extends StatelessWidget {
 
                                 if (isFuture) {
                                   fill = Colors.transparent;
-                                  border = colors.outline.withValues(alpha: 0.6);
+                                  border = colors.outline.withValues(alpha: 0.8);
                                 } else if (taken) {
                                   fill = colors.primary;
                                 } else {
-                                  fill = colors.onSurfaceVariant.withValues(alpha: 0.15);
+                                  fill = colors.onSurfaceVariant.withValues(alpha: 0.45);
                                 }
 
                                 return GestureDetector(
                                   onTap: isFuture
-                                      ? null
+                                      ? () {
+                                          ScaffoldMessenger.of(context).clearSnackBars();
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                isTr
+                                                    ? 'Gelecek doz: ${date.day} ${_monthShort(date, lang)} ${_dayShort(dow, lang)}'
+                                                    : 'Upcoming dose: ${date.day} ${_monthShort(date, lang)} ${_dayShort(dow, lang)}',
+                                              ),
+                                              duration: const Duration(seconds: 2),
+                                            ),
+                                          );
+                                        }
                                       : () => controller.toggleDoseTaken(
                                           med, dateStr),
                                   child: AnimatedContainer(
@@ -768,7 +780,7 @@ class _ContributionGrid extends StatelessWidget {
                                       width: 8,
                                       height: 2,
                                       decoration: BoxDecoration(
-                                        color: colors.onSurfaceVariant.withValues(alpha: 0.4),
+                                        color: colors.onSurfaceVariant.withValues(alpha: 0.2),
                                         borderRadius: BorderRadius.circular(1),
                                       ),
                                     ),
@@ -790,7 +802,7 @@ class _ContributionGrid extends StatelessWidget {
               _legendDot(colors.primary,
                   isTr ? 'Alındı' : 'Taken', colors),
               const SizedBox(width: 14),
-              _legendDot(colors.onSurfaceVariant.withValues(alpha: 0.15),
+              _legendDot(colors.onSurfaceVariant.withValues(alpha: 0.45),
                   isTr ? 'Alınmadı' : 'Missed', colors),
               const SizedBox(width: 14),
               _legendBorder(colors, isTr ? 'Gelecek' : 'Upcoming'),
@@ -827,7 +839,7 @@ class _ContributionGrid extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(2),
             border: Border.all(
-                color: colors.outline.withValues(alpha: 0.6)),
+                color: colors.outline.withValues(alpha: 0.8)),
           ),
         ),
         const SizedBox(width: 4),
