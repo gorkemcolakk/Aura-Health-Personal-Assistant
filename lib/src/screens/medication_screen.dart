@@ -501,6 +501,8 @@ class _ContributionCardState extends State<_ContributionCard>
     final total = widget.group.length;
     final allTaken = takenToday == total;
 
+    final isScheduledToday = rep.daysOfWeek.contains(DateTime.now().weekday);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: AuraCard(
@@ -552,30 +554,48 @@ class _ContributionCardState extends State<_ContributionCard>
                       ),
                     ),
                     // Today progress badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: allTaken
-                            ? colors.primaryContainer
-                            : takenToday > 0
-                                ? colors.secondaryContainer
-                                : colors.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        isTr
-                            ? 'Bugün $takenToday/$total'
-                            : 'Today $takenToday/$total',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
+                    if (!isScheduledToday)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: colors.surfaceContainerHighest.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          isTr ? 'Bugün Yok' : 'None Today',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
                           color: allTaken
-                              ? colors.primary
-                              : colors.onSurfaceVariant,
+                              ? colors.primaryContainer
+                              : takenToday > 0
+                                  ? colors.secondaryContainer
+                                  : colors.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          isTr
+                              ? 'Bugün $takenToday/$total'
+                              : 'Today $takenToday/$total',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: allTaken
+                                ? colors.primary
+                                : colors.onSurfaceVariant,
+                          ),
                         ),
                       ),
-                    ),
                     const SizedBox(width: 6),
                     AnimatedRotation(
                       turns: _expanded ? 0.5 : 0.0,
