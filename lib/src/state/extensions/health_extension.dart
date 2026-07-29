@@ -9,6 +9,26 @@ mixin AuraHealthMixin on AuraControllerBase {
     notifyListeners();
   }
 
+  Future<void> addMoodLog(MoodLog log) async {
+    final isToday = (DateTime d) => _isSameDay(d, log.timestamp);
+    
+    // Eğer aynı güne ait bir kayıt varsa, onu güncelleriz, yoksa yeni ekleriz
+    final filtered = profile.moodLogs
+        .where((l) => !isToday(l.timestamp))
+        .toList();
+    
+    filtered.add(log);
+    
+    // Tarihe göre sırala
+    filtered.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+    profile = profile.copyWith(moodLogs: filtered);
+    if (currentUserTc != null) {
+      await db.saveProfile(currentUserTc!, profile);
+    }
+    notifyListeners();
+  }
+
   Future<void> addWater(int ml, {DateTime? date}) async {
     final logDate = date ?? DateTime.now();
     final isToday = _isSameDay(logDate, DateTime.now());

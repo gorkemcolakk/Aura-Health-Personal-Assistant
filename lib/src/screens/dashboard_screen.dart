@@ -10,6 +10,7 @@ import '../state/aura_scope.dart';
 import '../widgets/aura_card.dart';
 import '../widgets/emergency_card.dart';
 import 'charts_screen.dart';
+import 'mood_entry_sheet.dart';
 import 'settings_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -67,6 +68,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
             sliver: SliverList.list(
               children: [
+                // Duygu Durumu Kartı
+                _MoodCard(controller: controller),
+                const SizedBox(height: 24),
+
                 // 4. Fiziksel Durum
                 _sectionTitle(controller.languageCode == 'tr' ? 'Fiziksel Durum' : 'Physical Status', Theme.of(context)),
                 Row(
@@ -1551,4 +1556,130 @@ class _WavePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_WavePainter old) => progress != old.progress || phase != old.phase;
+}
+
+class _MoodCard extends StatelessWidget {
+  const _MoodCard({required this.controller});
+  final AuraController controller;
+
+  String _getMoodEmoji(int value) {
+    if (value <= 1) return '😣';
+    if (value <= 2) return '🙁';
+    if (value <= 3) return '😐';
+    if (value <= 4) return '🙂';
+    return '😁';
+  }
+
+  String _getMoodLabel(int value, bool isTr) {
+    if (value <= 1) return isTr ? 'Çok Kötü' : 'Very Bad';
+    if (value <= 2) return isTr ? 'Kötü' : 'Bad';
+    if (value <= 3) return isTr ? 'Nötr' : 'Neutral';
+    if (value <= 4) return isTr ? 'İyi' : 'Good';
+    return isTr ? 'Harika' : 'Excellent';
+  }
+
+  Color _getMoodColor(int value) {
+    if (value <= 1) return Colors.redAccent.shade200;
+    if (value <= 2) return Colors.orangeAccent;
+    if (value <= 3) return Colors.amber.shade400;
+    if (value <= 4) return Colors.tealAccent.shade400;
+    return Colors.green.shade500;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final isTr = controller.languageCode == 'tr';
+    
+    // Find today's mood
+    final today = DateTime.now();
+    final isSameDay = (DateTime a, DateTime b) =>
+        a.year == b.year && a.month == b.month && a.day == b.day;
+        
+    final todayLogs = controller.profile.moodLogs
+        .where((log) => isSameDay(log.timestamp, today))
+        .toList();
+        
+    final hasMood = todayLogs.isNotEmpty;
+    final log = hasMood ? todayLogs.first : null;
+
+    final bgColor = hasMood ? _getMoodColor(log!.moodLevel).withValues(alpha: 0.15) : colors.primaryContainer.withValues(alpha: 0.3);
+    final fgColor = hasMood ? _getMoodColor(log!.moodLevel) : colors.primary;
+
+    return AuraCard(
+      padding: EdgeInsets.zero,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: () {
+          MoodEntrySheet.show(context);
+        },
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                bgColor,
+                colors.surfaceContainerLowest,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: fgColor.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  hasMood ? _getMoodEmoji(log!.moodLevel) : '🤔',
+                  style: const TextStyle(fontSize: 28),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      hasMood 
+                        ? (isTr ? 'Bugün ${_getMoodLabel(log!.moodLevel, isTr)} Hissediyorsun' : 'You feel ${_getMoodLabel(log!.moodLevel, isTr)} today')
+                        : (isTr ? 'Bugün nasıl hissediyorsun?' : 'How are you feeling today?'),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colors.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      hasMood 
+                        ? (isTr ? 'Güncellemek için dokun' : 'Tap to update')
+                        : (isTr ? 'Duygu durumunu kaydetmek için dokun' : 'Tap to log your state of mind'),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

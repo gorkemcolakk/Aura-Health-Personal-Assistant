@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'mood_log.dart';
 import 'sleep_log.dart';
 import 'water_log.dart';
 
@@ -27,6 +28,7 @@ class HealthProfile {
     required this.waterConsumedMl,
     required this.waterLogs,
     required this.sleepLogs,
+    required this.moodLogs,
     this.bloodType = '',
     this.allergies = '',
     this.emergencyContact = '',
@@ -48,6 +50,7 @@ class HealthProfile {
       waterConsumedMl: 0,
       waterLogs: const [],
       sleepLogs: const [],
+      moodLogs: const [],
     );
   }
 
@@ -74,6 +77,11 @@ class HealthProfile {
           ? const <SleepLog>[]
           : (json['sleepLogs'] as List<dynamic>)
               .map((item) => SleepLog.fromJson(item as Map<String, dynamic>))
+              .toList(),
+      moodLogs: json['moodLogs'] == null
+          ? const <MoodLog>[]
+          : (json['moodLogs'] as List<dynamic>)
+              .map((item) => MoodLog.fromJson(item as Map<String, dynamic>))
               .toList(),
       bloodType: json['bloodType'] as String? ?? '',
       allergies: json['allergies'] as String? ?? '',
@@ -166,6 +174,7 @@ class HealthProfile {
     int? waterConsumedMl,
     List<WaterLog>? waterLogs,
     List<SleepLog>? sleepLogs,
+    List<MoodLog>? moodLogs,
     String? bloodType,
     String? allergies,
     String? emergencyContact,
@@ -184,6 +193,7 @@ class HealthProfile {
       waterConsumedMl: waterConsumedMl ?? this.waterConsumedMl,
       waterLogs: waterLogs ?? this.waterLogs,
       sleepLogs: sleepLogs ?? this.sleepLogs,
+      moodLogs: moodLogs ?? this.moodLogs,
       bloodType: bloodType ?? this.bloodType,
       allergies: allergies ?? this.allergies,
       emergencyContact: emergencyContact ?? this.emergencyContact,
@@ -205,6 +215,7 @@ class HealthProfile {
       'waterConsumedMl': waterConsumedMl,
       'waterLogs': waterLogs.map((item) => item.toJson()).toList(),
       'sleepLogs': sleepLogs.map((item) => item.toJson()).toList(),
+      'moodLogs': moodLogs.map((item) => item.toJson()).toList(),
       'bloodType': bloodType,
       'allergies': allergies,
       'emergencyContact': emergencyContact,
