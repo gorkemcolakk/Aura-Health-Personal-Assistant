@@ -156,65 +156,49 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 else
                   for (int i = 0; i < nextMedication.length; i++) ...[
                     AuraCard(
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 54,
-                            height: 54,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFE8D6),
-                              borderRadius: BorderRadius.circular(18),
+                      child: InkWell(
+                        onTap: () {
+                          controller.toggleMedicationTaken(nextMedication[i], !nextMedication[i].isTakenToday);
+                        },
+                        borderRadius: BorderRadius.circular(18),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 54,
+                              height: 54,
+                              decoration: BoxDecoration(
+                                color: nextMedication[i].isTakenToday ? Colors.grey.withValues(alpha: 0.2) : const Color(0xFFFFE8D6),
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              child: Icon(
+                                nextMedication[i].isTakenToday ? Icons.check : Icons.medication,
+                                color: nextMedication[i].isTakenToday ? Colors.grey : const Color(0xFFE76F51),
+                              ),
                             ),
-                            child: const Icon(
-                              Icons.medication,
-                              color: Color(0xFFE76F51),
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Checkbox(
-                            value: nextMedication[i].isTakenToday,
-                            onChanged: (val) {
-                              if (val != null) {
-                                controller.toggleMedicationTaken(nextMedication[i], val);
-                              }
-                            },
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${nextMedication[i].name} • ${nextMedication[i].timeLabel}',
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    decoration: nextMedication[i].isTakenToday ? TextDecoration.lineThrough : null,
-                                    color: nextMedication[i].isTakenToday ? Colors.grey : null,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${nextMedication[i].period ?? ''} • ${nextMedication[i].mealTiming == 'Aç' ? controller.tr('med_meal_before') : nextMedication[i].mealTiming == 'Tok' ? controller.tr('med_meal_after') : nextMedication[i].mealTiming == 'Yemekle Beraber' ? (controller.languageCode == 'tr' ? 'Yemekle Beraber' : 'With Meal') : controller.tr('med_meal_any')}',
-                                  style: TextStyle(
-                                    color: nextMedication[i].isTakenToday ? Colors.grey : null,
-                                  ),
-                                ),
-                                if (nextMedication[i].stock != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 4),
-                                    child: Text(
-                                      controller.languageCode == 'tr' ? 'Kalan Stok: ${nextMedication[i].stock}' : 'Remaining Stock: ${nextMedication[i].stock}',
-                                      style: TextStyle(
-                                        color: nextMedication[i].isTakenToday ? Colors.grey : (nextMedication[i].stock! <= 5 ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary),
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12,
-                                        decoration: nextMedication[i].isTakenToday ? TextDecoration.lineThrough : null,
-                                      ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${nextMedication[i].name} • ${nextMedication[i].timeLabel}',
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      decoration: nextMedication[i].isTakenToday ? TextDecoration.lineThrough : null,
+                                      color: nextMedication[i].isTakenToday ? Colors.grey : null,
                                     ),
                                   ),
-                              ],
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${nextMedication[i].period ?? ''} • ${nextMedication[i].mealTiming == 'Aç' ? controller.tr('med_meal_before') : nextMedication[i].mealTiming == 'Tok' ? controller.tr('med_meal_after') : nextMedication[i].mealTiming == 'Yemekle Beraber' ? (controller.languageCode == 'tr' ? 'Yemekle Beraber' : 'With Meal') : controller.tr('med_meal_any')}',
+                                    style: TextStyle(
+                                      color: nextMedication[i].isTakenToday ? Colors.grey : null,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     if (i < nextMedication.length - 1)
