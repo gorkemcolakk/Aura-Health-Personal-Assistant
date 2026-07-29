@@ -112,8 +112,7 @@ mixin AuraMedicationMixin on AuraControllerBase {
       if (newStock != null && newStock > 0) newStock -= 1;
       if (!newHistory.contains(today)) newHistory.add(today);
     } else if (!taken && latestMed.isTakenToday) {
-      // Revert stock deduction
-      if (newStock != null) newStock += 1;
+      // İlaç geri alındığında stok artırılmıyor (kullanıcı manuel günceller)
       newHistory.remove(today);
     }
 
@@ -142,7 +141,7 @@ mixin AuraMedicationMixin on AuraControllerBase {
 
     if (alreadyTaken) {
       newHistory.remove(date);
-      if (newStock != null) newStock += 1;
+      // İlaç geri alındığında stok artırılmıyor
     } else {
       if (!newHistory.contains(date)) newHistory.add(date);
       if (newStock != null && newStock > 0) newStock -= 1;

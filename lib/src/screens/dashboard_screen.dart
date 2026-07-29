@@ -194,7 +194,17 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton(
-                            onPressed: () => controller.toggleMedicationTaken(nextMedication[i], !nextMedication[i].isTakenToday),
+                            onPressed: () {
+                              final med = nextMedication[i];
+                              if (!med.isTakenToday && med.stock != null && med.stock! <= 0) {
+                                ScaffoldMessenger.of(context).clearSnackBars();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(controller.languageCode == 'tr' ? 'İlacınız bitti. Lütfen stok güncelleyin.' : 'Medication is out of stock. Please update stock.')),
+                                );
+                                return;
+                              }
+                              controller.toggleMedicationTaken(med, !med.isTakenToday);
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: nextMedication[i].isTakenToday ? Colors.grey.withValues(alpha: 0.2) : Theme.of(context).colorScheme.primaryContainer,
                               foregroundColor: nextMedication[i].isTakenToday ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onPrimaryContainer,
