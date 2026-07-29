@@ -686,9 +686,15 @@ class _WaterTimelineCard extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return AuraCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      padding: EdgeInsets.zero,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: () => showCustomWaterDialog(context, controller),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
           Row(
             children: [
               const Icon(Icons.history, size: 20),
@@ -724,6 +730,8 @@ class _WaterTimelineCard extends StatelessWidget {
             );
           }),
         ],
+      ),
+        ),
       ),
     );
   }
