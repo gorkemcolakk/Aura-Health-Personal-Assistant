@@ -78,6 +78,7 @@ class Medication {
     String? period,
     String? groupId,
     bool clearStock = false,
+    bool clearDate = false,
   }) {
     return Medication(
       id: id,
@@ -87,7 +88,7 @@ class Medication {
       minute: minute ?? this.minute,
       notes: notes ?? this.notes,
       enabled: enabled ?? this.enabled,
-      lastTakenDate: lastTakenDate ?? this.lastTakenDate,
+      lastTakenDate: clearDate ? null : (lastTakenDate ?? this.lastTakenDate),
       mealTiming: mealTiming ?? this.mealTiming,
       daysOfWeek: daysOfWeek ?? this.daysOfWeek,
       stock: clearStock ? null : (stock ?? this.stock),

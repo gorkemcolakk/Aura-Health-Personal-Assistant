@@ -109,6 +109,7 @@ mixin AuraMedicationMixin on AuraControllerBase {
       lastTakenDate: taken ? today : null,
       stock: newStock,
       clearStock: taken ? false : (newStock == null),
+      clearDate: !taken,
     );
 
     await upsertMedication(updated);
