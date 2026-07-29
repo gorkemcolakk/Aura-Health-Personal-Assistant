@@ -719,11 +719,11 @@ class _ContributionGrid extends StatelessWidget {
 
                                 if (isFuture) {
                                   fill = Colors.transparent;
-                                  border = colors.outline.withValues(alpha: 0.3);
+                                  border = colors.outline.withValues(alpha: 0.6);
                                 } else if (taken) {
                                   fill = colors.primary;
                                 } else {
-                                  fill = colors.surfaceContainerHighest;
+                                  fill = colors.onSurfaceVariant.withValues(alpha: 0.15);
                                 }
 
                                 return GestureDetector(
@@ -765,11 +765,11 @@ class _ContributionGrid extends StatelessWidget {
                                   height: _box,
                                   child: Center(
                                     child: Container(
-                                      width: 4,
-                                      height: 4,
+                                      width: 8,
+                                      height: 2,
                                       decoration: BoxDecoration(
-                                        color: colors.onSurfaceVariant.withValues(alpha: 0.3),
-                                        shape: BoxShape.circle,
+                                        color: colors.onSurfaceVariant.withValues(alpha: 0.4),
+                                        borderRadius: BorderRadius.circular(1),
                                       ),
                                     ),
                                   ),
@@ -790,7 +790,7 @@ class _ContributionGrid extends StatelessWidget {
               _legendDot(colors.primary,
                   isTr ? 'Alındı' : 'Taken', colors),
               const SizedBox(width: 14),
-              _legendDot(colors.surfaceContainerHighest,
+              _legendDot(colors.onSurfaceVariant.withValues(alpha: 0.15),
                   isTr ? 'Alınmadı' : 'Missed', colors),
               const SizedBox(width: 14),
               _legendBorder(colors, isTr ? 'Gelecek' : 'Upcoming'),
@@ -827,7 +827,7 @@ class _ContributionGrid extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(2),
             border: Border.all(
-                color: colors.outline.withValues(alpha: 0.4)),
+                color: colors.outline.withValues(alpha: 0.6)),
           ),
         ),
         const SizedBox(width: 4),
