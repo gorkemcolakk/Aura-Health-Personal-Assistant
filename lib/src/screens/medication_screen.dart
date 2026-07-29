@@ -365,8 +365,37 @@ class _MedicationCard extends StatelessWidget {
                     ),
                     IconButton(
                       tooltip: controller.tr('btn_delete'),
-                      onPressed: () =>
-                          controller.removeMedication(medication),
+                      onPressed: () {
+                        final isTr = controller.languageCode == 'tr';
+                        showDialog<void>(
+                          context: context,
+                          builder: (BuildContext ctx) {
+                            return AlertDialog(
+                              title: Text(isTr ? 'İlacı Sil' : 'Delete Medication'),
+                              content: Text(isTr 
+                                  ? '${medication.name} ilacını silmek istediğinize emin misiniz?\n\nNot: Eğer bu ilaç grubunun (Sabah/Akşam gibi) bir parçasıysa, sadece bu periyot silinir.'
+                                  : 'Are you sure you want to delete ${medication.name}?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(isTr ? 'İptal' : 'Cancel'),
+                                  onPressed: () => Navigator.of(ctx).pop(),
+                                ),
+                                FilledButton(
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: colors.error,
+                                    foregroundColor: colors.onError,
+                                  ),
+                                  child: Text(isTr ? 'Sil' : 'Delete'),
+                                  onPressed: () {
+                                    controller.removeMedication(medication);
+                                    Navigator.of(ctx).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
                       icon: Icon(Icons.delete_outline,
                           color: colors.error.withValues(alpha: 0.7)),
                     ),
