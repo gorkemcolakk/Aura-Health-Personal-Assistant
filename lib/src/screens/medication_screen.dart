@@ -227,7 +227,7 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
   final _stock = TextEditingController();
   TimeOfDay _time = const TimeOfDay(hour: 9, minute: 0);
   String _mealTiming = 'Farketmez';
-  final List<int> _selectedDays = [1, 2, 3, 4, 5, 6, 7]; // Default everyday
+  final List<int> _selectedDays = []; // Default to empty list as requested
 
   @override
   void dispose() {
@@ -240,9 +240,7 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
   void _toggleDay(int day) {
     setState(() {
       if (_selectedDays.contains(day)) {
-        if (_selectedDays.length > 1) { // must select at least one day
-          _selectedDays.remove(day);
-        }
+        _selectedDays.remove(day);
       } else {
         _selectedDays.add(day);
         _selectedDays.sort();
@@ -314,7 +312,6 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                     controller: _dosage,
                     decoration: InputDecoration(
                       labelText: tr('med_dosage'),
-                      hintText: '1 Tablet',
                       prefixIcon: const Icon(Icons.vaccines),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                     ),
@@ -328,8 +325,7 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: InputDecoration(
-                      labelText: isTr ? 'Stok (Opsiyonel)' : 'Stock (Opt.)',
-                      hintText: '20',
+                      labelText: isTr ? 'Stok' : 'Stock',
                       prefixIcon: const Icon(Icons.inventory_2_outlined),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                     ),
@@ -407,6 +403,15 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
               ),
               onPressed: () async {
                 if (_name.text.trim().isEmpty) return;
+
+                if (_selectedDays.isEmpty) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(isTr ? 'Lütfen en az bir gün seçin.' : 'Please select at least one day.')),
+                    );
+                  }
+                  return;
+                }
 
                 int? stockVal;
                 if (_stock.text.trim().isNotEmpty) {
