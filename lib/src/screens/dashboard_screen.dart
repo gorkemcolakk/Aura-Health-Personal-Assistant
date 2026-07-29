@@ -970,50 +970,80 @@ class _SleepCard extends StatelessWidget {
         .toList()
       ..sort((a, b) => b.date.compareTo(a.date));
 
-    final yesterdaySleep = controller.profile.sleepLogs
-        .where((l) => l.date.year == yesterday.year && l.date.month == yesterday.month && l.date.day == yesterday.day)
-        .firstOrNull;
-
-    final displaySleep = todaySleep.isNotEmpty ? todaySleep.first : yesterdaySleep;
-    final isToday = todaySleep.isNotEmpty;
-
+    final displaySleep = todaySleep.isNotEmpty ? todaySleep.first : null;
     final target = HealthCalculator.recommendedSleepHours(controller.profile);
 
     return AuraCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      padding: EdgeInsets.zero,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: () => showSleepDialog(context, controller),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.bedtime_outlined),
-              const SizedBox(width: 10),
-              Text(controller.tr('dash_sleep_track'), style: Theme.of(context).textTheme.titleMedium),
+              Row(
+                children: [
+                  const Icon(Icons.bedtime_outlined),
+                  const SizedBox(width: 10),
+                  Text(controller.tr('dash_sleep_track'), style: Theme.of(context).textTheme.titleMedium),
+                  const Spacer(),
+                  if (displaySleep == null)
+                    Icon(Icons.add_circle_outline, color: Theme.of(context).colorScheme.primary, size: 20),
+                ],
+              ),
+              const SizedBox(height: 12),
+              if (displaySleep != null) ...[
+                Row(
+                  children: [
+                    Text(
+                      '${controller.tr('day_today')}: ${displaySleep.hours} ${controller.tr('sleep_hours_unit')}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(displaySleep.feeling.contains('Yorgun') ? '😴 ${controller.tr('feeling_tired')}' : displaySleep.feeling.contains('Normal') ? '😐 ${controller.tr('feeling_normal')}' : '🤩 ${controller.tr('feeling_energetic')}', style: const TextStyle(fontSize: 18)),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${controller.tr('dash_target')}: ${target.toStringAsFixed(1)} ${controller.tr('sleep_hours_unit')}',
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
+                ),
+              ] else ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.nights_stay, color: Theme.of(context).colorScheme.primary, size: 24),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              controller.languageCode == 'tr' ? 'Bugünün uykusunu girin' : 'Enter today\'s sleep',
+                              style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              controller.languageCode == 'tr' ? 'Verilerinizi takip etmek için dokunun' : 'Tap to track your data',
+                              style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
-          const SizedBox(height: 12),
-          if (displaySleep != null) ...[
-            Row(
-              children: [
-                Text(
-                  '${isToday ? controller.tr('day_today') : controller.tr('day_yesterday')}: ${displaySleep.hours} ${controller.tr('sleep_hours_unit')}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(width: 8),
-                Text(displaySleep.feeling.contains('Yorgun') ? '😴 ${controller.tr('feeling_tired')}' : displaySleep.feeling.contains('Normal') ? '😐 ${controller.tr('feeling_normal')}' : '🤩 ${controller.tr('feeling_energetic')}', style: const TextStyle(fontSize: 18)),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${controller.tr('dash_target')}: ${target.toStringAsFixed(1)} ${controller.tr('sleep_hours_unit')}',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
-            ),
-          ] else ...[
-            Text(
-              controller.tr('dash_no_sleep_logs'),
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }
