@@ -14,6 +14,13 @@ class MedicationScreen extends StatelessWidget {
     final controller = AuraScope.of(context);
     final colors = Theme.of(context).colorScheme;
 
+    final stockItems = <String, int>{};
+    for (final med in controller.medications) {
+      if (med.stock != null) {
+        stockItems[med.name] = med.stock!;
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(controller.tr('med_title')),
@@ -26,6 +33,42 @@ class MedicationScreen extends StatelessWidget {
               controller.tr('med_subtitle'),
               style: TextStyle(color: colors.onSurfaceVariant, fontSize: 15),
             ),
+            if (stockItems.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              Text(
+                controller.languageCode == 'tr' ? 'Kalan İlaç Stoklarım' : 'Remaining Stocks',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colors.primary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: stockItems.entries.map((entry) {
+                  final isLow = entry.value <= 5;
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isLow ? colors.errorContainer : colors.primaryContainer.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(12),
+                      border: isLow ? Border.all(color: colors.error.withValues(alpha: 0.5)) : null,
+                    ),
+                    child: Text(
+                      '${entry.key}: ${entry.value} ${controller.languageCode == 'tr' ? 'adet' : 'pcs'}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isLow ? colors.onErrorContainer : colors.onSurface,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
+              Divider(color: colors.outlineVariant.withValues(alpha: 0.5)),
+            ],
             const SizedBox(height: 24),
             if (controller.medications.isEmpty)
               Center(
@@ -116,7 +159,7 @@ class _MedicationCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${medication.dosage} • ${medication.timeLabel}',
+                        '${medication.period ?? ''} • ${medication.timeLabel}',
                         style: TextStyle(
                           color: medication.isTakenToday ? Colors.grey : colors.onSurfaceVariant,
                           fontSize: 13,
@@ -131,26 +174,6 @@ class _MedicationCard extends StatelessWidget {
                           fontSize: 12,
                         ),
                       ),
-                      if (medication.stock != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: medication.stock! <= 5 ? colors.errorContainer : colors.primaryContainer.withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              controller.languageCode == 'tr' ? 'Stok: ${medication.stock}' : 'Stock: ${medication.stock}',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: medication.stock! <= 5 ? colors.onErrorContainer : colors.primary,
-                                decoration: medication.isTakenToday ? TextDecoration.lineThrough : null,
-                              ),
-                            ),
-                          ),
-                        ),
                     ],
                   ),
                 ),
@@ -223,16 +246,33 @@ class _AddMedicationSheet extends StatefulWidget {
 
 class _AddMedicationSheetState extends State<_AddMedicationSheet> {
   final _name = TextEditingController();
-  final _dosage = TextEditingController();
   final _stock = TextEditingController();
-  TimeOfDay _time = const TimeOfDay(hour: 9, minute: 0);
+  final Map<String, TimeOfDay> _selectedPeriods = {};
   String _mealTiming = 'Farketmez';
   final List<int> _selectedDays = []; // Default to empty list as requested
+  final List<String> _availablePeriods = ['Sabah', 'Öğle', 'Akşam', 'Gece'];
+
+  void _togglePeriod(String period) {
+    setState(() {
+      if (_selectedPeriods.containsKey(period)) {
+        _selectedPeriods.remove(period);
+      } else {
+        TimeOfDay defaultTime;
+        switch (period) {
+          case 'Sabah': defaultTime = const TimeOfDay(hour: 9, minute: 0); break;
+          case 'Öğle': defaultTime = const TimeOfDay(hour: 13, minute: 0); break;
+          case 'Akşam': defaultTime = const TimeOfDay(hour: 20, minute: 0); break;
+          case 'Gece': defaultTime = const TimeOfDay(hour: 23, minute: 0); break;
+          default: defaultTime = const TimeOfDay(hour: 9, minute: 0);
+        }
+        _selectedPeriods[period] = defaultTime;
+      }
+    });
+  }
 
   @override
   void dispose() {
     _name.dispose();
-    _dosage.dispose();
     _stock.dispose();
     super.dispose();
   }
@@ -304,35 +344,72 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: TextField(
-                    controller: _dosage,
-                    decoration: InputDecoration(
-                      labelText: tr('med_dosage'),
-                      prefixIcon: const Icon(Icons.vaccines),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  flex: 2,
-                  child: TextField(
-                    controller: _stock,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration: InputDecoration(
-                      labelText: isTr ? 'Stok' : 'Stock',
-                      prefixIcon: const Icon(Icons.inventory_2_outlined),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                    ),
-                  ),
-                ),
-              ],
+            TextField(
+              controller: _stock,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: InputDecoration(
+                labelText: isTr ? 'Stok (Kutudaki Toplam İlaç)' : 'Stock (Total in Box)',
+                prefixIcon: const Icon(Icons.inventory_2_outlined),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+              ),
             ),
+            const SizedBox(height: 24),
+            Text(
+              isTr ? 'Günde Kaç Kere?' : 'How Many Times a Day?',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _availablePeriods.map((period) {
+                final isSelected = _selectedPeriods.containsKey(period);
+                return FilterChip(
+                  label: Text(period),
+                  selected: isSelected,
+                  onSelected: (_) => _togglePeriod(period),
+                  selectedColor: colors.primaryContainer,
+                  checkmarkColor: colors.primary,
+                  labelStyle: TextStyle(
+                    color: isSelected ? colors.primary : colors.onSurface,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                );
+              }).toList(),
+            ),
+            if (_selectedPeriods.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              ..._selectedPeriods.entries.map((entry) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          ),
+                          onPressed: () async {
+                            final next = await showTimePicker(
+                              context: context,
+                              initialTime: entry.value,
+                              initialEntryMode: TimePickerEntryMode.input,
+                            );
+                            if (next != null) {
+                              setState(() => _selectedPeriods[entry.key] = next);
+                            }
+                          },
+                          icon: const Icon(Icons.schedule),
+                          label: Text('${isTr ? "${entry.key} Saati:" : "${entry.key} Time:"} ${entry.value.format(context)}'),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
             const SizedBox(height: 24),
             Text(
               isTr ? 'Hangi Günler?' : 'Which Days?',
@@ -358,31 +435,6 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                   ),
                 );
               }),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    ),
-                    onPressed: () async {
-                      final next = await showTimePicker(
-                        context: context,
-                        initialTime: _time,
-                        initialEntryMode: TimePickerEntryMode.input,
-                      );
-                      if (next != null) {
-                        setState(() => _time = next);
-                      }
-                    },
-                    icon: const Icon(Icons.schedule),
-                    label: Text('${tr('med_hour')} ${_time.format(context)}'),
-                  ),
-                ),
-              ],
             ),
             const SizedBox(height: 16),
             Wrap(
@@ -413,25 +465,40 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                   return;
                 }
 
+                if (_selectedPeriods.isEmpty) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(isTr ? 'Lütfen en az bir periyot (Sabah, Akşam vb.) seçin.' : 'Please select at least one period.')),
+                    );
+                  }
+                  return;
+                }
+
                 int? stockVal;
                 if (_stock.text.trim().isNotEmpty) {
                   stockVal = int.tryParse(_stock.text.trim());
                 }
 
-                await widget.controller.upsertMedication(
-                  Medication(
-                    id: DateTime.now().microsecondsSinceEpoch.toString(),
-                    name: _name.text.trim(),
-                    dosage: _dosage.text.trim().isEmpty ? tr('med_no_dosage') : _dosage.text.trim(),
-                    hour: _time.hour,
-                    minute: _time.minute,
-                    notes: '', 
-                    enabled: true,
-                    mealTiming: _mealTiming,
-                    daysOfWeek: List.from(_selectedDays),
-                    stock: stockVal,
-                  ),
-                );
+                final groupId = DateTime.now().microsecondsSinceEpoch.toString();
+
+                for (final entry in _selectedPeriods.entries) {
+                  await widget.controller.upsertMedication(
+                    Medication(
+                      id: DateTime.now().microsecondsSinceEpoch.toString() + entry.key,
+                      name: _name.text.trim(),
+                      dosage: '', // Dosage field is removed from UI
+                      hour: entry.value.hour,
+                      minute: entry.value.minute,
+                      notes: '', 
+                      enabled: true,
+                      mealTiming: _mealTiming,
+                      daysOfWeek: List.from(_selectedDays),
+                      stock: stockVal,
+                      period: entry.key,
+                      groupId: groupId,
+                    ),
+                  );
+                }
                 if (context.mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(

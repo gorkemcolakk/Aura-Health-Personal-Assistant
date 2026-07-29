@@ -13,6 +13,8 @@ class Medication {
     this.mealTiming = 'Farketmez',
     this.daysOfWeek = const [1, 2, 3, 4, 5, 6, 7],
     this.stock,
+    this.period,
+    this.groupId,
   });
 
   factory Medication.fromMap(Map<String, dynamic> json) {
@@ -29,6 +31,8 @@ class Medication {
       daysOfWeek: (json['daysOfWeek'] as List<dynamic>?)?.cast<int>() ??
           const [1, 2, 3, 4, 5, 6, 7],
       stock: json['stock'] as int?,
+      period: json['period'] as String?,
+      groupId: json['groupId'] as String?,
     );
   }
 
@@ -43,6 +47,8 @@ class Medication {
   final String mealTiming;
   final List<int> daysOfWeek;
   final int? stock;
+  final String? period;
+  final String? groupId;
 
   int get notificationId => id.hashCode & 0x7fffffff;
 
@@ -69,6 +75,8 @@ class Medication {
     String? mealTiming,
     List<int>? daysOfWeek,
     int? stock,
+    String? period,
+    String? groupId,
     bool clearStock = false,
   }) {
     return Medication(
@@ -83,6 +91,8 @@ class Medication {
       mealTiming: mealTiming ?? this.mealTiming,
       daysOfWeek: daysOfWeek ?? this.daysOfWeek,
       stock: clearStock ? null : (stock ?? this.stock),
+      period: period ?? this.period,
+      groupId: groupId ?? this.groupId,
     );
   }
 
@@ -99,6 +109,8 @@ class Medication {
       'mealTiming': mealTiming,
       'daysOfWeek': daysOfWeek,
       'stock': stock,
+      'period': period,
+      'groupId': groupId,
     };
   }
 

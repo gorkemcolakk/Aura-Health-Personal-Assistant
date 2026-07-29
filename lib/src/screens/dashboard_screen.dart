@@ -193,7 +193,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${nextMedication[i].dosage} • ${nextMedication[i].mealTiming == 'Aç' ? controller.tr('med_meal_before') : nextMedication[i].mealTiming == 'Tok' ? controller.tr('med_meal_after') : nextMedication[i].mealTiming == 'Yemekle Beraber' ? (controller.languageCode == 'tr' ? 'Yemekle Beraber' : 'With Meal') : controller.tr('med_meal_any')}',
+                                  '${nextMedication[i].period ?? ''} • ${nextMedication[i].mealTiming == 'Aç' ? controller.tr('med_meal_before') : nextMedication[i].mealTiming == 'Tok' ? controller.tr('med_meal_after') : nextMedication[i].mealTiming == 'Yemekle Beraber' ? (controller.languageCode == 'tr' ? 'Yemekle Beraber' : 'With Meal') : controller.tr('med_meal_any')}',
                                   style: TextStyle(
                                     color: nextMedication[i].isTakenToday ? Colors.grey : null,
                                   ),

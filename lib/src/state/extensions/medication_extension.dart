@@ -37,41 +37,38 @@ mixin AuraMedicationMixin on AuraControllerBase {
   Future<void> markMedicationAsTaken(String id) async {
     final index = medications.indexWhere((m) => m.id == id);
     if (index >= 0) {
-      final med = medications[index];
-      final todayStr = DateTime.now().toIso8601String().split('T').first;
-      
-      int? newStock = med.stock;
-      if (!med.isTakenToday && newStock != null && newStock > 0) {
-        newStock -= 1;
-      }
-      
-      final updatedMed = med.copyWith(
-        lastTakenDate: todayStr,
-        stock: newStock,
-      );
-      
-      final newList = List<Medication>.from(medications)..[index] = updatedMed;
-      medications = newList;
-      if (currentUserTc != null) {
-        await db.saveMedications(currentUserTc!, newList);
-      }
-      
+      await toggleMedicationTaken(medications[index], true);
       if (activeAlarm?.id == id) {
         activeAlarm = null;
+        notifyListeners();
       }
-      notifyListeners();
     }
   }
 
   Future<void> upsertMedication(Medication medication) async {
     final index = medications.indexWhere((item) => item.id == medication.id);
+    List<Medication> copy = [...medications];
+    
     if (index == -1) {
-      medications = [...medications, medication];
+      copy.add(medication);
     } else {
-      final copy = [...medications];
       copy[index] = medication;
-      medications = copy;
     }
+
+    // Sync stock for medications in the same group
+    if (medication.groupId != null && medication.groupId!.isNotEmpty) {
+      for (int i = 0; i < copy.length; i++) {
+        if (copy[i].groupId == medication.groupId && copy[i].id != medication.id) {
+          copy[i] = copy[i].copyWith(
+            stock: medication.stock, 
+            clearStock: medication.stock == null
+          );
+        }
+      }
+    }
+
+    medications = copy;
+    
     if (currentUserTc != null) {
       await db.saveMedications(currentUserTc!, medications);
     }
@@ -108,13 +105,8 @@ mixin AuraMedicationMixin on AuraControllerBase {
     final updated = medication.copyWith(
       lastTakenDate: taken ? today : null,
       stock: newStock,
-      clearStock: taken ? false : (newStock == null), // Avoid accidentally setting stock to null in copyWith if it wasn't null
+      clearStock: taken ? false : (newStock == null),
     );
-    // Actually wait, if clearStock is false, copyWith(stock: null) will just keep original stock, which is what we want?
-    // Let me check copyWith: `stock: clearStock ? null : (stock ?? this.stock)`. 
-    // If I want to update stock to 0, I pass stock: 0. clearStock will be false. It sets stock: 0.
-    // So the above `clearStock` logic is not strictly needed here unless I want to explicitly remove stock, which I don't.
-    // Let's just pass `stock: newStock`.
 
     await upsertMedication(updated);
   }
