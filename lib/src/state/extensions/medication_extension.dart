@@ -93,16 +93,19 @@ mixin AuraMedicationMixin on AuraControllerBase {
 
   Future<void> toggleMedicationTaken(Medication medication, bool taken) async {
     final today = DateTime.now().toIso8601String().split('T').first;
-    int? newStock = medication.stock;
     
-    if (taken && !medication.isTakenToday) {
+    // Always fetch the latest version of this medication to prevent rapid tap race conditions
+    final latestMed = medications.firstWhere((m) => m.id == medication.id, orElse: () => medication);
+    int? newStock = latestMed.stock;
+    
+    if (taken && !latestMed.isTakenToday) {
       if (newStock != null && newStock > 0) newStock -= 1;
-    } else if (!taken && medication.isTakenToday) {
+    } else if (!taken && latestMed.isTakenToday) {
       // Revert the stock deduction
       if (newStock != null) newStock += 1;
     }
 
-    final updated = medication.copyWith(
+    final updated = latestMed.copyWith(
       lastTakenDate: taken ? today : null,
       stock: newStock,
       clearStock: taken ? false : (newStock == null),
