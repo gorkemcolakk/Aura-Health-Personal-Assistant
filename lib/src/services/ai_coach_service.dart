@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/health_profile.dart';
@@ -198,7 +199,10 @@ IMPORTANT: You MUST reply in the language specified by the ISO code: "$langCode"
               'Authorization': 'Bearer $key',
             },
             body: body,
-          ).timeout(const Duration(seconds: 15));
+          ).timeout(const Duration(seconds: 30));
+
+          debugPrint('[AiCoach] Doctor Summary status: ${response.statusCode}');
+          debugPrint('[AiCoach] Doctor Summary body: ${response.body.substring(0, response.body.length.clamp(0, 300))}');
 
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
@@ -206,8 +210,14 @@ IMPORTANT: You MUST reply in the language specified by the ISO code: "$langCode"
             if (text != null && text.isNotEmpty) {
               return text;
             }
+          } else {
+            return langCode == 'en'
+                ? 'AI Error (${response.statusCode}): ${response.body.substring(0, response.body.length.clamp(0, 200))}'
+                : 'Yapay zeka hatası (${response.statusCode}): ${response.body.substring(0, response.body.length.clamp(0, 200))}';
           }
-        } catch (_) {}
+        } catch (e) {
+          debugPrint('[AiCoach] Doctor Summary attempt error: $e');
+        }
         
         retries--;
         if (retries >= 0) await Future.delayed(const Duration(seconds: 1));

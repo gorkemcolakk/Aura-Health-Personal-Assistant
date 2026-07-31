@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
@@ -42,16 +43,24 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
         langCode: widget.langCode,
         days: widget.days,
       );
+      debugPrint('[PdfPreview] AI Summary received: "${summary.substring(0, summary.length.clamp(0, 100))}"');
       if (mounted) {
         setState(() {
-          _aiSummary = summary;
+          _aiSummary = summary.isEmpty
+              ? (widget.langCode == 'en'
+                  ? 'AI summary returned empty. Please check your API key in Settings.'
+                  : 'Yapay zeka boş yanıt döndürdü. Lütfen Ayarlar bölümünden API anahtarınızı kontrol edin.')
+              : summary;
           _isLoading = false;
         });
       }
     } catch (e) {
+      debugPrint('[PdfPreview] Error fetching AI summary: $e');
       if (mounted) {
         setState(() {
-          _error = e.toString();
+          _aiSummary = widget.langCode == 'en'
+              ? 'AI summary error: $e'
+              : 'Yapay zeka hatası: $e';
           _isLoading = false;
         });
       }
