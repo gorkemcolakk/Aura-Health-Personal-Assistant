@@ -84,6 +84,10 @@ class AiCoachService {
         ? "\n- Bugün Hissedilen Duygu (1-5): ${lastMood.moodLevel}/5 (Belirtiler: ${lastMood.symptoms.isEmpty ? 'Yok' : lastMood.symptoms.join(', ')})"
         : "";
 
+    final isSameDay = (DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
+    final todayBreath = profile.breathLogs.where((l) => isSameDay(l.timestamp, DateTime.now())).fold<int>(0, (s, l) => s + l.durationMinutes);
+    final breathText = todayBreath > 0 ? "\n- Bugün Yapılan Nefes Egzersizi (Farkındalık): $todayBreath dakika" : "";
+
     return '''
 Sen uzman bir sağlık koçu ve doktor, diyetisyen, spor eğitmeni "Aura Health AI"sın.
 Hastanın profili:
@@ -96,7 +100,7 @@ Hastanın profili:
 - Sağlık hedefi: ${profile.healthGoal}
 - Hastalıklar/Durum: ${profile.conditions.isEmpty ? 'Belirtilmedi' : profile.conditions}
 - Alerjiler: ${profile.allergies.isEmpty ? 'Belirtilmedi' : profile.allergies}
-- Bugün İçilen Su: ${HealthCalculator.todayWaterMl(profile)} / $waterTarget ml$sleepText$moodText
+- Bugün İçilen Su: ${HealthCalculator.todayWaterMl(profile)} / $waterTarget ml$sleepText$moodText$breathText
 - Vücut Kitle İndeksi (VKİ): ${HealthCalculator.bmi(profile).toStringAsFixed(1)}
 
 Şu anki ilaçları:
@@ -150,6 +154,9 @@ VKİ değerin yaklaşık ${bmi.toStringAsFixed(1)} ve kategori "$label". Günlü
       final avgMood = dataMood.isEmpty ? 0.0 : dataMood.map((e) => e.moodLevel).reduce((a, b) => a + b) / dataMood.length;
       final recentSymptoms = dataMood.expand((e) => e.symptoms).toSet().join(', ');
 
+      final dataBreath = profile.breathLogs.where((log) => DateTime.now().difference(log.timestamp).inDays <= days).toList();
+      final totalBreath = dataBreath.fold<int>(0, (sum, log) => sum + log.durationMinutes);
+
       final medList = medications.isEmpty ? 'Yok' : medications.map((m) => "- ${m.name} (${m.dosage})").join('\n');
       
       final systemPrompt = '''Sen uzman bir doktora ön değerlendirme sunan tıbbi asistan "Aura"sın.
@@ -163,6 +170,7 @@ Rapor Periyodu: Son $days Günlük Veriler
 - Ortalama Uyku Süresi: ${avgSleep.toStringAsFixed(1)} saat/gün (Hedef: ${sleepTarget.toStringAsFixed(1)} saat, Hedefe ulaşılan gün sayısı: $reachedSleepDays/$days)
 - Ortalama Su Tüketimi: ${avgWater.round()} ml/gün (Hedef: $waterTarget ml, Hedefe ulaşılan gün sayısı: $reachedWaterDays/$days)
 - Duygu Durumu Ortalaması (1-5): ${avgMood > 0 ? avgMood.toStringAsFixed(1) : 'Veri Yok'} (Sık Görülen Belirtiler: ${recentSymptoms.isEmpty ? 'Yok' : recentSymptoms})
+- Toplam Nefes Egzersizi (Farkındalık): ${totalBreath > 0 ? '$totalBreath dakika' : 'Yapılmadı'}
 
 Kullandığı İlaçlar ve Programı:
 $medList
