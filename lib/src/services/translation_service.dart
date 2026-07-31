@@ -384,6 +384,8 @@ class TranslationService {
     'dash_water_history': {'tr': 'Bugünkü su geçmişi', 'en': 'Today\'s water history'},
 
     // Insights
+    'insight_water_title_champ': {'tr': 'Su Şampiyonu!', 'en': 'Water Champion!'},
+    'insight_water_msg_champ': {'tr': 'Günlük su hedefini fazlasıyla aştın. Harika bir hidrasyon seviyesindesin.', 'en': 'You exceeded your daily water goal by a lot. Great hydration!'},
     'insight_water_title_goal': {'tr': 'Harika Gidiyorsun!', 'en': 'Doing Great!'},
     'insight_water_msg_goal': {'tr': 'Günlük su hedefine ulaştın. Vücudun sana teşekkür ediyor. 💧', 'en': 'You reached your daily water goal. Your body thanks you. 💧'},
     'insight_water_title_half': {'tr': 'Yarıladın', 'en': 'Halfway There'},
@@ -399,6 +401,8 @@ class TranslationService {
     
     'insight_sleep_title_perfect': {'tr': 'Mükemmel Uyku', 'en': 'Perfect Sleep'},
     'insight_sleep_msg_perfect': {'tr': 'Dün gece 8 saatten fazla uyudun. Bugün yenilenmiş hissedeceksin! ✨', 'en': 'You slept more than 8 hours last night. You will feel refreshed today! ✨'},
+    'insight_sleep_title_improved': {'tr': 'Uyku Kaliten Artıyor', 'en': 'Sleep is Improving'},
+    'insight_sleep_msg_improved': {'tr': 'Düne göre çok daha iyi uyudun. Bu düzeni korumaya çalış!', 'en': 'You slept much better than yesterday. Keep up this routine!'},
     'insight_sleep_title_good': {'tr': 'İyi Dinlenme', 'en': 'Good Rest'},
     'insight_sleep_msg_good': {'tr': 'Dün gece yeterli uyudun. Zihnin bugün berrak olacak! 🌙', 'en': 'You slept well last night. Your mind will be clear today! 🌙'},
     'insight_sleep_title_bad': {'tr': 'Kendine Dikkat Et', 'en': 'Take Care'},
@@ -416,6 +420,13 @@ class TranslationService {
     'insight_med_title_missed': {'tr': 'İlaç Hatırlatması', 'en': 'Med Reminder'},
     'insight_med_msg_missed': {'tr': 'Bugün henüz almadığın ilaçların var. Saati geldiyse içmeyi unutma.', 'en': 'You have untaken medications today. Don\'t forget to take them if it\'s time.'},
     
+    'insight_mood_title_great': {'tr': 'Harika Enerji', 'en': 'Great Energy'},
+    'insight_mood_msg_great': {'tr': 'Bugün kendini harika hissediyorsun! Bu pozitif enerjiyi etrafına da saç.', 'en': 'You are feeling great today! Spread this positive energy around.'},
+    'insight_mood_title_bad': {'tr': 'Kendine Şefkat Göster', 'en': 'Be Kind to Yourself'},
+    'insight_mood_msg_bad': {'tr': 'Bugün biraz zor geçiyor gibi. Belki ılık bir duş veya sevdiğin bir müzik iyi gelebilir.', 'en': 'Today seems a bit tough. Maybe a warm shower or your favorite music would help.'},
+    'insight_mood_title_none': {'tr': 'Günün Nasıl Geçiyor?', 'en': 'How is Your Day?'},
+    'insight_mood_msg_none': {'tr': 'Bugün kendini nasıl hissettiğini henüz kaydetmedin.', 'en': 'You haven\'t logged how you feel today.'},
+
     'insight_general_title': {'tr': 'Günün Sözü', 'en': 'Quote of the Day'},
     'insight_general_msg': {'tr': 'Sağlığın en büyük zenginliğindir. Bugün kendine iyi bakmayı unutma! ✨', 'en': 'Health is your greatest wealth. Don\'t forget to take care of yourself today! ✨'},
   };

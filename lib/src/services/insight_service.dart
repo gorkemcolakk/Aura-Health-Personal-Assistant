@@ -20,7 +20,15 @@ class InsightService {
         .where((log) => _isSameDay(log.timestamp, now.subtract(const Duration(days: 1))))
         .fold(0, (sum, log) => sum + log.amountMl);
 
-    if (todayWater >= targetWater) {
+    if (todayWater >= targetWater * 1.5) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_water_title_champ', langCode),
+        message: TranslationService.get('insight_water_msg_champ', langCode),
+        type: InsightType.water,
+        icon: Icons.emoji_events,
+        color: Colors.amber,
+      ));
+    } else if (todayWater >= targetWater) {
       insights.add(DailyInsight(
         title: TranslationService.get('insight_water_title_goal', langCode),
         message: TranslationService.get('insight_water_msg_goal', langCode),
@@ -67,7 +75,19 @@ class InsightService {
     if (todaySleepLogs.isNotEmpty) {
       todaySleepLogs.sort((a, b) => a.date.compareTo(b.date));
       final lastSleep = todaySleepLogs.last;
-      if (lastSleep.hours >= 8) {
+      final yesterdaySleepLogs = profile.sleepLogs.where((log) => _isSameDay(log.date, now.subtract(const Duration(days: 2))) || _isSameDay(log.date, now.subtract(const Duration(days: 1)))).toList();
+      yesterdaySleepLogs.sort((a, b) => a.date.compareTo(b.date));
+      final prevSleep = yesterdaySleepLogs.isNotEmpty && yesterdaySleepLogs.last.id != lastSleep.id ? yesterdaySleepLogs.last : null;
+
+      if (prevSleep != null && lastSleep.hours >= 7 && prevSleep.hours < 6) {
+        insights.add(DailyInsight(
+          title: TranslationService.get('insight_sleep_title_improved', langCode),
+          message: TranslationService.get('insight_sleep_msg_improved', langCode),
+          type: InsightType.sleep,
+          icon: Icons.trending_up,
+          color: Colors.teal,
+        ));
+      } else if (lastSleep.hours >= 8) {
         insights.add(DailyInsight(
           title: TranslationService.get('insight_sleep_title_perfect', langCode),
           message: TranslationService.get('insight_sleep_msg_perfect', langCode),
@@ -167,6 +187,38 @@ class InsightService {
           color: Colors.green,
         )
       );
+    }
+
+    // 5. Mood Insight
+    final todayMoods = profile.moodLogs.where((log) => _isSameDay(log.timestamp, now)).toList();
+    if (todayMoods.isNotEmpty) {
+      todayMoods.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      final lastMood = todayMoods.last;
+      if (lastMood.moodLevel == 5) {
+        insights.add(DailyInsight(
+          title: TranslationService.get('insight_mood_title_great', langCode),
+          message: TranslationService.get('insight_mood_msg_great', langCode),
+          type: InsightType.general,
+          icon: Icons.sentiment_very_satisfied,
+          color: Colors.amber,
+        ));
+      } else if (lastMood.moodLevel <= 2) {
+        insights.add(DailyInsight(
+          title: TranslationService.get('insight_mood_title_bad', langCode),
+          message: TranslationService.get('insight_mood_msg_bad', langCode),
+          type: InsightType.general,
+          icon: Icons.sentiment_dissatisfied,
+          color: Colors.blueGrey,
+        ));
+      }
+    } else if (now.hour >= 11) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_mood_title_none', langCode),
+        message: TranslationService.get('insight_mood_msg_none', langCode),
+        type: InsightType.general,
+        icon: Icons.mood,
+        color: Colors.purpleAccent,
+      ));
     }
 
     // 4. General Encouragement (if list is empty)
