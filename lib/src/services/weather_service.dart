@@ -31,7 +31,7 @@ class WeatherService {
       
       try {
         // 1. Get location via IP (no permissions required, HTTPS)
-        final ipResponse = await http.get(Uri.parse('https://get.geojs.io/v1/ip/geo.json')).timeout(const Duration(seconds: 3));
+        final ipResponse = await http.get(Uri.parse('https://get.geojs.io/v1/ip/geo.json')).timeout(const Duration(seconds: 10));
         if (ipResponse.statusCode == 200) {
           final ipData = jsonDecode(ipResponse.body);
           if (ipData['latitude'] != null && ipData['longitude'] != null) {
@@ -45,7 +45,7 @@ class WeatherService {
 
       // 2. Get weather via Open-Meteo
       final weatherUrl = 'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current_weather=true';
-      final weatherResponse = await http.get(Uri.parse(weatherUrl)).timeout(const Duration(seconds: 5));
+      final weatherResponse = await http.get(Uri.parse(weatherUrl)).timeout(const Duration(seconds: 10));
       if (weatherResponse.statusCode != 200) return null;
 
       final weatherData = jsonDecode(weatherResponse.body);

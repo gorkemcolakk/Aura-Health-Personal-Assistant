@@ -18,6 +18,14 @@ mixin AuraChatMixin on AuraControllerBase {
     isThinking = true;
     notifyListeners();
 
+    if (currentWeather == null) {
+      try {
+        await fetchWeather();
+      } catch (e) {
+        debugPrint("Error fetching weather before AI call: $e");
+      }
+    }
+
     final answer = await ai.ask(
       profile: profile,
       medications: medications,
