@@ -79,7 +79,7 @@ class InsightService {
       yesterdaySleepLogs.sort((a, b) => a.date.compareTo(b.date));
       final prevSleep = yesterdaySleepLogs.isNotEmpty && yesterdaySleepLogs.last.date != lastSleep.date ? yesterdaySleepLogs.last : null;
 
-      if (prevSleep != null && lastSleep.hours >= 7 && prevSleep.hours < 6) {
+      if (prevSleep != null && lastSleep.hours > prevSleep.hours && lastSleep.hours >= 7) {
         insights.add(DailyInsight(
           title: TranslationService.get('insight_sleep_title_improved', langCode),
           message: TranslationService.get('insight_sleep_msg_improved', langCode),
@@ -87,14 +87,24 @@ class InsightService {
           icon: Icons.trending_up,
           color: Colors.teal,
         ));
-      } else if (prevSleep != null && lastSleep.hours < 6 && prevSleep.hours >= 7) {
-        insights.add(DailyInsight(
-          title: TranslationService.get('insight_sleep_title_worse', langCode),
-          message: TranslationService.get('insight_sleep_msg_worse', langCode),
-          type: InsightType.sleep,
-          icon: Icons.trending_down,
-          color: Colors.deepOrangeAccent,
-        ));
+      } else if (prevSleep != null && lastSleep.hours < prevSleep.hours) {
+        if (lastSleep.hours < 8) {
+          insights.add(DailyInsight(
+            title: TranslationService.get('insight_sleep_title_worse_under_8', langCode),
+            message: TranslationService.get('insight_sleep_msg_worse_under_8', langCode),
+            type: InsightType.sleep,
+            icon: Icons.battery_alert,
+            color: Colors.deepOrange,
+          ));
+        } else {
+          insights.add(DailyInsight(
+            title: TranslationService.get('insight_sleep_title_less', langCode),
+            message: TranslationService.get('insight_sleep_msg_less', langCode),
+            type: InsightType.sleep,
+            icon: Icons.trending_down,
+            color: Colors.orangeAccent,
+          ));
+        }
       } else if (lastSleep.hours >= 8) {
         insights.add(DailyInsight(
           title: TranslationService.get('insight_sleep_title_perfect', langCode),
