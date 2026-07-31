@@ -78,8 +78,8 @@ mixin AuraMedicationMixin on AuraControllerBase {
     }
     try {
       await notifications.scheduleMedication(medication);
-    } catch (_) {
-      // Scheduling reminders is best-effort only.
+    } catch (e) {
+      debugPrint("Alarm planlama hatası: $e");
     }
     notifyListeners();
   }

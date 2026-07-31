@@ -31,11 +31,15 @@ class NotificationService {
   }
 
   Future<void> _requestPermissions() async {
-    await _plugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.requestNotificationsPermission();
+    final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    
+    if (androidPlugin != null) {
+      await androidPlugin.requestNotificationsPermission();
+      // Android 14+ için kesin alarm iznini açıkça iste:
+      await androidPlugin.requestExactAlarmsPermission();
+    }
+    
     await _plugin
         .resolvePlatformSpecificImplementation<
           IOSFlutterLocalNotificationsPlugin
