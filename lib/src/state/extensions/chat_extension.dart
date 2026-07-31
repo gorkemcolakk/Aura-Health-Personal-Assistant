@@ -45,6 +45,10 @@ mixin AuraChatMixin on AuraControllerBase {
     isThinking = false;
     notifyListeners();
 
+    if (isVoiceOutputEnabled) {
+      voice.speak(answer);
+    }
+
     // Auto-save: kayıtlı sohbet varsa sessizce güncelle
     if (_activeSessionId != null) {
       await _silentSave();
@@ -57,6 +61,14 @@ mixin AuraChatMixin on AuraControllerBase {
       messages = [messages.first];
       notifyListeners();
     }
+  }
+
+  void toggleVoiceOutput() {
+    isVoiceOutputEnabled = !isVoiceOutputEnabled;
+    if (!isVoiceOutputEnabled) {
+      voice.stop();
+    }
+    notifyListeners();
   }
 
   // --- Chat Sessions ---

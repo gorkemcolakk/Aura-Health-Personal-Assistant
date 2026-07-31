@@ -4,6 +4,7 @@ import '../models/chat_message.dart';
 import '../models/chat_session.dart';
 import '../state/aura_controller.dart';
 import '../state/aura_scope.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 class AiCoachScreen extends StatefulWidget {
   const AiCoachScreen({super.key});
@@ -15,6 +16,43 @@ class AiCoachScreen extends StatefulWidget {
 class _AiCoachScreenState extends State<AiCoachScreen> {
   final _question = TextEditingController();
   final _scrollController = ScrollController();
+  
+  final _speechToText = SpeechToText();
+  bool _isListening = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initSpeech();
+  }
+
+  void _initSpeech() async {
+    try {
+      await _speechToText.initialize();
+    } catch (e) {
+      debugPrint("Speech init error: $e");
+    }
+  }
+
+  void _toggleListening() async {
+    if (_isListening) {
+      await _speechToText.stop();
+      setState(() => _isListening = false);
+    } else {
+      bool available = await _speechToText.initialize();
+      if (available) {
+        setState(() => _isListening = true);
+        _speechToText.listen(
+          onResult: (result) {
+            setState(() {
+              _question.text = result.recognizedWords;
+            });
+          },
+          localeId: 'tr_TR',
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -78,6 +116,12 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                     onPressed: () => _saveChat(controller),
                     icon: const Icon(Icons.save_outlined),
                     tooltip: controller.tr('ai_coach_save_chat'),
+                  ),
+                  // Voice toggle button
+                  IconButton(
+                    onPressed: controller.toggleVoiceOutput,
+                    icon: Icon(controller.isVoiceOutputEnabled ? Icons.volume_up : Icons.volume_off),
+                    tooltip: controller.tr('ai_coach_voice'),
                   ),
                   // Clear button
                   IconButton(
@@ -163,8 +207,11 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                       minLines: 1,
                       maxLines: 4,
                       decoration: InputDecoration(
-                        hintText: controller.tr('ai_coach_hint'),
-                        prefixIcon: Icon(Icons.chat_bubble_outline),
+                        hintText: _isListening ? "Dinliyor..." : controller.tr('ai_coach_hint'),
+                        prefixIcon: IconButton(
+                          icon: Icon(_isListening ? Icons.mic : Icons.mic_none, color: _isListening ? Colors.red : null),
+                          onPressed: _toggleListening,
+                        ),
                       ),
                       onSubmitted: (_) => _send(controller),
                     ),

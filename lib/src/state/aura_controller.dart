@@ -17,6 +17,7 @@ import '../services/database_service.dart';
 import '../services/biometric_service.dart';
 import '../services/translation_service.dart';
 import '../services/weather_service.dart';
+import '../services/voice_service.dart';
 
 part 'extensions/auth_extension.dart';
 part 'extensions/health_extension.dart';
@@ -36,8 +37,10 @@ abstract class AuraControllerBase extends ChangeNotifier {
   final AiCoachService ai;
   final DatabaseService db = DatabaseService();
   final BiometricService biometric = BiometricService();
+  final VoiceService voice = VoiceService();
 
   HealthProfile profile = HealthProfile.initial();
+  bool isVoiceOutputEnabled = false;
   List<Medication> medications = const [];
   String? apiKey;
   ThemeMode themeMode = ThemeMode.system;
