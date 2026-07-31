@@ -14,14 +14,14 @@ mixin AuraAuthMixin on AuraControllerBase {
       // EREN'İN VERİLERİNİ KURTARMA PROTOKOLÜ (MOCK DATA)
       if (name.trim().toLowerCase() == 'eren') {
         final mockMeds = [
-          Medication(id: 'aug_sabah', name: 'Augmentin', dosage: '1000mg', hour: 10, minute: 0, daysOfWeek: [1,2,3,4,5,6,7], enabled: true, timeOfDay: 'Sabah', timing: 'Tok'),
-          Medication(id: 'aferin_ogle', name: 'Aferin Sinus', dosage: '1 Tablet', hour: 15, minute: 50, daysOfWeek: [1,2,3,4,5,6,7], enabled: true, timeOfDay: 'Öğle', timing: 'Tok'),
-          Medication(id: 'aug_aksam', name: 'Augmentin', dosage: '1000mg', hour: 22, minute: 0, daysOfWeek: [1,2,3,4,5,6,7], enabled: true, timeOfDay: 'Akşam', timing: 'Tok'),
+          Medication(id: 'aug_sabah', name: 'Augmentin', dosage: '1000mg', hour: 10, minute: 0, daysOfWeek: const [1,2,3,4,5,6,7], enabled: true, period: 'Sabah', mealTiming: 'Tok'),
+          Medication(id: 'aferin_ogle', name: 'Aferin Sinus', dosage: '1 Tablet', hour: 15, minute: 50, daysOfWeek: const [1,2,3,4,5,6,7], enabled: true, period: 'Öğle', mealTiming: 'Tok'),
+          Medication(id: 'aug_aksam', name: 'Augmentin', dosage: '1000mg', hour: 22, minute: 0, daysOfWeek: const [1,2,3,4,5,6,7], enabled: true, period: 'Akşam', mealTiming: 'Tok'),
         ];
         await db.saveMedications(tc, mockMeds);
         
-        final mockProfile = HealthProfile.initial(name: 'Eren', gender: 'Erkek', birthDate: '01.01.1995')
-            .copyWith(weight: 75, height: 180, dailyWaterGoal: 2500, dailySleepGoal: 8);
+        final mockProfile = HealthProfile.initial(name: 'Eren', gender: 'Erkek', birthDate: '1995-01-01')
+            .copyWith(weightKg: 75.0, heightCm: 180.0, sleepTargetHours: 8.0);
         await db.saveProfile(tc, mockProfile);
       }
     }
