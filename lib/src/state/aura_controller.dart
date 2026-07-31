@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../models/chat_message.dart';
+import '../models/breath_log.dart';
 import '../models/chat_session.dart';
 import '../models/health_profile.dart';
 import '../models/medication.dart';

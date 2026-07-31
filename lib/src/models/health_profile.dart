@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'breath_log.dart';
 import 'mood_log.dart';
 import 'sleep_log.dart';
 import 'water_log.dart';
@@ -29,6 +30,7 @@ class HealthProfile {
     required this.waterLogs,
     required this.sleepLogs,
     required this.moodLogs,
+    required this.breathLogs,
     this.bloodType = '',
     this.allergies = '',
     this.emergencyContact = '',
@@ -51,6 +53,7 @@ class HealthProfile {
       waterLogs: const [],
       sleepLogs: const [],
       moodLogs: const [],
+      breathLogs: const [],
     );
   }
 
@@ -82,6 +85,11 @@ class HealthProfile {
           ? const <MoodLog>[]
           : (json['moodLogs'] as List<dynamic>)
               .map((item) => MoodLog.fromJson(item as Map<String, dynamic>))
+              .toList(),
+      breathLogs: json['breathLogs'] == null
+          ? const <BreathLog>[]
+          : (json['breathLogs'] as List<dynamic>)
+              .map((item) => BreathLog.fromJson(item as Map<String, dynamic>))
               .toList(),
       bloodType: json['bloodType'] as String? ?? '',
       allergies: json['allergies'] as String? ?? '',
@@ -131,6 +139,7 @@ class HealthProfile {
   final List<WaterLog> waterLogs;
   final List<SleepLog> sleepLogs;
   final List<MoodLog> moodLogs;
+  final List<BreathLog> breathLogs;
   final String bloodType;
   final String allergies;
   final String emergencyContact;
@@ -176,6 +185,7 @@ class HealthProfile {
     List<WaterLog>? waterLogs,
     List<SleepLog>? sleepLogs,
     List<MoodLog>? moodLogs,
+    List<BreathLog>? breathLogs,
     String? bloodType,
     String? allergies,
     String? emergencyContact,
@@ -195,6 +205,7 @@ class HealthProfile {
       waterLogs: waterLogs ?? this.waterLogs,
       sleepLogs: sleepLogs ?? this.sleepLogs,
       moodLogs: moodLogs ?? this.moodLogs,
+      breathLogs: breathLogs ?? this.breathLogs,
       bloodType: bloodType ?? this.bloodType,
       allergies: allergies ?? this.allergies,
       emergencyContact: emergencyContact ?? this.emergencyContact,
@@ -217,6 +228,7 @@ class HealthProfile {
       'waterLogs': waterLogs.map((item) => item.toJson()).toList(),
       'sleepLogs': sleepLogs.map((item) => item.toJson()).toList(),
       'moodLogs': moodLogs.map((item) => item.toJson()).toList(),
+      'breathLogs': breathLogs.map((item) => item.toJson()).toList(),
       'bloodType': bloodType,
       'allergies': allergies,
       'emergencyContact': emergencyContact,

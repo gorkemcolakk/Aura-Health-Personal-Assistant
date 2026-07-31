@@ -29,6 +29,18 @@ mixin AuraHealthMixin on AuraControllerBase {
     notifyListeners();
   }
 
+  Future<void> addBreathLog(BreathLog log) async {
+    final updatedList = List<BreathLog>.from(profile.breathLogs)..add(log);
+    // En yeni en üstte olsun
+    updatedList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    
+    profile = profile.copyWith(breathLogs: updatedList);
+    if (currentUserTc != null) {
+      await db.saveProfile(currentUserTc!, profile);
+    }
+    notifyListeners();
+  }
+
   Future<void> addWater(int ml, {DateTime? date}) async {
     final logDate = date ?? DateTime.now();
     final isToday = _isSameDay(logDate, DateTime.now());

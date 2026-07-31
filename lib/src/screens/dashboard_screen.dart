@@ -9,6 +9,7 @@ import '../state/aura_controller.dart';
 import '../state/aura_scope.dart';
 import '../widgets/aura_card.dart';
 import '../widgets/emergency_card.dart';
+import 'breathwork_screen.dart';
 import 'charts_screen.dart';
 import 'mood_entry_sheet.dart';
 import 'settings_screen.dart';
@@ -70,6 +71,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               children: [
                 // Duygu Durumu Kartı
                 _MoodCard(controller: controller),
+                const SizedBox(height: 12),
+                
+                // Nefes Egzersizi (Mindfulness) Kartı
+                _BreathCard(controller: controller),
                 const SizedBox(height: 24),
 
                 // 4. Fiziksel Durum
@@ -1667,6 +1672,106 @@ class _MoodCard extends StatelessWidget {
                       hasMood 
                         ? (isTr ? 'Güncellemek için dokun' : 'Tap to update')
                         : (isTr ? 'Duygu durumunu kaydetmek için dokun' : 'Tap to log your state of mind'),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BreathCard extends StatelessWidget {
+  const _BreathCard({required this.controller});
+  final AuraController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final isTr = controller.languageCode == 'tr';
+    
+    // Calculate total mindfulness minutes for today
+    final today = DateTime.now();
+    final isSameDay = (DateTime a, DateTime b) =>
+        a.year == b.year && a.month == b.month && a.day == b.day;
+        
+    final todayLogs = controller.profile.breathLogs
+        .where((log) => isSameDay(log.timestamp, today))
+        .toList();
+        
+    final totalMinutes = todayLogs.fold<int>(0, (sum, log) => sum + log.durationMinutes);
+    final hasPracticed = totalMinutes > 0;
+
+    return AuraCard(
+      padding: EdgeInsets.zero,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const BreathworkScreen()),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                colors.tertiaryContainer.withValues(alpha: 0.3),
+                colors.surfaceContainerLowest,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: colors.tertiary.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  hasPracticed ? '🌿' : '🌬️',
+                  style: const TextStyle(fontSize: 28),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'Farkındalık' : 'Mindfulness',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colors.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      hasPracticed 
+                        ? (isTr ? 'Bugün $totalMinutes dk nefes egzersizi' : '$totalMinutes min breathwork today')
+                        : (isTr ? 'Rahatlamak için 1 dakika ayır' : 'Take a minute to relax'),
                       style: TextStyle(
                         fontSize: 13,
                         color: colors.onSurfaceVariant,
