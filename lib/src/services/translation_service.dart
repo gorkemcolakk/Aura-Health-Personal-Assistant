@@ -433,6 +433,11 @@ class TranslationService {
     'insight_mood_title_none': {'tr': 'Günün Nasıl Geçiyor?', 'en': 'How is Your Day?'},
     'insight_mood_msg_none': {'tr': 'Bugün kendini nasıl hissettiğini henüz kaydetmedin.', 'en': 'You haven\'t logged how you feel today.'},
 
+    'insight_general_title_perfect': {'tr': 'Mükemmel Bir Gün! 🌟', 'en': 'A Perfect Day! 🌟'},
+    'insight_general_msg_perfect': {'tr': 'Su, uyku, nefes, ruh hali... Bugün kendine muhteşem bakıyorsun, tebrikler!', 'en': 'Water, sleep, breath, mood... You are taking amazing care of yourself today, congrats!'},
+    'insight_water_title_streak': {'tr': 'Su Serisi: 3 Gün 🔥', 'en': 'Water Streak: 3 Days 🔥'},
+    'insight_water_msg_streak': {'tr': 'Son 3 gündür su hedeflerini hiç aksatmadın. İnanılmaz bir istikrar!', 'en': 'You hit your water goals for 3 days in a row. Incredible consistency!'},
+
     'insight_general_title': {'tr': 'Günün Sözü', 'en': 'Quote of the Day'},
     'insight_general_msg': {'tr': 'Sağlığın en büyük zenginliğindir. Bugün kendine iyi bakmayı unutma! ✨', 'en': 'Health is your greatest wealth. Don\'t forget to take care of yourself today! ✨'},
   };

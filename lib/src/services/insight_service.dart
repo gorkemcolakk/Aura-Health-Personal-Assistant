@@ -20,7 +20,38 @@ class InsightService {
         .where((log) => _isSameDay(log.timestamp, now.subtract(const Duration(days: 1))))
         .fold(0, (sum, log) => sum + log.amountMl);
 
-    if (todayWater >= targetWater * 1.5) {
+    final dayBeforeWater = profile.waterLogs
+        .where((log) => _isSameDay(log.timestamp, now.subtract(const Duration(days: 2))))
+        .fold(0, (sum, log) => sum + log.amountMl);
+
+    // Mükemmel Gün (Perfect Day) Check
+    final goodSleep = profile.sleepLogs.isNotEmpty && profile.sleepLogs.last.hours >= 7;
+    final todayMoods = profile.moodLogs.where((l) => _isSameDay(l.timestamp, now)).toList();
+    final goodMood = todayMoods.isNotEmpty && todayMoods.last.moodLevel >= 4;
+    final didBreath = profile.breathLogs.where((l) => _isSameDay(l.timestamp, now)).isNotEmpty;
+    final todayWeekday = now.weekday;
+    final todaysMeds = controller.medications.where((m) => m.enabled && m.daysOfWeek.contains(todayWeekday)).toList();
+    final medsOk = todaysMeds.isEmpty || todaysMeds.every((m) => m.isTakenToday);
+
+    if (todayWater >= targetWater && goodSleep && goodMood && didBreath && medsOk) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_general_title_perfect', langCode),
+        message: TranslationService.get('insight_general_msg_perfect', langCode),
+        type: InsightType.general,
+        icon: Icons.auto_awesome,
+        color: Colors.amber,
+      ));
+    }
+
+    if (todayWater >= targetWater && yesterdayWater >= targetWater && dayBeforeWater >= targetWater) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_water_title_streak', langCode),
+        message: TranslationService.get('insight_water_msg_streak', langCode),
+        type: InsightType.water,
+        icon: Icons.local_fire_department,
+        color: Colors.deepOrange,
+      ));
+    } else if (todayWater >= targetWater * 1.5) {
       insights.add(DailyInsight(
         title: TranslationService.get('insight_water_title_champ', langCode),
         message: TranslationService.get('insight_water_msg_champ', langCode),

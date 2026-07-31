@@ -15,7 +15,7 @@ class DailyInsightCarousel extends StatefulWidget {
 }
 
 class _DailyInsightCarouselState extends State<DailyInsightCarousel> {
-  final PageController _pageController = PageController(viewportFraction: 0.9);
+  final PageController _pageController = PageController(viewportFraction: 1.0);
   int _currentPage = 0;
 
   @override
@@ -33,20 +33,8 @@ class _DailyInsightCarouselState extends State<DailyInsightCarousel> {
 
     return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4.0, bottom: 8.0, top: 4.0),
-          child: Text(
-            TranslationService.get('dash_insight', controller.languageCode),
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.primary,
-              letterSpacing: 1.2,
-            ),
-          ),
-        ),
         SizedBox(
           height: 140,
           child: PageView.builder(
@@ -92,7 +80,7 @@ class _DailyInsightCarouselState extends State<DailyInsightCarousel> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 4.0),
+      margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: LinearGradient(
