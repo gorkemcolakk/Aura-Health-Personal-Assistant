@@ -87,6 +87,14 @@ class InsightService {
           icon: Icons.trending_up,
           color: Colors.teal,
         ));
+      } else if (prevSleep != null && lastSleep.hours < 6 && prevSleep.hours >= 7) {
+        insights.add(DailyInsight(
+          title: TranslationService.get('insight_sleep_title_worse', langCode),
+          message: TranslationService.get('insight_sleep_msg_worse', langCode),
+          type: InsightType.sleep,
+          icon: Icons.trending_down,
+          color: Colors.deepOrangeAccent,
+        ));
       } else if (lastSleep.hours >= 8) {
         insights.add(DailyInsight(
           title: TranslationService.get('insight_sleep_title_perfect', langCode),

@@ -403,6 +403,8 @@ class TranslationService {
     'insight_sleep_msg_perfect': {'tr': 'Dün gece 8 saatten fazla uyudun. Bugün yenilenmiş hissedeceksin! ✨', 'en': 'You slept more than 8 hours last night. You will feel refreshed today! ✨'},
     'insight_sleep_title_improved': {'tr': 'Uyku Kaliten Artıyor', 'en': 'Sleep is Improving'},
     'insight_sleep_msg_improved': {'tr': 'Düne göre çok daha iyi uyudun. Bu düzeni korumaya çalış!', 'en': 'You slept much better than yesterday. Keep up this routine!'},
+    'insight_sleep_title_worse': {'tr': 'Uyku Düzenin Bozuldu', 'en': 'Sleep Routine Disrupted'},
+    'insight_sleep_msg_worse': {'tr': 'Düne göre çok daha az uyumuşsun. Bu gece erken yatmaya ne dersin?', 'en': 'You slept much less than yesterday. How about going to bed early tonight?'},
     'insight_sleep_title_good': {'tr': 'İyi Dinlenme', 'en': 'Good Rest'},
     'insight_sleep_msg_good': {'tr': 'Dün gece yeterli uyudun. Zihnin bugün berrak olacak! 🌙', 'en': 'You slept well last night. Your mind will be clear today! 🌙'},
     'insight_sleep_title_bad': {'tr': 'Kendine Dikkat Et', 'en': 'Take Care'},
