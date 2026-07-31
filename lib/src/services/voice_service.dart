@@ -9,9 +9,26 @@ class VoiceService {
     if (_isInitialized) return;
     try {
       await _tts.setLanguage("tr-TR");
-      await _tts.setSpeechRate(0.55); // Konuşma hızını ufak bir miktar artırdık
+      await _tts.setSpeechRate(0.70); // Daha da hızlandırıldı
       await _tts.setVolume(1.0);
-      await _tts.setPitch(0.7); // Ses tonunu kalınlaştırarak erkek/tok bir sese dönüştürdük
+      await _tts.setPitch(0.5); // Sesi çok daha kalın yaptık
+
+      // Cihazdaki (Özellikle Google TTS) mevcut erkek Türkçe sesini bulmaya çalış
+      try {
+        final voices = await _tts.getVoices;
+        if (voices != null) {
+          for (var v in voices) {
+            // Android Google TTS'te 'cfs' veya 'network' içerenler genelde erkek sesleridir
+            if (v["locale"] == "tr-TR" && v["name"].toString().contains("cfs")) {
+              await _tts.setVoice({"name": v["name"], "locale": v["locale"]});
+              break;
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint("Error setting specific male voice: $e");
+      }
+      
       _isInitialized = true;
     } catch (e) {
       debugPrint("TTS Init Error: $e");
