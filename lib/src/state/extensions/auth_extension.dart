@@ -13,10 +13,10 @@ mixin AuraAuthMixin on AuraControllerBase {
           
       // EREN'İN VERİLERİNİ KURTARMA PROTOKOLÜ (MOCK DATA)
       if (name.trim().toLowerCase() == 'eren') {
-        final mockMeds = [
-          Medication(id: 'aug_sabah', name: 'Augmentin', dosage: '1000mg', hour: 10, minute: 0, daysOfWeek: const [1,2,3,4,5,6,7], enabled: true, period: 'Sabah', mealTiming: 'Tok'),
-          Medication(id: 'aferin_ogle', name: 'Aferin Sinus', dosage: '1 Tablet', hour: 15, minute: 50, daysOfWeek: const [1,2,3,4,5,6,7], enabled: true, period: 'Öğle', mealTiming: 'Tok'),
-          Medication(id: 'aug_aksam', name: 'Augmentin', dosage: '1000mg', hour: 22, minute: 0, daysOfWeek: const [1,2,3,4,5,6,7], enabled: true, period: 'Akşam', mealTiming: 'Tok'),
+        final List<Medication> mockMeds = [
+          Medication(id: 'aug_sabah', name: 'Augmentin', dosage: '1000mg', hour: 10, minute: 0, daysOfWeek: const [1,2,3,4,5,6,7], enabled: true, period: 'Sabah', mealTiming: 'Tok', notes: ''),
+          Medication(id: 'aferin_ogle', name: 'Aferin Sinus', dosage: '1 Tablet', hour: 15, minute: 50, daysOfWeek: const [1,2,3,4,5,6,7], enabled: true, period: 'Öğle', mealTiming: 'Tok', notes: ''),
+          Medication(id: 'aug_aksam', name: 'Augmentin', dosage: '1000mg', hour: 22, minute: 0, daysOfWeek: const [1,2,3,4,5,6,7], enabled: true, period: 'Akşam', mealTiming: 'Tok', notes: ''),
         ];
         await db.saveMedications(tc, mockMeds);
         
