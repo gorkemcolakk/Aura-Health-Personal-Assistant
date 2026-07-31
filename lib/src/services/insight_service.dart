@@ -11,77 +11,140 @@ class InsightService {
     final now = DateTime.now();
 
     // 1. Water Insight
-    if (profile.waterLogs.isNotEmpty) {
-      final todayWater = profile.waterLogs
-          .where((log) => _isSameDay(log.timestamp, now))
-          .fold(0, (sum, log) => sum + log.amountMl);
-      
-      final yesterdayWater = profile.waterLogs
-          .where((log) => _isSameDay(log.timestamp, now.subtract(const Duration(days: 1))))
-          .fold(0, (sum, log) => sum + log.amountMl);
+    final targetWater = HealthCalculator.dailyWaterTargetMl(profile);
+    final todayWater = profile.waterLogs
+        .where((log) => _isSameDay(log.timestamp, now))
+        .fold(0, (sum, log) => sum + log.amountMl);
+    
+    final yesterdayWater = profile.waterLogs
+        .where((log) => _isSameDay(log.timestamp, now.subtract(const Duration(days: 1))))
+        .fold(0, (sum, log) => sum + log.amountMl);
 
-      if (todayWater >= HealthCalculator.dailyWaterTargetMl(profile)) {
-        insights.add(
-          DailyInsight(
-            title: TranslationService.get('insight_water_title_goal', langCode),
-            message: TranslationService.get('insight_water_msg_goal', langCode),
-            type: InsightType.water,
-            icon: Icons.water_drop,
-            color: Colors.blueAccent,
-          )
-        );
-      } else if (yesterdayWater > 0 && todayWater < yesterdayWater && now.hour > 12) {
-        insights.add(
-          DailyInsight(
-            title: TranslationService.get('insight_water_title_behind', langCode),
-            message: TranslationService.get('insight_water_msg_behind', langCode),
-            type: InsightType.water,
-            icon: Icons.local_drink,
-            color: Colors.lightBlue,
-          )
-        );
-      } else if (todayWater == 0 && now.hour > 8) {
-        insights.add(
-          DailyInsight(
-            title: TranslationService.get('insight_water_title_start', langCode),
-            message: TranslationService.get('insight_water_msg_start', langCode),
-            type: InsightType.water,
-            icon: Icons.water_drop_outlined,
-            color: Colors.cyan,
-          )
-        );
-      }
+    if (todayWater >= targetWater) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_water_title_goal', langCode),
+        message: TranslationService.get('insight_water_msg_goal', langCode),
+        type: InsightType.water,
+        icon: Icons.water_drop,
+        color: Colors.blueAccent,
+      ));
+    } else if (todayWater >= targetWater * 0.5) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_water_title_half', langCode),
+        message: TranslationService.get('insight_water_msg_half', langCode),
+        type: InsightType.water,
+        icon: Icons.opacity,
+        color: Colors.lightBlue,
+      ));
+    } else if (todayWater > 0 && todayWater < targetWater * 0.5 && now.hour >= 14) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_water_title_drink', langCode),
+        message: TranslationService.get('insight_water_msg_drink', langCode),
+        type: InsightType.water,
+        icon: Icons.local_drink,
+        color: Colors.cyan,
+      ));
+    } else if (todayWater == 0 && now.hour >= 8) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_water_title_none', langCode),
+        message: TranslationService.get('insight_water_msg_none', langCode),
+        type: InsightType.water,
+        icon: Icons.water_drop_outlined,
+        color: Colors.blueGrey,
+      ));
+    } else if (yesterdayWater > 0 && todayWater < yesterdayWater && now.hour >= 12) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_water_title_behind', langCode),
+        message: TranslationService.get('insight_water_msg_behind', langCode),
+        type: InsightType.water,
+        icon: Icons.water,
+        color: Colors.lightBlueAccent,
+      ));
     }
 
     // 2. Sleep Insight
-    if (profile.sleepLogs.isNotEmpty) {
-      final lastSleep = profile.sleepLogs.last;
-      if (_isSameDay(lastSleep.date, now) || _isSameDay(lastSleep.date, now.subtract(const Duration(days: 1)))) {
-        if (lastSleep.hours >= 7.5) {
-          insights.add(
-            DailyInsight(
-              title: TranslationService.get('insight_sleep_title_good', langCode),
-              message: TranslationService.get('insight_sleep_msg_good', langCode),
-              type: InsightType.sleep,
-              icon: Icons.nights_stay,
-              color: Colors.indigo,
-            )
-          );
-        } else if (lastSleep.hours < 6) {
-          insights.add(
-            DailyInsight(
-              title: TranslationService.get('insight_sleep_title_bad', langCode),
-              message: TranslationService.get('insight_sleep_msg_bad', langCode),
-              type: InsightType.sleep,
-              icon: Icons.bedtime,
-              color: Colors.deepPurple,
-            )
-          );
+    final todaySleepLogs = profile.sleepLogs.where((log) => _isSameDay(log.date, now) || _isSameDay(log.date, now.subtract(const Duration(days: 1)))).toList();
+    if (todaySleepLogs.isNotEmpty) {
+      final lastSleep = todaySleepLogs.last;
+      if (lastSleep.hours >= 8) {
+        insights.add(DailyInsight(
+          title: TranslationService.get('insight_sleep_title_perfect', langCode),
+          message: TranslationService.get('insight_sleep_msg_perfect', langCode),
+          type: InsightType.sleep,
+          icon: Icons.nights_stay,
+          color: Colors.indigoAccent,
+        ));
+      } else if (lastSleep.hours >= 6) {
+        insights.add(DailyInsight(
+          title: TranslationService.get('insight_sleep_title_good', langCode),
+          message: TranslationService.get('insight_sleep_msg_good', langCode),
+          type: InsightType.sleep,
+          icon: Icons.bedtime,
+          color: Colors.indigo,
+        ));
+      } else {
+        insights.add(DailyInsight(
+          title: TranslationService.get('insight_sleep_title_bad', langCode),
+          message: TranslationService.get('insight_sleep_msg_bad', langCode),
+          type: InsightType.sleep,
+          icon: Icons.battery_alert,
+          color: Colors.deepPurple,
+        ));
+      }
+    } else if (now.hour >= 9) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_sleep_title_none', langCode),
+        message: TranslationService.get('insight_sleep_msg_none', langCode),
+        type: InsightType.sleep,
+        icon: Icons.snooze,
+        color: Colors.blueGrey,
+      ));
+    }
+
+    // 3. Medication Insight
+    final todayWeekday = now.weekday;
+    final todaysMeds = controller.medications.where((m) => m.enabled && m.daysOfWeek.contains(todayWeekday)).toList();
+    
+    if (todaysMeds.isNotEmpty) {
+      final allTaken = todaysMeds.every((m) => m.isTakenToday);
+      if (allTaken) {
+        insights.add(DailyInsight(
+          title: TranslationService.get('insight_med_title_done', langCode),
+          message: TranslationService.get('insight_med_msg_done', langCode),
+          type: InsightType.general, // No med specific type yet
+          icon: Icons.check_circle_outline,
+          color: Colors.green,
+        ));
+      } else {
+        // check if any missed
+        bool missed = false;
+        for (var m in todaysMeds) {
+          if (!m.isTakenToday) {
+            final parts = m.timeLabel.split(':');
+            if (parts.length == 2) {
+              final h = int.tryParse(parts[0]) ?? 0;
+              final min = int.tryParse(parts[1]) ?? 0;
+              final medTime = DateTime(now.year, now.month, now.day, h, min);
+              if (now.isAfter(medTime.add(const Duration(minutes: 30)))) {
+                missed = true;
+                break;
+              }
+            }
+          }
+        }
+        if (missed) {
+          insights.add(DailyInsight(
+            title: TranslationService.get('insight_med_title_missed', langCode),
+            message: TranslationService.get('insight_med_msg_missed', langCode),
+            type: InsightType.general,
+            icon: Icons.medication_liquid,
+            color: Colors.orange,
+          ));
         }
       }
     }
 
-    // 3. Mindfulness Insight
+    // 4. Mindfulness Insight
     final todayBreath = profile.breathLogs.where((log) => _isSameDay(log.timestamp, now)).isNotEmpty;
     if (!todayBreath && now.hour > 10) {
       insights.add(
