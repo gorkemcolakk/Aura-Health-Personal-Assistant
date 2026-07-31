@@ -79,6 +79,7 @@ abstract class AuraControllerBase extends ChangeNotifier {
   void newChat();
   void clearDismissedAlarms();
   void _checkMedications();
+  Future<void> fetchWeather();
 }
 
 class AuraController extends AuraControllerBase
