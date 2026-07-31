@@ -401,8 +401,10 @@ class TranslationService {
     
     'insight_sleep_title_perfect': {'tr': 'Mükemmel Uyku', 'en': 'Perfect Sleep'},
     'insight_sleep_msg_perfect': {'tr': 'Dün gece 8 saatten fazla uyudun. Bugün yenilenmiş hissedeceksin! ✨', 'en': 'You slept more than 8 hours last night. You will feel refreshed today! ✨'},
+    'insight_sleep_title_improved_perfect': {'tr': 'Uykunun Zirvesi', 'en': 'Peak Sleep'},
+    'insight_sleep_msg_improved_perfect': {'tr': 'Hem dünden daha fazla hem de 8 saatin üzerinde uyudun. Harika bir dinlenme!', 'en': 'You slept more than yesterday and over 8 hours. A wonderful rest!'},
     'insight_sleep_title_improved': {'tr': 'Uyku Kaliten Artıyor', 'en': 'Sleep is Improving'},
-    'insight_sleep_msg_improved': {'tr': 'Düne göre çok daha iyi uyudun. Bu düzeni korumaya çalış!', 'en': 'You slept much better than yesterday. Keep up this routine!'},
+    'insight_sleep_msg_improved': {'tr': 'Düne göre daha iyi uyudun. Bu düzeni korumaya çalış!', 'en': 'You slept better than yesterday. Keep up this routine!'},
     'insight_sleep_title_worse_under_8': {'tr': 'Uykusuz Kalıyorsun', 'en': 'Getting Sleep Deprived'},
     'insight_sleep_msg_worse_under_8': {'tr': 'Hem düne göre daha az uyudun hem de hedefin altındasın. Bugün kendini fazla yormamaya çalış!', 'en': 'You slept less than yesterday and under your goal. Try not to overexert yourself today!'},
     'insight_sleep_title_less': {'tr': 'Uyku Süren Azaldı', 'en': 'Sleep Duration Decreased'},

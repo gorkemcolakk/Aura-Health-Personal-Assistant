@@ -110,7 +110,15 @@ class InsightService {
       yesterdaySleepLogs.sort((a, b) => a.date.compareTo(b.date));
       final prevSleep = yesterdaySleepLogs.isNotEmpty && yesterdaySleepLogs.last.date != lastSleep.date ? yesterdaySleepLogs.last : null;
 
-      if (prevSleep != null && lastSleep.hours > prevSleep.hours && lastSleep.hours >= 7) {
+      if (prevSleep != null && lastSleep.hours > prevSleep.hours && lastSleep.hours >= 8) {
+        insights.add(DailyInsight(
+          title: TranslationService.get('insight_sleep_title_improved_perfect', langCode),
+          message: TranslationService.get('insight_sleep_msg_improved_perfect', langCode),
+          type: InsightType.sleep,
+          icon: Icons.hotel_class,
+          color: Colors.blueAccent,
+        ));
+      } else if (prevSleep != null && lastSleep.hours > prevSleep.hours && lastSleep.hours >= 7) {
         insights.add(DailyInsight(
           title: TranslationService.get('insight_sleep_title_improved', langCode),
           message: TranslationService.get('insight_sleep_msg_improved', langCode),
