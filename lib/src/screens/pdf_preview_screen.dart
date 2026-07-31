@@ -69,6 +69,16 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Ekranın en-boy oranına göre PDF sayfası oluştur
+    final screenSize = MediaQuery.of(context).size;
+    final appBarHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
+    final availableHeight = screenSize.height - appBarHeight;
+    final availableWidth = screenSize.width;
+
+    // Ekranı doldurmak için aspect ratio'yu telefon ekranı oranına eşitliyoruz
+    final pageWidth = 595.0; // A4 genişliği pt cinsinden
+    final pageHeight = pageWidth * (availableHeight / availableWidth);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(TranslationService.get('pdf_title', widget.langCode)),
@@ -86,7 +96,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
             )
           : PdfPreview(
               build: (format) => PdfService.buildPdf(
-                PdfPageFormat.a4,
+                PdfPageFormat(pageWidth, pageHeight, marginAll: 0),
                 widget.profile,
                 _aiSummary ?? '',
                 widget.langCode,
@@ -98,7 +108,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
               canChangePageFormat: false,
               canDebug: false,
               padding: EdgeInsets.zero,
-              initialPageFormat: PdfPageFormat.a4,
+              initialPageFormat: PdfPageFormat(pageWidth, pageHeight),
               scrollViewDecoration: const BoxDecoration(
                 color: Color(0xFFF5F5F5),
               ),
