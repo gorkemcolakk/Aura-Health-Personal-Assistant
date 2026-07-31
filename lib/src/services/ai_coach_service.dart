@@ -154,9 +154,6 @@ VKİ değerin yaklaşık ${bmi.toStringAsFixed(1)} ve kategori "$label". Günlü
       final avgMood = dataMood.isEmpty ? 0.0 : dataMood.map((e) => e.moodLevel).reduce((a, b) => a + b) / dataMood.length;
       final recentSymptoms = dataMood.expand((e) => e.symptoms).toSet().join(', ');
 
-      final dataBreath = profile.breathLogs.where((log) => DateTime.now().difference(log.timestamp).inDays <= days).toList();
-      final totalBreath = dataBreath.fold<int>(0, (sum, log) => sum + log.durationMinutes);
-
       final medList = medications.isEmpty ? 'Yok' : medications.map((m) => "- ${m.name} (${m.dosage})").join('\n');
       
       final systemPrompt = '''Sen uzman bir doktora ön değerlendirme sunan tıbbi asistan "Aura"sın.
@@ -170,7 +167,6 @@ Rapor Periyodu: Son $days Günlük Veriler
 - Ortalama Uyku Süresi: ${avgSleep.toStringAsFixed(1)} saat/gün (Hedef: ${sleepTarget.toStringAsFixed(1)} saat, Hedefe ulaşılan gün sayısı: $reachedSleepDays/$days)
 - Ortalama Su Tüketimi: ${avgWater.round()} ml/gün (Hedef: $waterTarget ml, Hedefe ulaşılan gün sayısı: $reachedWaterDays/$days)
 - Duygu Durumu Ortalaması (1-5): ${avgMood > 0 ? avgMood.toStringAsFixed(1) : 'Veri Yok'} (Sık Görülen Belirtiler: ${recentSymptoms.isEmpty ? 'Yok' : recentSymptoms})
-- Toplam Nefes Egzersizi (Farkındalık): ${totalBreath > 0 ? '$totalBreath dakika' : 'Yapılmadı'}
 
 Kullandığı İlaçlar ve Programı:
 $medList
