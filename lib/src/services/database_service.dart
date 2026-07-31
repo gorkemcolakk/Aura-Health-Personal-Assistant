@@ -180,6 +180,12 @@ class DatabaseService {
     return null;
   }
 
+  Future<bool> hasAnyUsers() async {
+    final db = await database;
+    final results = await db.query('users', limit: 1);
+    return results.isNotEmpty;
+  }
+
   // --- Profile ---
   Future<HealthProfile> loadProfile(String tc) async {
     final db = await database;

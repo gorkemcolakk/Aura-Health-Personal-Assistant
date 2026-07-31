@@ -104,6 +104,21 @@ class AuraController extends AuraControllerBase
     weeklyReportEnabled = await storage.loadWeeklyReportEnabled();
     crashReportsEnabled = await storage.loadCrashReportsEnabled();
     // Do not load profile/medications until user logs in.
+
+    // OTOMATİK KURTARMA VE GİRİŞ (AUTO-RESTORE & LOGIN)
+    try {
+      final hasUsers = await db.hasAnyUsers(); // Bu fonksiyonu ekleyeceğiz
+      if (!hasUsers) {
+        // Uygulama yeni silinip yüklendiyse otomatik olarak Eren'i ve verilerini oluştur
+        await registerUser('11111111111', 'Eren', '123456');
+        await login('11111111111', '123456');
+      } else if (currentUserTc == null) {
+        // Eğer zaten kayıtlıysa ama çıkış yapmışsa otomatik gir
+        await login('11111111111', '123456');
+      }
+    } catch (e) {
+      debugPrint("Auto-restore failed: $e");
+    }
     
     _medicationTimer?.cancel();
     _medicationTimer = Timer.periodic(const Duration(seconds: 10), (_) => _checkMedications());
