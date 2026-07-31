@@ -48,6 +48,7 @@ mixin AuraChatMixin on AuraControllerBase {
     // Auto-save: kayıtlı sohbet varsa sessizce güncelle
     if (_activeSessionId != null) {
       await _silentSave();
+      notifyListeners();
     }
   }
 

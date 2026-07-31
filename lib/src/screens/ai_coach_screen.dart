@@ -315,7 +315,7 @@ class _ChatDrawer extends StatelessWidget {
                         ),
                       ),
                       subtitle: Text(
-                        '${session.messages.length} ${controller.tr('ai_coach_messages')}',
+                        '${session.messages.length} ${controller.tr('ai_coach_messages')} • ${_formatDate(session.updatedAt)}',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       trailing: PopupMenuButton<String>(
@@ -386,6 +386,19 @@ class _ChatDrawer extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final diff = now.difference(date);
+    
+    if (diff.inDays == 0 && now.day == date.day) {
+      return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    } else if (diff.inDays < 7) {
+      return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    } else {
+      return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    }
   }
 }
 
