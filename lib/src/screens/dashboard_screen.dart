@@ -9,6 +9,7 @@ import '../state/aura_controller.dart';
 import '../state/aura_scope.dart';
 import '../widgets/aura_card.dart';
 import '../widgets/emergency_card.dart';
+import '../widgets/daily_insight_carousel.dart';
 import 'breathwork_screen.dart';
 import 'charts_screen.dart';
 import 'mood_entry_sheet.dart';
@@ -69,6 +70,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
             sliver: SliverList.list(
               children: [
+                // Akıllı Günlük Özet Kartları (Daily Insights)
+                const DailyInsightCarousel(),
+                const SizedBox(height: 16),
+
                 // Duygu Durumu Kartı
                 _MoodCard(controller: controller),
                 const SizedBox(height: 12),

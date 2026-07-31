@@ -382,6 +382,27 @@ class TranslationService {
 
     // Dashboard Water History
     'dash_water_history': {'tr': 'Bugünkü su geçmişi', 'en': 'Today\'s water history'},
+
+    // Insights
+    'insight_water_title_goal': {'tr': 'Harika Gidiyorsun!', 'en': 'Doing Great!'},
+    'insight_water_msg_goal': {'tr': 'Günlük su hedefine ulaştın. Vücudun sana teşekkür ediyor. 💧', 'en': 'You reached your daily water goal. Your body thanks you. 💧'},
+    'insight_water_title_behind': {'tr': 'Su Molası', 'en': 'Water Break'},
+    'insight_water_msg_behind': {'tr': 'Düne göre biraz geridesin, şimdi 1 bardak su içerek arayı kapatabilirsin.', 'en': 'You are a bit behind compared to yesterday, drink a glass of water now.'},
+    'insight_water_title_start': {'tr': 'Güne İyi Başla', 'en': 'Start Well'},
+    'insight_water_msg_start': {'tr': 'Güne enerjik başlamak için büyük bir bardak su içmelisin.', 'en': 'Drink a large glass of water to start the day energetic.'},
+    
+    'insight_sleep_title_good': {'tr': 'Harika Dinlenme', 'en': 'Great Rest'},
+    'insight_sleep_msg_good': {'tr': 'Dün gece harika uyumuşsun. Bugün zihnin çok daha berrak olacak! 🌙', 'en': 'You slept great last night. Your mind will be very clear today! 🌙'},
+    'insight_sleep_title_bad': {'tr': 'Kendine Dikkat Et', 'en': 'Take Care'},
+    'insight_sleep_msg_bad': {'tr': 'Dün gece az uyumuşsun. Bugün kendine fazla yüklenmemeye çalış.', 'en': 'You slept little last night. Try not to overwork yourself today.'},
+    
+    'insight_mind_title_reminder': {'tr': 'Kendine Vakit Ayır', 'en': 'Take Time for Yourself'},
+    'insight_mind_msg_reminder': {'tr': 'Bugün henüz hiç duraklamadın. Sadece 1 dakikalık nefes egzersizine ne dersin? 🧘', 'en': 'You haven\'t paused at all today. How about a 1-minute breathing exercise? 🧘'},
+    'insight_mind_title_done': {'tr': 'Zihin Berraklığı', 'en': 'Mental Clarity'},
+    'insight_mind_msg_done': {'tr': 'Nefes egzersizi ile bugüne sakinlik kattın. Çok iyi gidiyorsun.', 'en': 'You added calmness to today with your breathing exercise. Doing well.'},
+    
+    'insight_general_title': {'tr': 'Günün Sözü', 'en': 'Quote of the Day'},
+    'insight_general_msg': {'tr': 'Sağlığın en büyük zenginliğindir. Bugün kendine iyi bakmayı unutma! ✨', 'en': 'Health is your greatest wealth. Don\'t forget to take care of yourself today! ✨'},
   };
 
   static String get(String key, String langCode) {
