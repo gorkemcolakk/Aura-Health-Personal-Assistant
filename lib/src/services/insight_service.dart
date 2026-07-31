@@ -17,7 +17,10 @@ class InsightService {
         .fold(0, (sum, log) => sum + log.amountMl);
     
     // Mükemmel Gün (Perfect Day) Check
-    final goodSleep = profile.sleepLogs.isNotEmpty && profile.sleepLogs.last.hours >= 7;
+    final todaySleepLogs = profile.sleepLogs.where((log) => _isSameDay(log.date, now) || _isSameDay(log.date, now.subtract(const Duration(days: 1)))).toList();
+    todaySleepLogs.sort((a, b) => a.date.compareTo(b.date));
+    final goodSleep = todaySleepLogs.isNotEmpty && todaySleepLogs.last.hours >= 7;
+
     final todayMoods = profile.moodLogs.where((l) => _isSameDay(l.timestamp, now)).toList();
     final goodMood = todayMoods.isNotEmpty && todayMoods.last.moodLevel >= 4;
     final didBreath = profile.breathLogs.where((l) => _isSameDay(l.timestamp, now)).isNotEmpty;
@@ -195,9 +198,7 @@ class InsightService {
     }
 
     // 2. Sleep Insight
-    final todaySleepLogs = profile.sleepLogs.where((log) => _isSameDay(log.date, now) || _isSameDay(log.date, now.subtract(const Duration(days: 1)))).toList();
     if (todaySleepLogs.isNotEmpty) {
-      todaySleepLogs.sort((a, b) => a.date.compareTo(b.date));
       final lastSleep = todaySleepLogs.last;
       final yesterdaySleepLogs = profile.sleepLogs.where((log) => _isSameDay(log.date, now.subtract(const Duration(days: 2))) || _isSameDay(log.date, now.subtract(const Duration(days: 1)))).toList();
       yesterdaySleepLogs.sort((a, b) => a.date.compareTo(b.date));
