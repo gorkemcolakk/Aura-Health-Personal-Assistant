@@ -16,14 +16,6 @@ class InsightService {
         .where((log) => _isSameDay(log.timestamp, now))
         .fold(0, (sum, log) => sum + log.amountMl);
     
-    final yesterdayWater = profile.waterLogs
-        .where((log) => _isSameDay(log.timestamp, now.subtract(const Duration(days: 1))))
-        .fold(0, (sum, log) => sum + log.amountMl);
-
-    final dayBeforeWater = profile.waterLogs
-        .where((log) => _isSameDay(log.timestamp, now.subtract(const Duration(days: 2))))
-        .fold(0, (sum, log) => sum + log.amountMl);
-
     // Mükemmel Gün (Perfect Day) Check
     final goodSleep = profile.sleepLogs.isNotEmpty && profile.sleepLogs.last.hours >= 7;
     final todayMoods = profile.moodLogs.where((l) => _isSameDay(l.timestamp, now)).toList();
@@ -43,10 +35,32 @@ class InsightService {
       ));
     }
 
-    if (todayWater >= targetWater && yesterdayWater >= targetWater && dayBeforeWater >= targetWater) {
+    final yesterdayWater = profile.waterLogs
+        .where((log) => _isSameDay(log.timestamp, now.subtract(const Duration(days: 1))))
+        .fold(0, (sum, log) => sum + log.amountMl);
+
+    // Dinamik Su Serisi (Streak) Hesaplama
+    int waterStreak = 0;
+    if (todayWater >= targetWater) {
+      waterStreak = 1;
+      DateTime streakDate = now.subtract(const Duration(days: 1));
+      while (true) {
+        final dailyWater = profile.waterLogs
+            .where((log) => _isSameDay(log.timestamp, streakDate))
+            .fold(0, (sum, log) => sum + log.amountMl);
+        if (dailyWater >= targetWater) {
+          waterStreak++;
+          streakDate = streakDate.subtract(const Duration(days: 1));
+        } else {
+          break;
+        }
+      }
+    }
+
+    if (waterStreak >= 3) {
       insights.add(DailyInsight(
-        title: TranslationService.get('insight_water_title_streak', langCode),
-        message: TranslationService.get('insight_water_msg_streak', langCode),
+        title: TranslationService.get('insight_water_title_streak', langCode).replaceAll('{days}', waterStreak.toString()),
+        message: TranslationService.get('insight_water_msg_streak', langCode).replaceAll('{days}', waterStreak.toString()),
         type: InsightType.water,
         icon: Icons.local_fire_department,
         color: Colors.deepOrange,
