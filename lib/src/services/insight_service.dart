@@ -180,8 +180,6 @@ class InsightService {
     }
 
     // 3. Medication Insight
-    final todayWeekday = now.weekday;
-    final todaysMeds = controller.medications.where((m) => m.enabled && m.daysOfWeek.contains(todayWeekday)).toList();
     
     if (todaysMeds.isNotEmpty) {
       final allTaken = todaysMeds.every((m) => m.isTakenToday);
@@ -247,7 +245,6 @@ class InsightService {
     }
 
     // 5. Mood Insight
-    final todayMoods = profile.moodLogs.where((log) => _isSameDay(log.timestamp, now)).toList();
     if (todayMoods.isNotEmpty) {
       todayMoods.sort((a, b) => a.timestamp.compareTo(b.timestamp));
       final lastMood = todayMoods.last;
