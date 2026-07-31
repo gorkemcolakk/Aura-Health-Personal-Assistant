@@ -16,6 +16,7 @@ import '../services/storage_service.dart';
 import '../services/database_service.dart';
 import '../services/biometric_service.dart';
 import '../services/translation_service.dart';
+import '../services/weather_service.dart';
 
 part 'extensions/auth_extension.dart';
 part 'extensions/health_extension.dart';
@@ -44,6 +45,8 @@ abstract class AuraControllerBase extends ChangeNotifier {
 
   bool biometricEnabled = false;
   String? biometricUserTc;
+
+  WeatherData? currentWeather;
 
   bool waterRemindersEnabled = true;
   bool medsAlarmsEnabled = true;
@@ -101,6 +104,13 @@ class AuraController extends AuraControllerBase
     _medicationTimer?.cancel();
     _medicationTimer = Timer.periodic(const Duration(seconds: 10), (_) => _checkMedications());
     
+    fetchWeather();
+    
+    notifyListeners();
+  }
+
+  Future<void> fetchWeather() async {
+    currentWeather = await WeatherService.fetchCurrentWeather();
     notifyListeners();
   }
 }

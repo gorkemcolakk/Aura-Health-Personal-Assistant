@@ -23,6 +23,7 @@ mixin AuraChatMixin on AuraControllerBase {
       medications: medications,
       question: trimmed,
       langCode: languageCode,
+      weather: currentWeather,
       apiKey: apiKey,
     );
     messages = [

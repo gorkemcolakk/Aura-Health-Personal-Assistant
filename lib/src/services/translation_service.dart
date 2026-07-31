@@ -458,6 +458,9 @@ class TranslationService {
     'insight_power_duo_title': {'tr': 'Muhteşem İkili 🔋', 'en': 'The Power Duo 🔋'},
     'insight_power_duo_msg': {'tr': 'Hem uykunu tam aldın hem de suyunu içtin. Bugün metabolizman zirvede!', 'en': 'You got enough sleep and drank your water. Your metabolism is at its peak today!'},
 
+    'insight_hot_weather_title': {'tr': 'Çok Sıcak Hava! ☀️', 'en': 'Very Hot Weather! ☀️'},
+    'insight_hot_weather_msg': {'tr': 'Bugün hava sıcaklığı oldukça yüksek ({temp}°C). Susuz kalmaman için günlük hedefini artırdım.', 'en': 'The temperature is quite high today ({temp}°C). I increased your daily goal to keep you hydrated.'},
+
     'insight_general_title': {'tr': 'Günün Sözü', 'en': 'Quote of the Day'},
     'insight_general_msg': {'tr': 'Sağlığın en büyük zenginliğindir. Bugün kendine iyi bakmayı unutma! ✨', 'en': 'Health is your greatest wealth. Don\'t forget to take care of yourself today! ✨'},
   };

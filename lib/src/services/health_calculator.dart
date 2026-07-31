@@ -27,10 +27,20 @@ class HealthCalculator {
     return lang == 'en' ? 'Obese' : 'Çok yüksek';
   }
 
-  static int dailyWaterTargetMl(HealthProfile profile) {
+  static int dailyWaterTargetMl(HealthProfile profile, {double? currentTemp}) {
     final base = profile.weightKg * 35;
     final ageAdjustment = profile.age >= 55 ? -150 : 0;
-    return (base + profile.activity.waterBoostMl + ageAdjustment)
+    
+    int tempAdjustment = 0;
+    if (currentTemp != null) {
+      if (currentTemp >= 30) {
+        tempAdjustment = 500;
+      } else if (currentTemp >= 25) {
+        tempAdjustment = 250;
+      }
+    }
+    
+    return (base + profile.activity.waterBoostMl + ageAdjustment + tempAdjustment)
         .clamp(1400, 4800)
         .round();
   }
@@ -54,8 +64,8 @@ class HealthCalculator {
         .fold<int>(0, (sum, log) => sum + log.amountMl);
   }
 
-  static double waterProgress(HealthProfile profile) {
-    final target = dailyWaterTargetMl(profile);
+  static double waterProgress(HealthProfile profile, {double? currentTemp}) {
+    final target = dailyWaterTargetMl(profile, currentTemp: currentTemp);
     if (target <= 0) return 0;
     return (todayWaterMl(profile) / target).clamp(0, 1);
   }

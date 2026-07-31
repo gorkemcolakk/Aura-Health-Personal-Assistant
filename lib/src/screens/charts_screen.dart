@@ -96,7 +96,8 @@ class _WaterWaveChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = AuraScope.of(context);
     final data = HealthCalculator.getHistoricalWaterData(controller.profile, days: days);
-    final target = HealthCalculator.dailyWaterTargetMl(controller.profile);
+    final currentTemp = controller.currentWeather?.temperature;
+    final target = HealthCalculator.dailyWaterTargetMl(controller.profile, currentTemp: currentTemp);
     
     // Bugün animasyonu için
     final todayMl = HealthCalculator.todayWaterMl(controller.profile);

@@ -43,8 +43,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     final controller = AuraScope.of(context);
     final profile = controller.profile;
     final bmi = HealthCalculator.bmi(profile);
-    final waterTarget = HealthCalculator.dailyWaterTargetMl(profile);
-    final waterProgress = HealthCalculator.waterProgress(profile);
+    final currentTemp = controller.currentWeather?.temperature;
+    final waterTarget = HealthCalculator.dailyWaterTargetMl(profile, currentTemp: currentTemp);
+    final waterProgress = HealthCalculator.waterProgress(profile, currentTemp: currentTemp);
     final todayWeekday = DateTime.now().weekday;
     final nextMedication =
         controller.medications
@@ -863,7 +864,8 @@ class _WeeklyWaterChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final weeklyData = HealthCalculator.getWeeklyWaterData(controller.profile);
-    final target = HealthCalculator.dailyWaterTargetMl(controller.profile).toDouble();
+    final currentTemp = controller.currentWeather?.temperature;
+    final target = HealthCalculator.dailyWaterTargetMl(controller.profile, currentTemp: currentTemp).toDouble();
 
     // Find the max value to set the Y-axis correctly
     double maxY = target;

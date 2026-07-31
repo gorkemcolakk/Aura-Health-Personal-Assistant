@@ -11,7 +11,8 @@ class InsightService {
     final now = DateTime.now();
 
     // 1. Water Insight
-    final targetWater = HealthCalculator.dailyWaterTargetMl(profile);
+    final currentTemp = controller.currentWeather?.temperature;
+    final targetWater = HealthCalculator.dailyWaterTargetMl(profile, currentTemp: currentTemp);
     final todayWater = profile.waterLogs
         .where((log) => _isSameDay(log.timestamp, now))
         .fold(0, (sum, log) => sum + log.amountMl);
@@ -87,6 +88,17 @@ class InsightService {
         type: InsightType.mindfulness,
         icon: Icons.self_improvement,
         color: Colors.deepPurple,
+      ));
+    }
+
+    if (currentTemp != null && currentTemp >= 30) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_hot_weather_title', langCode),
+        message: TranslationService.get('insight_hot_weather_msg', langCode)
+            .replaceAll('{temp}', currentTemp.toStringAsFixed(1)),
+        type: InsightType.general,
+        icon: Icons.local_fire_department,
+        color: Colors.redAccent,
       ));
     }
 

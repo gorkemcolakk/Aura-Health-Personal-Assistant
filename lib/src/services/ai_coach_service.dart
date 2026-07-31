@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../models/health_profile.dart';
 import '../models/medication.dart';
 import 'health_calculator.dart';
+import 'weather_service.dart';
 
 class AiCoachService {
   static const _endpoint = 'https://api.deepseek.com/v1/chat/completions';
@@ -16,6 +17,7 @@ class AiCoachService {
     required List<Medication> medications,
     required String question,
     required String langCode,
+    WeatherData? weather,
     String? apiKey,
   }) async {
     final key = (apiKey ?? '').trim();
@@ -24,7 +26,7 @@ class AiCoachService {
     }
 
     try {
-      final systemPrompt = _buildPrompt(profile, medications, langCode);
+      final systemPrompt = _buildPrompt(profile, medications, langCode, weather);
 
       final body = jsonEncode({
         'model': _model,
@@ -70,8 +72,8 @@ class AiCoachService {
     }
   }
 
-  String _buildPrompt(HealthProfile profile, List<Medication> medications, String langCode) {
-    final waterTarget = HealthCalculator.dailyWaterTargetMl(profile);
+  String _buildPrompt(HealthProfile profile, List<Medication> medications, String langCode, WeatherData? weather) {
+    final waterTarget = HealthCalculator.dailyWaterTargetMl(profile, currentTemp: weather?.temperature);
     final sleepLogs = profile.sleepLogs;
     final lastSleep = sleepLogs.isNotEmpty ? sleepLogs.first : null;
     final sleepText = lastSleep != null
@@ -89,8 +91,12 @@ class AiCoachService {
     final todayBreath = profile.breathLogs.where((l) => isSameDay(l.timestamp, DateTime.now())).fold<int>(0, (s, l) => s + l.durationMinutes);
     final breathText = todayBreath > 0 ? "\n- Bugün Yapılan Nefes Egzersizi (Farkındalık): $todayBreath dakika" : "";
 
+    final weatherText = weather != null 
+        ? "\n- Dışarıdaki Hava: ${weather.temperature.toStringAsFixed(1)}°C, ${weather.condition}" 
+        : "";
+
     return '''
-Sen uzman bir sağlık koçu ve doktor, diyetisyen, spor eğitmeni "Aura Health AI"sın.
+Sen uzman bir sağlık koçu, doktor, diyetisyen, spor eğitmeni ve günlük yaşam asistanı "Aura Health AI"sın.
 Hastanın profili:
 - İsim: ${profile.name}
 - Cinsiyet: ${profile.gender}
@@ -101,13 +107,13 @@ Hastanın profili:
 - Sağlık hedefi: ${profile.healthGoal}
 - Hastalıklar/Durum: ${profile.conditions.isEmpty ? 'Belirtilmedi' : profile.conditions}
 - Alerjiler: ${profile.allergies.isEmpty ? 'Belirtilmedi' : profile.allergies}
-- Bugün İçilen Su: ${HealthCalculator.todayWaterMl(profile)} / $waterTarget ml$sleepText$moodText$breathText
+- Bugün İçilen Su: ${HealthCalculator.todayWaterMl(profile)} / $waterTarget ml$sleepText$moodText$breathText$weatherText
 - Vücut Kitle İndeksi (VKİ): ${HealthCalculator.bmi(profile).toStringAsFixed(1)}
 
 Şu anki ilaçları:
 $medList
 
-Hastanın cinsiyetine (kadın/erkek fizyolojisine uygun metabolizma, hormon, kas kütlesi ve beslenme ihtiyaçları), yaşına ve hedeflerine özel, kısa, samimi, empatik ve motive edici cevaplar ver. Tıbbi tavsiye verme, sadece sağlıklı yaşam koçluğu yap.
+Hastanın cinsiyetine, yaşına ve hedeflerine özel, kısa, samimi ve motive edici cevaplar ver. Tıbbi tavsiye verme, sadece sağlıklı yaşam koçluğu yap. Ayrıca sağlanan hava durumu verisini kullanarak (örn. "bugün koşabilir miyim?" gibi sorulara) dış dünya aktiviteleri için mantıklı tavsiyeler ver. Su hedefini hava sıcaksa zaten artırılmış (waterTarget içinde) olarak göreceksin, bunu vurgulayabilirsin.
 
 IMPORTANT: You MUST reply in the language specified by the ISO code: "$langCode". If it's "en", reply entirely in English. If it's "tr", reply entirely in Turkish.
 ''';
