@@ -224,29 +224,29 @@ class PdfService {
   static pw.Widget _buildMetricBox(String title, String value, String unit, pw.Font fontBold) {
     return pw.Container(
       width: 160,
-      padding: const pw.EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: pw.BoxDecoration(
-        border: pw.Border.all(color: PdfColors.teal400, width: 2),
-        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(16)),
+        border: pw.Border.all(color: PdfColors.teal400, width: 1.5),
+        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(12)),
         color: PdfColors.teal50,
       ),
       child: pw.Column(
         children: [
           pw.Text(title,
               style: pw.TextStyle(
-                  fontSize: 17,
+                  fontSize: 13,
                   font: fontBold,
                   color: PdfColors.teal900)),
-          pw.SizedBox(height: 12),
+          pw.SizedBox(height: 6),
           pw.Text(value,
               style: pw.TextStyle(
-                  fontSize: 38,
+                  fontSize: 32,
                   font: fontBold,
                   color: PdfColors.teal900)),
-          pw.SizedBox(height: 4),
+          pw.SizedBox(height: 2),
           pw.Text(unit,
               style: pw.TextStyle(
-                  fontSize: 15,
+                  fontSize: 12,
                   font: fontBold,
                   color: PdfColors.teal800)),
         ],
