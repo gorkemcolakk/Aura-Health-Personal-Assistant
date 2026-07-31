@@ -34,7 +34,7 @@ class PdfService {
     ].join('\n');
 
     pdf.addPage(
-      pw.Page(
+      pw.MultiPage(
         pageFormat: format,
         margin: const pw.EdgeInsets.symmetric(horizontal: 28, vertical: 28),
         theme: pw.ThemeData.withFont(
@@ -42,10 +42,8 @@ class PdfService {
           bold: fontBold,
         ),
         build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              // ── Header ──────────────────────────────────────────────
+          return [
+            // ── Header ──────────────────────────────────────────────
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
@@ -196,7 +194,7 @@ class PdfService {
                 ),
               ),
 
-              pw.Spacer(),
+              pw.SizedBox(height: 32),
 
               pw.Container(
                 width: double.infinity,
@@ -216,8 +214,7 @@ class PdfService {
                   ),
                 ),
               ),
-            ],
-          );
+            ];
         },
       ),
     );
