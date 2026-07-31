@@ -9,9 +9,9 @@ class VoiceService {
     if (_isInitialized) return;
     try {
       await _tts.setLanguage("tr-TR");
-      await _tts.setSpeechRate(0.5);
+      await _tts.setSpeechRate(0.55); // Konuşma hızını ufak bir miktar artırdık
       await _tts.setVolume(1.0);
-      await _tts.setPitch(1.0);
+      await _tts.setPitch(0.7); // Ses tonunu kalınlaştırarak erkek/tok bir sese dönüştürdük
       _isInitialized = true;
     } catch (e) {
       debugPrint("TTS Init Error: $e");
