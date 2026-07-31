@@ -49,21 +49,21 @@ class PdfService {
                 children: [
                   pw.Text('AURA HEALTH',
                       style: pw.TextStyle(
-                          fontSize: 28,
+                          fontSize: 32,
                           font: fontBold,
                           color: PdfColors.teal800)),
                   pw.Text(TranslationService.get('pdf_title', langCode),
                       style: pw.TextStyle(
-                          fontSize: 18, font: fontBold, color: PdfColors.grey700)),
+                          fontSize: 20, font: fontBold, color: PdfColors.grey700)),
                 ],
               ),
               pw.Divider(thickness: 2, color: PdfColors.teal300),
-              pw.SizedBox(height: 10),
+              pw.SizedBox(height: 12),
 
               // ── Hasta Bilgileri ──────────────────────────────────────
               pw.Text(TranslationService.get('pdf_patient_info', langCode),
                   style: pw.TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       font: fontBold,
                       color: PdfColors.teal800)),
               pw.SizedBox(height: 8),
@@ -81,25 +81,25 @@ class PdfService {
                       children: [
                         pw.Text('${TranslationService.get('pdf_name', langCode)}: ${profile.name}',
                             style: pw.TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 font: fontBold,
                                 color: PdfColors.black)),
                         pw.SizedBox(height: 5),
                         pw.Text('${TranslationService.get('pdf_gender', langCode)}: ${TranslationService.get(profile.gender == 'Erkek' ? 'prof_gender_m' : profile.gender == 'Kadın' ? 'prof_gender_f' : 'prof_gender_u', langCode)}',
                             style: pw.TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 font: fontBold,
                                 color: PdfColors.black)),
                         pw.SizedBox(height: 5),
                         pw.Text('${TranslationService.get('pdf_age', langCode)}: ${profile.age}',
                             style: pw.TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 font: fontBold,
                                 color: PdfColors.black)),
                         pw.SizedBox(height: 5),
                         pw.Text('${TranslationService.get('pdf_date', langCode)}: $formattedDate',
                             style: pw.TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 font: fontBold,
                                 color: PdfColors.black)),
                       ],
@@ -109,20 +109,20 @@ class PdfService {
                       children: [
                         pw.Text('${TranslationService.get('pdf_height', langCode)}: ${profile.heightCm} cm',
                             style: pw.TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 font: fontBold,
                                 color: PdfColors.black)),
                         pw.SizedBox(height: 5),
                         pw.Text('${TranslationService.get('pdf_weight', langCode)}: ${profile.weightKg} kg',
                             style: pw.TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 font: fontBold,
                                 color: PdfColors.black)),
                         pw.SizedBox(height: 5),
                         pw.Text(
                             '${TranslationService.get('pdf_blood_type', langCode)}: ${profile.bloodType.isEmpty ? TranslationService.get('pdf_not_specified', langCode) : profile.bloodType}',
                             style: pw.TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 font: fontBold,
                                 color: PdfColors.black)),
                       ],
@@ -135,7 +135,7 @@ class PdfService {
               // ── Sağlık Verileri ────────────────────────────────────────────────
               pw.Text('${TranslationService.get('pdf_health_data', langCode)} ${TranslationService.get('pdf_health_data_days', langCode).replaceAll('@', days.toString())}',
                   style: pw.TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       font: fontBold,
                       color: PdfColors.teal800)),
               pw.SizedBox(height: 8),
@@ -153,29 +153,29 @@ class PdfService {
               // ── Klinik Durum ───────────────────────────────────────────────
               pw.Text(TranslationService.get('pdf_clinical_status', langCode),
                   style: pw.TextStyle(
-                      fontSize: 14, font: fontBold, color: PdfColors.black)),
+                      fontSize: 16, font: fontBold, color: PdfColors.black)),
               pw.SizedBox(height: 6),
               pw.Text(
                 clinicalText.isEmpty
                     ? TranslationService.get('pdf_no_critical', langCode)
                     : clinicalText,
                 style: pw.TextStyle(
-                    fontSize: 13, font: fontBold, color: PdfColors.black),
+                    fontSize: 15, font: fontBold, color: PdfColors.black),
               ),
               pw.SizedBox(height: 12),
               pw.Divider(color: PdfColors.grey400),
-              pw.SizedBox(height: 8),
+              pw.SizedBox(height: 10),
 
               // ── Yapay Zeka Özeti ─────────────────────────────────────
               pw.Text(TranslationService.get('pdf_ai_summary_title', langCode),
                   style: pw.TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       font: fontBold,
                       color: PdfColors.indigo800)),
               pw.SizedBox(height: 8),
               pw.Container(
                 width: double.infinity,
-                padding: const pw.EdgeInsets.all(12),
+                padding: const pw.EdgeInsets.all(14),
                 decoration: pw.BoxDecoration(
                   color: PdfColors.indigo50,
                   borderRadius:
@@ -185,8 +185,8 @@ class PdfService {
                 child: pw.Text(
                   aiSummary,
                   style: pw.TextStyle(
-                    fontSize: 13,
-                    lineSpacing: 5,
+                    fontSize: 16,
+                    lineSpacing: 6,
                     font: fontBold,
                     color: PdfColors.black,
                   ),
@@ -207,7 +207,7 @@ class PdfService {
                   TranslationService.get('pdf_footer_warning', langCode),
                   textAlign: pw.TextAlign.center,
                   style: pw.TextStyle(
-                    fontSize: 11,
+                    fontSize: 13,
                     font: fontBold,
                     color: const PdfColor.fromInt(0xFF0A223B),
                   ),
@@ -234,19 +234,19 @@ class PdfService {
         children: [
           pw.Text(title,
               style: pw.TextStyle(
-                  fontSize: 13,
+                  fontSize: 15,
                   font: fontBold,
                   color: PdfColors.teal900)),
           pw.SizedBox(height: 8),
           pw.Text(value,
               style: pw.TextStyle(
-                  fontSize: 32,
+                  fontSize: 36,
                   font: fontBold,
                   color: PdfColors.teal900)),
           pw.SizedBox(height: 3),
           pw.Text(unit,
               style: pw.TextStyle(
-                  fontSize: 12,
+                  fontSize: 14,
                   font: fontBold,
                   color: PdfColors.teal800)),
         ],
