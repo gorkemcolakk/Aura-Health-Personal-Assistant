@@ -26,13 +26,13 @@ class WeatherService {
     }
 
     try {
-      // 1. Get location via IP (no permissions required)
-      final ipResponse = await http.get(Uri.parse('http://ip-api.com/json/'));
+      // 1. Get location via IP (no permissions required, HTTPS)
+      final ipResponse = await http.get(Uri.parse('https://get.geojs.io/v1/ip/geo.json'));
       if (ipResponse.statusCode != 200) return null;
       
       final ipData = jsonDecode(ipResponse.body);
-      final double lat = ipData['lat'];
-      final double lon = ipData['lon'];
+      final double lat = double.parse(ipData['latitude'].toString());
+      final double lon = double.parse(ipData['longitude'].toString());
 
       // 2. Get weather via Open-Meteo
       final weatherUrl = 'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current_weather=true';
