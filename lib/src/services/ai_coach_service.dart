@@ -92,7 +92,7 @@ class AiCoachService {
     final breathText = todayBreath > 0 ? "\n- Bugün Yapılan Nefes Egzersizi (Farkındalık): $todayBreath dakika" : "";
 
     final weatherText = weather != null 
-        ? "\n- Dışarıdaki Hava: ${weather.temperature.toStringAsFixed(1)}°C, ${weather.condition}" 
+        ? "\n- Dışarıdaki Hava (${weather.city}): ${weather.temperature.toStringAsFixed(1)}°C, ${weather.condition}" 
         : "";
 
     return '''

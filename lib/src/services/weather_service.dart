@@ -5,11 +5,13 @@ class WeatherData {
   final double temperature;
   final String condition;
   final int weatherCode;
+  final String city;
   
   WeatherData({
     required this.temperature,
     required this.condition,
     required this.weatherCode,
+    required this.city,
   });
 }
 
@@ -28,6 +30,7 @@ class WeatherService {
     try {
       double lat = 41.0082; // Varsayılan: İstanbul
       double lon = 28.9784; // Varsayılan: İstanbul
+      String city = 'İstanbul';
       
       try {
         // 1. Get location via IP (no permissions required, HTTPS)
@@ -37,6 +40,7 @@ class WeatherService {
           if (ipData['latitude'] != null && ipData['longitude'] != null) {
             lat = double.parse(ipData['latitude'].toString());
             lon = double.parse(ipData['longitude'].toString());
+            city = ipData['city']?.toString() ?? 'Bilinmeyen Konum';
           }
         }
       } catch (e) {
@@ -61,6 +65,7 @@ class WeatherService {
         temperature: temp,
         condition: condition,
         weatherCode: code,
+        city: city,
       );
       _lastFetch = DateTime.now();
 
