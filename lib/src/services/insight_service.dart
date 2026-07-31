@@ -77,7 +77,7 @@ class InsightService {
       final lastSleep = todaySleepLogs.last;
       final yesterdaySleepLogs = profile.sleepLogs.where((log) => _isSameDay(log.date, now.subtract(const Duration(days: 2))) || _isSameDay(log.date, now.subtract(const Duration(days: 1)))).toList();
       yesterdaySleepLogs.sort((a, b) => a.date.compareTo(b.date));
-      final prevSleep = yesterdaySleepLogs.isNotEmpty && yesterdaySleepLogs.last.id != lastSleep.id ? yesterdaySleepLogs.last : null;
+      final prevSleep = yesterdaySleepLogs.isNotEmpty && yesterdaySleepLogs.last.date != lastSleep.date ? yesterdaySleepLogs.last : null;
 
       if (prevSleep != null && lastSleep.hours >= 7 && prevSleep.hours < 6) {
         insights.add(DailyInsight(
