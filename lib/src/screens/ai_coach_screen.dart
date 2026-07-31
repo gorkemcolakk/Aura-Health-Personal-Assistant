@@ -88,7 +88,6 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                 ],
               ),
             ),
-            // Messages
             Expanded(
               child: ListView.builder(
                 controller: _scrollController,
@@ -98,7 +97,31 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                   if (index >= controller.messages.length) {
                     return const _ThinkingBubble();
                   }
-                  return _ChatBubble(message: controller.messages[index]);
+                  
+                  final message = controller.messages[index];
+                  bool showDate = false;
+                  if (index == 0) {
+                    showDate = true;
+                  } else {
+                    final prev = controller.messages[index - 1];
+                    if (message.createdAt.year != prev.createdAt.year ||
+                        message.createdAt.month != prev.createdAt.month ||
+                        message.createdAt.day != prev.createdAt.day) {
+                      showDate = true;
+                    }
+                  }
+
+                  final bubble = _ChatBubble(message: message);
+                  
+                  if (showDate) {
+                    return Column(
+                      children: [
+                        _DateHeader(date: message.createdAt),
+                        bubble,
+                      ],
+                    );
+                  }
+                  return bubble;
                 },
               ),
             ),
@@ -410,12 +433,14 @@ class _ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.role == ChatRole.user;
+    final timeString = '${message.createdAt.hour.toString().padLeft(2, '0')}:${message.createdAt.minute.toString().padLeft(2, '0')}';
+    
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         constraints: const BoxConstraints(maxWidth: 330),
         margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
         decoration: BoxDecoration(
           color: isUser ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20).copyWith(
@@ -423,11 +448,63 @@ class _ChatBubble extends StatelessWidget {
             bottomLeft: isUser ? null : const Radius.circular(6),
           ),
         ),
-        child: Text(
-          message.text,
-          style: TextStyle(
-            color: isUser ? Colors.white : Theme.of(context).colorScheme.onSurface,
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              message.text,
+              style: TextStyle(
+                color: isUser ? Colors.white : Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Text(
+                timeString,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: isUser ? Colors.white70 : Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DateHeader extends StatelessWidget {
+  const _DateHeader({required this.date});
+  final DateTime date;
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    String text;
+    if (date.year == now.year && date.month == now.month && date.day == now.day) {
+      text = 'Bugün';
+    } else if (date.year == now.year && date.month == now.month && date.day == now.day - 1) {
+      text = 'Dün';
+    } else {
+      final months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+      text = '${date.day} ${months[date.month - 1]}${date.year != now.year ? ' ${date.year}' : ''}';
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
