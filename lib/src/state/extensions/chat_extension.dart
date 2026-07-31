@@ -71,13 +71,14 @@ mixin AuraChatMixin on AuraControllerBase {
 
     final sessionId = _activeSessionId ?? DateTime.now().millisecondsSinceEpoch.toString();
     final sessionTitle = title ?? _chatTitleFromMessages();
+    final lastMessageTime = messages.isNotEmpty ? messages.last.createdAt : DateTime.now();
 
     final session = ChatSession(
       id: sessionId,
       title: sessionTitle,
       messages: List.from(messages),
       createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
+      updatedAt: lastMessageTime,
     );
 
     await db.saveChatSession(currentUserTc!, session);
@@ -102,12 +103,14 @@ mixin AuraChatMixin on AuraControllerBase {
 
     final existing = chatSessions.where((s) => s.id == sid).firstOrNull;
     final title = existing?.title ?? _chatTitleFromMessages();
+    final lastMessageTime = messages.isNotEmpty ? messages.last.createdAt : (existing?.updatedAt ?? DateTime.now());
+
     final session = ChatSession(
       id: sid,
       title: title,
       messages: List.from(messages),
       createdAt: existing?.createdAt ?? DateTime.now(),
-      updatedAt: DateTime.now(),
+      updatedAt: lastMessageTime,
     );
     await db.saveChatSession(currentUserTc!, session);
     
@@ -127,7 +130,7 @@ mixin AuraChatMixin on AuraControllerBase {
       title: newTitle,
       messages: session.messages,
       createdAt: session.createdAt,
-      updatedAt: DateTime.now(),
+      updatedAt: session.updatedAt,
     );
     await db.saveChatSession(currentUserTc!, updated);
     await loadChatSessions();
