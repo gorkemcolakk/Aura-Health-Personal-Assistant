@@ -439,6 +439,24 @@ class TranslationService {
     'insight_general_msg_perfect': {'tr': 'Su, uyku, nefes, ruh hali... Bugün kendine muhteşem bakıyorsun, tebrikler!', 'en': 'Water, sleep, breath, mood... You are taking amazing care of yourself today, congrats!'},
     'insight_water_title_streak': {'tr': 'Su Serisi: {days} Gün 🔥', 'en': 'Water Streak: {days} Days 🔥'},
     'insight_water_msg_streak': {'tr': 'Tam {days} gündür su hedefini hiç aksatmadın. İnanılmaz bir istikrar!', 'en': 'You hit your water goals for {days} days in a row. Incredible consistency!'},
+    
+    'insight_early_bird_title': {'tr': 'Erkenci Kuş 🌅', 'en': 'Early Bird 🌅'},
+    'insight_early_bird_msg': {'tr': 'Güne çok erken ve enerjik başladın! Harika bir gün seni bekliyor.', 'en': 'You started the day early and full of energy! A great day awaits.'},
+    
+    'insight_night_owl_title': {'tr': 'Gece Kuşu 🦉', 'en': 'Night Owl 🦉'},
+    'insight_night_owl_msg': {'tr': 'Hala ayaktasın! Vücudunun yenilenmesi için dinlenmeye ihtiyacı var.', 'en': 'You are still up! Your body needs rest to recover.'},
+    
+    'insight_recovery_title': {'tr': 'Duygusal Toparlanma 🌱', 'en': 'Emotional Recovery 🌱'},
+    'insight_recovery_msg': {'tr': 'Düne göre çok daha iyi hissediyorsun! Bu pozitif enerjinin tadını çıkar.', 'en': 'You are feeling much better than yesterday! Enjoy this positive energy.'},
+    
+    'insight_sleep_streak_title': {'tr': 'Uyku Serisi: {days} Gün 💤', 'en': 'Sleep Streak: {days} Days 💤'},
+    'insight_sleep_streak_msg': {'tr': 'Tam {days} gündür mükemmel uyuyorsun. Biyolojik saatin harika işliyor!', 'en': 'You have slept perfectly for {days} days. Your biological clock is working great!'},
+    
+    'insight_wind_down_title': {'tr': 'Akşam Rahatlaması 🧘‍♂️', 'en': 'Evening Wind-down 🧘‍♂️'},
+    'insight_wind_down_msg': {'tr': 'Günün yorgunluğunu atmak için 3 dakikalık bir nefes egzersizine ne dersin?', 'en': 'How about a 3-minute breathing exercise to relieve the tiredness of the day?'},
+    
+    'insight_power_duo_title': {'tr': 'Muhteşem İkili 🔋', 'en': 'The Power Duo 🔋'},
+    'insight_power_duo_msg': {'tr': 'Hem uykunu tam aldın hem de suyunu içtin. Bugün metabolizman zirvede!', 'en': 'You got enough sleep and drank your water. Your metabolism is at its peak today!'},
 
     'insight_general_title': {'tr': 'Günün Sözü', 'en': 'Quote of the Day'},
     'insight_general_msg': {'tr': 'Sağlığın en büyük zenginliğindir. Bugün kendine iyi bakmayı unutma! ✨', 'en': 'Health is your greatest wealth. Don\'t forget to take care of yourself today! ✨'},

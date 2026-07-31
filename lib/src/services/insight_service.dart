@@ -33,7 +33,86 @@ class InsightService {
         icon: Icons.auto_awesome,
         color: Colors.amber,
       ));
+    } else if (todayWater >= targetWater && goodSleep) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_power_duo_title', langCode),
+        message: TranslationService.get('insight_power_duo_msg', langCode),
+        type: InsightType.general,
+        icon: Icons.battery_charging_full,
+        color: Colors.greenAccent,
+      ));
     }
+
+    final yesterdayMoods = profile.moodLogs.where((l) => _isSameDay(l.timestamp, now.subtract(const Duration(days: 1)))).toList();
+    if (yesterdayMoods.isNotEmpty && todayMoods.isNotEmpty) {
+      if (yesterdayMoods.last.moodLevel <= 2 && todayMoods.last.moodLevel >= 4) {
+        insights.add(DailyInsight(
+          title: TranslationService.get('insight_recovery_title', langCode),
+          message: TranslationService.get('insight_recovery_msg', langCode),
+          type: InsightType.general,
+          icon: Icons.spa,
+          color: Colors.green,
+        ));
+      }
+    }
+
+    final isEarlyMorning = now.hour >= 5 && now.hour < 9;
+    final isNightOwl = now.hour >= 0 && now.hour < 4;
+    
+    if (isEarlyMorning && (todayWater > 0 || didBreath)) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_early_bird_title', langCode),
+        message: TranslationService.get('insight_early_bird_msg', langCode),
+        type: InsightType.general,
+        icon: Icons.wb_sunny,
+        color: Colors.orangeAccent,
+      ));
+    } else if (isNightOwl && (todayWater > 0 || didBreath || todayMoods.isNotEmpty)) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_night_owl_title', langCode),
+        message: TranslationService.get('insight_night_owl_msg', langCode),
+        type: InsightType.general,
+        icon: Icons.nights_stay,
+        color: Colors.indigo,
+      ));
+    }
+
+    if (now.hour >= 20 && now.hour <= 23 && !didBreath) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_wind_down_title', langCode),
+        message: TranslationService.get('insight_wind_down_msg', langCode),
+        type: InsightType.mindfulness,
+        icon: Icons.self_improvement,
+        color: Colors.deepPurple,
+      ));
+    }
+
+    // Dinamik Uyku Serisi (Streak)
+    int sleepStreak = 0;
+    if (goodSleep) {
+      sleepStreak = 1;
+      DateTime sDate = now.subtract(const Duration(days: 1));
+      while (true) {
+        final logs = profile.sleepLogs.where((l) => _isSameDay(l.date, sDate)).toList();
+        if (logs.isNotEmpty && logs.last.hours >= 7) {
+          sleepStreak++;
+          sDate = sDate.subtract(const Duration(days: 1));
+        } else {
+          break;
+        }
+      }
+    }
+
+    if (sleepStreak >= 2) {
+      insights.add(DailyInsight(
+        title: TranslationService.get('insight_sleep_streak_title', langCode).replaceAll('{days}', sleepStreak.toString()),
+        message: TranslationService.get('insight_sleep_streak_msg', langCode).replaceAll('{days}', sleepStreak.toString()),
+        type: InsightType.sleep,
+        icon: Icons.hotel_class,
+        color: Colors.deepPurpleAccent,
+      ));
+    }
+
 
     final yesterdayWater = profile.waterLogs
         .where((log) => _isSameDay(log.timestamp, now.subtract(const Duration(days: 1))))
@@ -302,8 +381,8 @@ class InsightService {
       );
     }
 
-    // Sort or shuffle, or just return top 3
-    return insights.take(3).toList();
+    // Sort or shuffle, or return all satisfied insights
+    return insights;
   }
 
   static bool _isSameDay(DateTime a, DateTime b) {
