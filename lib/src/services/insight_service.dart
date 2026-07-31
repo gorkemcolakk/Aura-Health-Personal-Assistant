@@ -65,6 +65,7 @@ class InsightService {
     // 2. Sleep Insight
     final todaySleepLogs = profile.sleepLogs.where((log) => _isSameDay(log.date, now) || _isSameDay(log.date, now.subtract(const Duration(days: 1)))).toList();
     if (todaySleepLogs.isNotEmpty) {
+      todaySleepLogs.sort((a, b) => a.date.compareTo(b.date));
       final lastSleep = todaySleepLogs.last;
       if (lastSleep.hours >= 8) {
         insights.add(DailyInsight(
