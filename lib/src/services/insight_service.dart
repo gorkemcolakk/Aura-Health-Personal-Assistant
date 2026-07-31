@@ -57,7 +57,7 @@ class InsightService {
       }
     }
 
-    if (waterStreak >= 3) {
+    if (waterStreak >= 2) {
       insights.add(DailyInsight(
         title: TranslationService.get('insight_water_title_streak', langCode).replaceAll('{days}', waterStreak.toString()),
         message: TranslationService.get('insight_water_msg_streak', langCode).replaceAll('{days}', waterStreak.toString()),
