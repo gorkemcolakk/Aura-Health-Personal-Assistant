@@ -490,7 +490,7 @@ class _DateHeader extends StatelessWidget {
       text = 'Dün';
     } else {
       final months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
-      text = '${date.day} ${months[date.month - 1]}${date.year != now.year ? ' ${date.year}' : ''}';
+      text = '${date.day} ${months[date.month - 1]} ${date.year}';
     }
 
     return Container(
