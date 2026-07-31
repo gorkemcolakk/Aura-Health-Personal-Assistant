@@ -26,17 +26,26 @@ class WeatherService {
     }
 
     try {
-      // 1. Get location via IP (no permissions required, HTTPS)
-      final ipResponse = await http.get(Uri.parse('https://get.geojs.io/v1/ip/geo.json'));
-      if (ipResponse.statusCode != 200) return null;
+      double lat = 41.0082; // Varsayılan: İstanbul
+      double lon = 28.9784; // Varsayılan: İstanbul
       
-      final ipData = jsonDecode(ipResponse.body);
-      final double lat = double.parse(ipData['latitude'].toString());
-      final double lon = double.parse(ipData['longitude'].toString());
+      try {
+        // 1. Get location via IP (no permissions required, HTTPS)
+        final ipResponse = await http.get(Uri.parse('https://get.geojs.io/v1/ip/geo.json')).timeout(const Duration(seconds: 3));
+        if (ipResponse.statusCode == 200) {
+          final ipData = jsonDecode(ipResponse.body);
+          if (ipData['latitude'] != null && ipData['longitude'] != null) {
+            lat = double.parse(ipData['latitude'].toString());
+            lon = double.parse(ipData['longitude'].toString());
+          }
+        }
+      } catch (e) {
+        print("IP location fetch failed, using default: $e");
+      }
 
       // 2. Get weather via Open-Meteo
       final weatherUrl = 'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current_weather=true';
-      final weatherResponse = await http.get(Uri.parse(weatherUrl));
+      final weatherResponse = await http.get(Uri.parse(weatherUrl)).timeout(const Duration(seconds: 5));
       if (weatherResponse.statusCode != 200) return null;
 
       final weatherData = jsonDecode(weatherResponse.body);
