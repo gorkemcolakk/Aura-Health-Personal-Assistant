@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../models/insight.dart';
+import '../state/aura_scope.dart';
 import '../services/insight_service.dart';
 import '../state/aura_controller.dart';
 import '../services/translation_service.dart';
@@ -26,7 +26,7 @@ class _DailyInsightCarouselState extends State<DailyInsightCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<AuraController>();
+    final controller = AuraScope.of(context);
     final insights = InsightService.generateInsights(controller, controller.languageCode);
 
     if (insights.isEmpty) return const SizedBox.shrink();

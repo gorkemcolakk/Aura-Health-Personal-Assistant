@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/insight.dart';
 import '../state/aura_controller.dart';
+import 'health_calculator.dart';
 import 'translation_service.dart';
 
 class InsightService {
@@ -12,14 +13,14 @@ class InsightService {
     // 1. Water Insight
     if (profile.waterLogs.isNotEmpty) {
       final todayWater = profile.waterLogs
-          .where((log) => _isSameDay(log.date, now))
+          .where((log) => _isSameDay(log.timestamp, now))
           .fold(0, (sum, log) => sum + log.amountMl);
       
       final yesterdayWater = profile.waterLogs
-          .where((log) => _isSameDay(log.date, now.subtract(const Duration(days: 1))))
+          .where((log) => _isSameDay(log.timestamp, now.subtract(const Duration(days: 1))))
           .fold(0, (sum, log) => sum + log.amountMl);
 
-      if (todayWater >= profile.dailyWaterGoalMl) {
+      if (todayWater >= HealthCalculator.dailyWaterTargetMl(profile)) {
         insights.add(
           DailyInsight(
             title: TranslationService.get('insight_water_title_goal', langCode),
@@ -56,7 +57,7 @@ class InsightService {
     if (profile.sleepLogs.isNotEmpty) {
       final lastSleep = profile.sleepLogs.last;
       if (_isSameDay(lastSleep.date, now) || _isSameDay(lastSleep.date, now.subtract(const Duration(days: 1)))) {
-        if (lastSleep.durationHours >= 7.5) {
+        if (lastSleep.hours >= 7.5) {
           insights.add(
             DailyInsight(
               title: TranslationService.get('insight_sleep_title_good', langCode),
@@ -66,7 +67,7 @@ class InsightService {
               color: Colors.indigo,
             )
           );
-        } else if (lastSleep.durationHours < 6) {
+        } else if (lastSleep.hours < 6) {
           insights.add(
             DailyInsight(
               title: TranslationService.get('insight_sleep_title_bad', langCode),
@@ -81,7 +82,7 @@ class InsightService {
     }
 
     // 3. Mindfulness Insight
-    final todayBreath = profile.breathLogs.where((log) => _isSameDay(log.date, now)).isNotEmpty;
+    final todayBreath = profile.breathLogs.where((log) => _isSameDay(log.timestamp, now)).isNotEmpty;
     if (!todayBreath && now.hour > 10) {
       insights.add(
         DailyInsight(
