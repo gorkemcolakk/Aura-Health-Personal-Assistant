@@ -40,18 +40,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextPage() {
-    if (_currentPage == 0) {
-      if (_birthDateController.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AuraScope.of(context, listen: false).languageCode == 'tr' ? 'Lütfen doğum tarihinizi seçin.' : 'Please select your birth date.')));
-        return;
-      }
-    } else if (_currentPage == 1) {
-      if (_heightController.text.isEmpty || _weightController.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AuraScope.of(context, listen: false).languageCode == 'tr' ? 'Lütfen boy ve kilo bilgilerinizi girin.' : 'Please enter your height and weight.')));
-        return;
-      }
-    }
-    
     _pageController.nextPage(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
@@ -87,6 +75,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isTr = controller.languageCode == 'tr';
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          TextButton(
+            onPressed: _finish,
+            child: Text(isTr ? 'Atla' : 'Skip'),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
